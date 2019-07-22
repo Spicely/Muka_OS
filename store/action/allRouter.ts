@@ -1,0 +1,1 @@
+export const SET_ALLROUTER = 'SET_ALLROUTER'

@@ -1,0 +1,40 @@
+{
+  "presets": [
+    "next/babel",
+    "@zeit/next-typescript/babel"
+  ],
+  "plugins": [
+    [
+      "@babel/plugin-proposal-decorators",
+      {
+        "legacy": true
+      }
+    ],
+    [
+      "import",
+      {
+        "libraryName": "components",
+        "camel2DashComponentName": false,
+        "style": true
+      },
+      "components"
+    ],
+    [
+      "import",
+      {
+        "libraryName": "muka",
+        "camel2DashComponentName": false,
+      },
+      "muka"
+    ],
+    [
+      "import",
+      {
+        "libraryName": "antd",
+        "style": true
+      },
+      "antd"
+    ],
+    "lodash"
+  ]
+}
