@@ -30,5 +30,7 @@ export const label_view: string;
 export const label_view_list: string;
 export const label_list: string;
 export const label_list_btn: string;
+export const label_list_view: string;
+export const label_list_view_bot: string;
 export const label_list_int: string;
 export const label_list_icon: string;

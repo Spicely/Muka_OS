@@ -205,7 +205,7 @@ export default class LForm extends Component<ILFormProps, IState> {
                         vals[field] = _porps.initColor || ''
                         // tslint:disable-next-line: align
                     } break
-                    
+
                     case 'LUpload': {
                         vals[field] = _porps.fileList || (_porps.maxLength > 1 ? [] : '')
                         // tslint:disable-next-line: align
@@ -230,6 +230,7 @@ export default class LForm extends Component<ILFormProps, IState> {
                     ...newChild[index].props,
                     ...newProps
                 }
+                newChild[index].additional = item.additional
             }
         })
         this.setState({
@@ -431,7 +432,7 @@ export default class LForm extends Component<ILFormProps, IState> {
                 const _porps: any = props
                 const onChange: any = _porps.onChange
                 return (
-                    <div className={getClassName(`${prefixClass}__list flex_justify `, className)} key={field}>
+                    <div className={getClassName(`${prefixClass}__list flex_justify`, className)} key={field}>
                         <div className="flex">
                             {label && <div className={getClassName(`${prefixClass}__list_label`)}>{label}</div>}
                             <div className="flex_1">
@@ -442,6 +443,7 @@ export default class LForm extends Component<ILFormProps, IState> {
                                 />
                             </div>
                         </div>
+                        {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
                     </div>
                 )
             }

@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component, Fragment, CSSProperties } from 'react'
 import { createPortal } from 'react-dom'
 import { isFunction } from 'muka'
 import { getClassName, prefix } from '../utils'
@@ -10,6 +10,7 @@ export interface IDialogProps {
     className?: string
     title?: string | JSX.Element
     visible?: boolean
+    style?: CSSProperties
     animateInClass?: string
     animateOutClass?: string
     footer?: JSX.Element
@@ -97,12 +98,12 @@ export default class Dialog extends Component<IDialogProps, IState> {
     }
 
     public render(): JSX.Element {
-        const { className, title, children, footer, animateInClass, animateOutClass } = this.props
+        const { className, title, children, footer, animateInClass, animateOutClass, style } = this.props
         const { visible, animate } = this.state
         if (this.node) {
             return createPortal(
                 <div className={getClassName(`${prefixClass} flex_center ${animate ? 'fadeIn' : 'fadeOut'}`)} style={{ display: visible ? '' : 'none' }}>
-                    <div className={getClassName(`${prefixClass}_content flex_column ${animate ? animateInClass : animateOutClass}`, className)} ref={(e) => this.animateNode = e}>
+                    <div className={getClassName(`${prefixClass}_content flex_column ${animate ? animateInClass : animateOutClass}`, className)} ref={(e) => this.animateNode = e} style={style}>
                         <NavBar
                             left={
                                 <div className="navbar_label">{title}</div>

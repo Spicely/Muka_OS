@@ -7,7 +7,7 @@ import PageLayout from 'layouts/PageLayout'
 import http, { IinitProps, IRresItems, IRresItem } from 'utils/axios'
 import { SET_ROUTER, IRouter } from 'store/action/router'
 import { SET_ICONS } from 'store/action/icons'
-import { Label, LabelHeader, NavBar, Dialog, ILFormFun, ILFormItem, LForm, Table, ITableColumns, IValue, LSelect } from 'components'
+import { Label, LabelHeader, NavBar, Dialog, ILFormFun, ILFormItem, LForm, Table } from 'components'
 import { mapDispatchToProps, IDispatchProps } from 'store/action/icons'
 import { mapStateToProps, SET_USERLIST, IUser, IJurisdiction as Jurisd } from 'store/action/userList'
 import { router_circle } from '../settings/router/index.less'
@@ -15,7 +15,6 @@ import { SET_JURISD, IJurisdiction } from 'store/action/jurisdiction'
 import { SET_USERINFO, IUserInfo } from 'store/action/userInfo'
 
 const confirm = Modal.confirm
-const LSelectOption = LSelect.Option
 interface IState {
     visible: boolean
 }
@@ -136,12 +135,6 @@ class UserList extends Component<IProps, IState> {
                 placeholder: '请选择权限',
                 optionFilterProp: 'children',
                 filterOption: (input, option: any) => option.props.children.props.children[1].toLowerCase().indexOf(input.toLowerCase()) >= 0,
-                children: jurisdiction.map((item: IJurisdiction) => {
-                    return (
-                        <LSelectOption value={item.id} key={item.name}>
-                            {item.name}
-                        </LSelectOption>)
-                })
             },
             field: 'jurisdiction'
         }]

@@ -1,8 +1,6 @@
 import React, { Component, CSSProperties } from 'react'
-import Router from 'next/router'
-import { omit, isArray, isFunction } from 'muka'
-import Icon, { iconType } from '../Icon'
-import Image from '../Image'
+import { omit } from 'muka'
+import { iconType } from '../Icon'
 import Input, { IInputProps } from '../Input'
 import NavBar from '../NavBar'
 import { getClassName } from '../utils'
@@ -44,22 +42,8 @@ export default class SearchBar extends Component<ISearchBarProps, any> {
 
     public render(): JSX.Element {
         const { className, divider, left, right, fixed, onRightClick, style } = this.props
-        let rightValue: any
-        if (isArray(right)) {
-            rightValue = right.map((item: ISearchBarRightIcon | ISearchBarRightImage, index: number) => {
-                if (item.type === 'icon') {
-                    return (
-                        <Icon icon={item.url} color={item.color} onClick={this.handleClick.bind(this, item.link, item.onClick)} key={index} />
-                    )
-                } else if (item.type === "image") {
-                    return (
-                        <Image src={item.url} onClick={this.handleClick.bind(this, item.link, item.onClick)} key={index} />
-                    )
-                }
-            })
-        } else {
-            rightValue = right
-        }
+
+
         return (
             <NavBar
                 className={getClassName(`${prefixClass}`, className)}
@@ -67,7 +51,7 @@ export default class SearchBar extends Component<ISearchBarProps, any> {
                 style={style}
                 divider={divider}
                 title={this.getSearchNode()}
-                right={rightValue}
+                right={right}
                 fixed={fixed}
                 onRightClick={onRightClick}
             />
@@ -81,15 +65,5 @@ export default class SearchBar extends Component<ISearchBarProps, any> {
                 <Input className={getClassName(`${prefixClass}_search__int`)} {...otherProps} />
             </div>
         )
-    }
-
-    private handleClick = (link?: string, onClick?: () => boolean) => {
-        let status = true
-        if (isFunction(onClick)) {
-            status = onClick()
-        }
-        if (status && link) {
-            Router.push(link)
-        }
     }
 }

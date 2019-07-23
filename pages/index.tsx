@@ -2,14 +2,13 @@ import { Component, Fragment } from 'react'
 import { setCookie } from 'nookies'
 import PageHead from 'layouts/PageHead'
 import PageLayout from 'layouts/PageLayout'
-import { NavBar, Label, Table, ITableColumns, IValue, Dialog, LForm, ILFormItem, ILFormFun, Icon, Image, LSelect, LabelHeader } from 'components'
+import { NavBar, Label, Table, Dialog, LForm, ILFormItem, ILFormFun, Icon, Image, LabelHeader } from 'components'
 import http, { imgUrl, baseUrl, IRresItems, IRresItem, IinitProps } from 'utils/axios'
 import { connect } from 'react-redux'
 import { IRouter, SET_ROUTER } from 'store/action/router'
 import { SET_ICONS, mapStateToProps, mapDispatchToProps, IIcons, IDispatchProps } from 'store/action/icons'
 import { nav_bar, nav_bar_label } from 'layouts/PageLayout/index.less'
 
-const LSelectOption = LSelect.Option
 
 interface IProps extends IDispatchProps {
     icons: IIcons[]
@@ -76,17 +75,6 @@ class SettingsRouter extends Component<IProps, IState> {
                 placeholder: '请选择图标',
                 optionFilterProp: 'children',
                 filterOption: (input, option: any) => option.props.children.props.children[1].toLowerCase().indexOf(input.toLowerCase()) >= 0,
-                children: icons.map((item: IValue) => {
-                    return (
-                        <LSelectOption value={item.id} key={item.name}>
-                            <div className="flex" style={{ height: '1.5rem', lineHeight: '1.5rem' }}>
-                                <div className="flex_justify">
-                                    <Icon icon={item.name} style={{ marginRight: ' 0.5rem' }} />
-                                </div>
-                                {item.name}
-                            </div>
-                        </LSelectOption>)
-                })
             },
             field: 'icon'
         }, {
@@ -97,24 +85,6 @@ class SettingsRouter extends Component<IProps, IState> {
                 placeholder: '选择父级路由(可选)',
                 optionFilterProp: 'children',
                 filterOption: (input, option: any) => option.props.children.props.children[1].toLowerCase().indexOf(input.toLowerCase()) >= 0,
-                children: router.map((item: IRouter) => {
-                    const name: any = item.icon ? item.icon.name : ''
-                    return (
-                        <LSelectOption value={item.id} key={item.id}>
-                            <div className="flex" style={{ height: '1.5rem', lineHeight: '1.5rem' }}>
-                                <div className="flex_justify">
-                                    {
-                                        item.icon ?
-                                            item.icon.type == 'icon' ?
-                                                <Icon icon={name} style={{ marginRight: ' 0.5rem' }} /> :
-                                                <Image src={baseUrl + name} />
-                                            : <Fragment />
-                                    }
-                                </div>
-                                {item.label}
-                            </div>
-                        </LSelectOption>)
-                })
             },
             field: 'parentId'
         }]

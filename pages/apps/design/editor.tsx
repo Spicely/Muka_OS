@@ -1,13 +1,13 @@
 import { Component, ChangeEvent } from 'react'
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd'
 import { Modal } from 'antd'
-import { cloneDeep } from 'lodash'
+import { assign, cloneDeep } from 'lodash'
 import { bindActionCreators } from 'redux'
 import PageHead from 'layouts/PageHead'
 import PageLayout from 'layouts/PageLayout'
-import { omit } from 'muka'
+import { omit, isArray, isString } from 'muka'
 import { IInitState } from 'store/state'
-import { Alert, Carousel, Drag, Icon, LabelHeader, Label, NavBar, TabBar, ILFormItem, LForm, ILFormFun, Input, Button, Radio, SearchBar } from 'components'
+import { Alert, Carousel, Dialog, Drag, Icon, LabelHeader, Label, NavBar, TabBar, ILFormItem, LForm, ILFormFun, Input, Button, Radio, SearchBar } from 'components'
 import { IValue } from 'components/lib/utils'
 import http, { IinitProps, IRresItems } from 'utils/axios'
 import { connect } from 'react-redux'
@@ -16,6 +16,7 @@ import componentViewData from '../../../data/componentData'
 import EditComponent from '../editComponent'
 import { nav_bar } from 'layouts/PageLayout/index.less'
 import { app_view, tpl_phone, m_tit, cri, lon, m_scroll_view, com, com_actions, com_bar, com_label, form_style, label_list, label_list_btn, label_list_int, label_view, label_view_list, label_list_icon } from '../index.less'
+import { component_label, component_list } from './index.less'
 
 const { confirm } = Modal
 
@@ -47,6 +48,7 @@ interface IState {
     componentName: string
     selected: number
     type: typeList
+    searchSelect: boolean
 }
 
 const reorder = (list: IComponents[], startIndex: number, endIndex: number) => {
@@ -72,7 +74,8 @@ class AppsDesign extends Component<IProps, IState> {
         components: [],
         componentName: '',
         selected: 0,
-        type: 'LForm'
+        type: 'LForm',
+        searchSelect: false
     }
 
     private index: number = 0
@@ -83,6 +86,7 @@ class AppsDesign extends Component<IProps, IState> {
 
     public render(): JSX.Element {
         const { componentData } = this.props
+        const { searchSelect } = this.state
         return (
             <PageHead title="小程序-页面设计">
                 <PageLayout
@@ -144,8 +148,13 @@ class AppsDesign extends Component<IProps, IState> {
                                 </Drag.Box>
                             </div>
                         </div>
-                        <Radio >111</Radio>
                     </div>
+                    <Dialog visible={searchSelect} title="字体/图片" style={{ width: 1088, height: 756 }} onClose={this.handleCloseDialog.bind(this, 'searchSelect')}>
+                        <TabBar tabBarClassName="mk_divider">
+                            <TabBar.Item label="字体">111</TabBar.Item>
+                            <TabBar.Item label="服务器图片">111</TabBar.Item>
+                        </TabBar>
+                    </Dialog>
                 </PageLayout>
             </PageHead>
         )
@@ -170,6 +179,7 @@ class AppsDesign extends Component<IProps, IState> {
 
     private handleFormChange = () => {
         const { componentData, setComponentData } = this.props
+        const { componentName } = this.state
         const pageProps: any = [...componentData.pagePorps]
         const data: any = {}
         if (this.exFun) {
@@ -188,12 +198,21 @@ class AppsDesign extends Component<IProps, IState> {
                 } else {
                     data[i] = val[i]
                 }
+                if (componentName === 'SearchBar' && key[0] === 'extendRadio') {
+                    if (val[i] === 'label' && !isString(val['right'])) {
+                        data['right'] = '搜索'
+                    } else if (val[i] === 'actions' && !isArray(val['right'])) {
+                        data['right'] = [{
+                            type: 'icon',
+                            url: 'msg',
+                            color: '#fff'
+                        }]
+                    }
+                }
             })
+            delete data['extendRadio']
         }
-        pageProps[this.index].props = {
-            ...pageProps[this.index].props,
-            ...data
-        }
+        pageProps[this.index].props = assign(pageProps[this.index].props, data)
         componentData.pagePorps = pageProps
         setComponentData({ ...componentData })
     }
@@ -204,6 +223,19 @@ class AppsDesign extends Component<IProps, IState> {
             case 'width': return Number(val)
             default: return val
         }
+    }
+
+    private handleCloseDialog(field: any) {
+        this.setState({
+            [field]: false
+        })
+    }
+
+    private handleFormIntChange(field: string, e: any) {
+        const { componentData, setComponentData } = this.props
+        const pageProps: any = [...componentData.pagePorps]
+        pageProps[this.index].props[field] = e.target.value
+        setComponentData({ ...componentData })
     }
 
     private getComponentsView(data: IComponents, index: number) {
@@ -337,7 +369,6 @@ class AppsDesign extends Component<IProps, IState> {
                     {
                         componentName !== 'Page' && <LForm getItems={this.getItem} className={form_style} />
                     }
-
                     {/*{this.componentType === 'TabBar' ?
                         (
                             <DragDropContext onDragEnd={this.onDragTabBar}>
@@ -431,6 +462,12 @@ class AppsDesign extends Component<IProps, IState> {
             },
             field: 'pageColor'
         }]
+    }
+
+    private handleSelectView = () => {
+        this.setState({
+            searchSelect: true
+        })
     }
 
     private getPageNode() {

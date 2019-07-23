@@ -1,7 +1,24 @@
 import React, { Component, CSSProperties } from 'react'
-import { isNumber, isNull } from 'muka'
+import Router from 'next/router'
+import { isArray, isNumber, isNull, isFunction } from 'muka'
 import { getClassName, prefix } from '../utils'
-import Icon from '../Icon'
+import Icon, { iconType } from '../Icon'
+import Image from '../Image'
+
+interface ISearchBarRightIcon {
+    type: 'icon'
+    url: iconType
+    link?: string
+    color?: string
+    onClick?: () => boolean
+}
+
+interface ISearchBarRightImage {
+    type: 'image'
+    url: string
+    link?: string
+    onClick?: () => boolean
+}
 
 export interface INavBarProps {
     className?: string
@@ -12,7 +29,7 @@ export interface INavBarProps {
     style?: CSSProperties
     left?: string | JSX.Element | null
     title?: string | JSX.Element
-    right?: string | JSX.Element | null
+    right?: string | JSX.Element | null | (ISearchBarRightIcon | ISearchBarRightImage)[]
     fixed?: boolean
     endVal?: number
     divider?: boolean
@@ -29,6 +46,22 @@ export default class NavBar extends Component<INavBarProps, any> {
 
     public render(): JSX.Element {
         const { className, left, divider, title, right, fixed, goBack, leftClassName, titleCenter, titleClassName, rightClassName, style, onRightClick } = this.props
+        let rightValue: any
+        if (isArray(right)) {
+            rightValue = right.map((item: ISearchBarRightIcon | ISearchBarRightImage, index: number) => {
+                if (item.type === 'icon') {
+                    return (
+                        <Icon icon={item.url} color={item.color} onClick={this.handleClick.bind(this, item.link, item.onClick)} key={index} />
+                    )
+                } else if (item.type === "image") {
+                    return (
+                        <Image src={item.url} onClick={this.handleClick.bind(this, item.link, item.onClick)} key={index} />
+                    )
+                }
+            })
+        } else {
+            rightValue = right
+        }
         return (
             <div
                 className={`${getClassName(`nav_bar ${divider ? prefix + 'divider' : ''} flex_justify${fixed ? ' fixed' : ''}`, className)}`}
@@ -44,8 +77,8 @@ export default class NavBar extends Component<INavBarProps, any> {
                     }
                     <div className={getClassName(`nav_bar_title flex_1 ${titleCenter ? 'flex_center' : 'flex_justify'}`, titleClassName)}> {title}</div>
                     {
-                        !isNull(right) && (
-                            <div className={getClassName('nav_bar_right flex_justify', rightClassName)} onClick={onRightClick}> {right} </div>
+                        !isNull(rightValue) && (
+                            <div className={getClassName('nav_bar_right flex_justify', rightClassName)} onClick={onRightClick}> {rightValue} </div>
                         )
                     }
                 </div>
@@ -65,6 +98,16 @@ export default class NavBar extends Component<INavBarProps, any> {
         const top = (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop
         if (isNumber(endVal)) {
             console.log(top)
+        }
+    }
+
+    private handleClick = (link?: string, onClick?: () => boolean) => {
+        let status = true
+        if (isFunction(onClick)) {
+            status = onClick()
+        }
+        if (status && link) {
+            Router.push(link)
         }
     }
 }

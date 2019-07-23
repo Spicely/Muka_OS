@@ -300,15 +300,13 @@
 }
 
 .label_view {
-    padding-top: 10 * @unit;
-    margin-top: 10 * @unit;
-    border-top: 1 * @unit dashed #eee;
     height: 400px;
 
     &_list {
         border: 1 * @unit solid #eee;
         padding: 10 * @unit;
         margin-bottom: 10 * @unit;
+        position: relative;
     }
 
     .label_list {
@@ -320,12 +318,37 @@
             height: 30 * @unit;
         }
 
+        &_view {
+            width: 68 * @unit;
+            height: 68 * @unit;
+            margin-right: 10 * @unit;
+            background: #d8d8d8;
+            position: relative;
+            cursor: pointer;
+
+            &_bot {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                background: rgba(0, 0, 0, 0.5);
+                color: #fff;
+                text-align: center;
+            }
+        }
+
         &_int {
             height: 30 * @unit;
         }
 
         &_icon {
-            padding-left: 10 * @unit;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transform: translate(50%, -50%);
         }
     }
 }

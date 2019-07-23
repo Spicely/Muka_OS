@@ -8,9 +8,8 @@ import PageHead from 'layouts/PageHead'
 import PageLayout from 'layouts/PageLayout'
 import http, { IinitProps, IRresItems, initServerData, IRresItem, baseUrl } from 'utils/axios'
 import { IRouter } from 'store/action/router'
-import { Label, LabelHeader, ILFormFun, ILFormItem, LForm, NavBar, Dialog, Table, Image, ITableColumns } from 'components'
+import { Label, LabelHeader, ILFormFun, ILFormItem, LForm, NavBar, Dialog, Table, Image } from 'components'
 import { page_navbar } from 'styles/global.less'
-import notVal from 'muka/lib/type/notVal'
 import { SET_SHOPLIST, IShopList, actions } from 'store/action/shop'
 import { shop_logo } from './index.less'
 import Link from 'next/link'
@@ -217,11 +216,11 @@ class ShopList extends Component<IProps, IState> {
     private handleDialogOk = async () => {
         if (this.exFun) {
             const data = this.exFun.getFieldValue()
-            if (notVal(data.startDeliveryMoney) || notVal(data.riderDeliveryMoney) || notVal(data.name) || notVal(data.averageMoney) || !data.address.address) {
-                return notification.error({
-                    message: '参数不完整'
-                })
-            }
+            // if (notVal(data.startDeliveryMoney) || notVal(data.riderDeliveryMoney) || notVal(data.name) || notVal(data.averageMoney) || !data.address.address) {
+            //     return notification.error({
+            //         message: '参数不完整'
+            //     })
+            // }
             const formData = new FormData()
             data.shopLogo.map((i: any) => {
                 formData.append('avatar', i.file)

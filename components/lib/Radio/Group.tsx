@@ -46,7 +46,6 @@ export default class RadioGroup extends Component<IRadioGroupProps, IState> {
             <div className={getClassName(`${prefixClass}`, className)}>
                 {
                     options.map((i, index: number) => {
-                        console.log(value===i.value)
                         return <Radio className={i.className} key={index} type={type} onChange={this.handleRadioChange.bind(this, i.value)} checked={i.value === value}>{i.label}</Radio>
                     })
                 }

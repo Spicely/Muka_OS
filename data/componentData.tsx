@@ -1,7 +1,12 @@
+import * as React from 'react'
+import { isArray } from 'muka'
+import { Button, Icon, Input, } from 'components'
+import { label_box } from './index.less'
+import { label_list_btn, label_list_int, label_view_list, label_list_icon, label_view, label_list_view, label_list_view_bot } from '../pages/apps/index.less'
+
 const componentData = function (self: any) {
     const { componentData } = self.props
     let props = componentData.pagePorps[self.index].props || {}
-    console.log(props.left)
     return {
         'NavBar': [{
             component: 'Input',
@@ -46,7 +51,7 @@ const componentData = function (self: any) {
                 showMaxLength: true
             },
             field: 'placeholder'
-        },{
+        }, {
             component: 'Slider',
             label: '左侧间距：',
             props: {
@@ -95,6 +100,70 @@ const componentData = function (self: any) {
                 value: props.left
             },
             field: 'left'
+        }, {
+            component: 'Radio',
+            label: '右侧显示：',
+            props: {
+                onChange: self.handleFormChange,
+                options: [{
+                    label: '文字', value: 'label',
+                }, {
+                    label: '功能', value: 'actions',
+                }],
+                value: isArray(props.right) ? 'actions' : 'label'
+            },
+            additional: isArray(props.right) ? (
+                <div className={label_view}>
+                    {props.right.map((item: any, index: number) => {
+                        return (
+                            <div
+                                className={`flex ${label_view_list}`}
+                                key={index}
+                            >
+                                <div className={`${label_list_view} flex_center`} onClick={self.handleSelectView}>
+                                    {item.type === 'icon' && <Icon icon={item.url} color={item.color} />}
+                                    <div className={label_list_view_bot}>图片/字体</div>
+                                </div>
+                                <div className="flex_1">
+                                    {/* <div className="flex">
+                                <div className={`flex_justify ${label_list}`}>选项卡文字</div>
+                                <Input
+                                    className={`flex_1 ${label_list_int}`}
+                                    maxLength={5}
+                                    showMaxLength
+                                />
+                            </div> */}
+                                    <div className="flex">
+                                        <Input className={`flex_1 ${label_list_int}`} placeholder="请选择链接地址" disabled closeIconShow={false} style={{ borderRight: 0 }} />
+                                        <Button className={`flex_justify ${label_list_btn}`} mold="primary">选择链接</Button>
+                                    </div>
+                                </div>
+                                <Icon
+                                    className={label_list_icon}
+                                    icon="md-close-circle"
+                                    color="rgba(0, 0, 0, 0.3)"
+                                    style={{ cursor: 'pointer' }}
+                                // onClick={this.handleTabBarDel.bind(this, index)}
+                                />
+                            </div>
+                        )
+                    })}
+                </div>
+            ) : (
+                    <div className={label_view}>
+                        <div className={`flex`}>
+                            <div className={`flex_justify ${label_box}`}>显示文字</div>
+                            <Input
+                                className="flex_1"
+                                value={props.right}
+                                onChange={self.handleFormIntChange.bind(self, 'right')}
+                                showMaxLength={true}
+                                maxLength={4}
+                            />
+                        </div>
+                    </div>
+                ),
+            field: 'extendRadio'
         }],
         'Carousel': [{
             component: 'Slider',
