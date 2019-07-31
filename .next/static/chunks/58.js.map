@@ -1,0 +1,1 @@
+{"version":3,"file":"static/chunks/58.js","sources":["webpack:///./components/lib/Icon/md/remove.ts"],"sourcesContent":["export default {\r\n    path: [\r\n        'M96 235h320v42H96z'\r\n    ],\r\n    viewBox: '0 0 512 512',\r\n    name: 'md-remove'\r\n}\r\n"],"mappings":";;;;;;;;;;AAAA;AAAA;AACA;AAGA;AACA;AALA;;;;A","sourceRoot":""}

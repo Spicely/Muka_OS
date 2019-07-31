@@ -2303,6 +2303,7 @@ function (_Component) {
           left = _this$state.left,
           top = _this$state.top,
           animate = _this$state.animate;
+      console.log(selectIndex, ' 222222222222222');
       var length = react__WEBPACK_IMPORTED_MODULE_11__["Children"].count(value || children);
       var cssStyle = {};
       var dotStyle = {};
@@ -2410,17 +2411,13 @@ function (_Component) {
         }
       }
 
-      if (Object(muka_lib_isNumber__WEBPACK_IMPORTED_MODULE_3__[/* default */ "a"])(selected) && selected !== nextProps.selected) {
+      if (Object(muka_lib_isNumber__WEBPACK_IMPORTED_MODULE_3__[/* default */ "a"])(nextProps.selected) && selected !== nextProps.selected) {
         clearInterval(this.timer);
-        var time = setTimeout(function () {
-          clearTimeout(time);
-
-          _this3.setState({
-            selectIndex: selected
-          });
-
-          _this3.interval(true);
-        }, 900);
+        this.setState({
+          selectIndex: nextProps.selected || 0
+        }, function () {
+          _this3.interval(nextProps.autoplay || false);
+        });
       }
     }
   }, {
@@ -3658,35 +3655,8 @@ var Dialog_style = __webpack_require__("OVmd");
 // EXTERNAL MODULE: ./components/lib/Dialog/index.tsx
 var Dialog = __webpack_require__("XdnO");
 
-// EXTERNAL MODULE: ./components/lib/ScrollView/style/index.ts
-var ScrollView_style = __webpack_require__("Ajw/");
-
-// EXTERNAL MODULE: ./components/lib/ScrollView/index.tsx
-var ScrollView = __webpack_require__("xwo2");
-
-// EXTERNAL MODULE: ./components/lib/Image/style/index.ts
-var Image_style = __webpack_require__("zltQ");
-
-// EXTERNAL MODULE: ./components/lib/Image/index.tsx + 3 modules
-var Image = __webpack_require__("HKQd");
-
 // EXTERNAL MODULE: ./components/lib/Button/style/index.ts
 var Button_style = __webpack_require__("ymE4");
-
-// EXTERNAL MODULE: ./components/lib/Button/index.tsx
-var Button = __webpack_require__("B6vA");
-
-// EXTERNAL MODULE: ./components/lib/TabBar/style/index.ts
-var TabBar_style = __webpack_require__("BSRw");
-
-// EXTERNAL MODULE: ./components/lib/TabBar/index.tsx + 2 modules
-var TabBar = __webpack_require__("9cIs");
-
-// EXTERNAL MODULE: ./components/lib/BoxLine/style/index.ts
-var BoxLine_style = __webpack_require__("YFqO");
-
-// EXTERNAL MODULE: ./components/lib/BoxLine/index.tsx
-var BoxLine = __webpack_require__("/S2g");
 
 // EXTERNAL MODULE: ./components/lib/Pagination/style/index.less
 var Pagination_style = __webpack_require__("sKCx");
@@ -3698,6 +3668,9 @@ var Pagination_style = __webpack_require__("sKCx");
 // EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/array/from.js
 var from = __webpack_require__("d04V");
 var from_default = /*#__PURE__*/__webpack_require__.n(from);
+
+// EXTERNAL MODULE: ./components/lib/Button/index.tsx
+var Button = __webpack_require__("B6vA");
 
 // CONCATENATED MODULE: ./components/lib/Pagination/index.tsx
 
@@ -3765,14 +3738,16 @@ function (_Component) {
       var _this$props2 = this.props,
           className = _this$props2.className,
           current = _this$props2.current,
-          total = _this$props2.total;
+          total = _this$props2.total,
+          disabled = _this$props2.disabled;
       var pageSize = this.state.pageSize;
       var num = Math.ceil(total / pageSize);
       return external_react_default.a.createElement("div", {
         className: Object(utils["a" /* getClassName */])("".concat(Pagination_prefixClass), className)
       }, external_react_default.a.createElement(Button["default"], {
         className: Object(utils["a" /* getClassName */])("".concat(Pagination_prefixClass, "_btn")),
-        disabled: current === 1 ? true : false
+        disabled: current === 1 || disabled ? true : false,
+        onClick: this.handleChange.bind(this, current - 1)
       }, external_react_default.a.createElement(Icon["a" /* default */], {
         icon: "ios-arrow-back",
         fontSize: "18px",
@@ -3783,12 +3758,14 @@ function (_Component) {
             return external_react_default.a.createElement(Button["default"], {
               className: Object(utils["a" /* getClassName */])("".concat(Pagination_prefixClass, "_btn"), current === index + 1 ? utils["b" /* prefix */] + 'select' : ''),
               key: index,
+              disabled: disabled,
               onClick: _this2.handleChange.bind(_this2, index + 1)
             }, index + 1);
           } else if (index + 1 === num) {
             return external_react_default.a.createElement(Button["default"], {
               className: Object(utils["a" /* getClassName */])("".concat(Pagination_prefixClass, "_btn"), current === index + 1 ? utils["b" /* prefix */] + 'select' : ''),
               key: index,
+              disabled: disabled,
               onClick: _this2.handleChange.bind(_this2, index + 1)
             }, index + 1);
           } else if (current === 1) {
@@ -3796,11 +3773,13 @@ function (_Component) {
               return external_react_default.a.createElement(Button["default"], {
                 className: Object(utils["a" /* getClassName */])("".concat(Pagination_prefixClass, "_btn"), current === index + 1 ? utils["b" /* prefix */] + 'select' : ''),
                 key: index,
+                disabled: disabled,
                 onClick: _this2.handleChange.bind(_this2, index + 1)
               }, index + 1);
             } else if (index + 1 === current + 6) {
               return external_react_default.a.createElement(Button["default"], {
                 className: Object(utils["a" /* getClassName */])("".concat(Pagination_prefixClass, "_btn ").concat(utils["b" /* prefix */], "notline"), current === index + 1 ? utils["b" /* prefix */] + 'select' : ''),
+                disabled: disabled,
                 key: index
               }, external_react_default.a.createElement(Icon["a" /* default */], {
                 icon: "ios-more",
@@ -3809,15 +3788,17 @@ function (_Component) {
               }));
             }
           } else if (current === num) {
-            if (index + 1 > num - 5) {
+            if (index + 1 >= num - 4) {
               return external_react_default.a.createElement(Button["default"], {
                 className: Object(utils["a" /* getClassName */])("".concat(Pagination_prefixClass, "_btn"), current === index + 1 ? utils["b" /* prefix */] + 'select' : ''),
                 key: index,
+                disabled: disabled,
                 onClick: _this2.handleChange.bind(_this2, index + 1)
               }, index + 1);
             } else if (index + 1 === current - 6) {
               return external_react_default.a.createElement(Button["default"], {
                 className: Object(utils["a" /* getClassName */])("".concat(Pagination_prefixClass, "_btn ").concat(utils["b" /* prefix */], "notline"), current === index + 1 ? utils["b" /* prefix */] + 'select' : ''),
+                disabled: disabled,
                 key: index
               }, external_react_default.a.createElement(Icon["a" /* default */], {
                 icon: "ios-more",
@@ -3826,17 +3807,42 @@ function (_Component) {
               }));
             }
           } else {
-            if (current === num - 1 && index + 1 === num - 4) {
+            if (current === 2 || current === num - 1) {
+              if (Math.abs(current - (index + 1)) === 4) {
+                return external_react_default.a.createElement(Button["default"], {
+                  className: Object(utils["a" /* getClassName */])("".concat(Pagination_prefixClass, "_btn ").concat(utils["b" /* prefix */], "notline"), current === index + 1 ? utils["b" /* prefix */] + 'select' : ''),
+                  disabled: disabled,
+                  key: index
+                }, external_react_default.a.createElement(Icon["a" /* default */], {
+                  icon: "ios-more",
+                  fontSize: "18px",
+                  color: "rgba(0, 0, 0, 0.65)"
+                }));
+              }
+            }
+
+            if (current <= 3 && index + 1 <= 5) {
               return external_react_default.a.createElement(Button["default"], {
                 className: Object(utils["a" /* getClassName */])("".concat(Pagination_prefixClass, "_btn"), current === index + 1 ? utils["b" /* prefix */] + 'select' : ''),
                 key: index,
+                disabled: disabled,
                 onClick: _this2.handleChange.bind(_this2, index + 1)
               }, index + 1);
             }
 
-            if (Math.abs(current - index) === 4) {
+            if (current >= num - 2 && index + 1 >= num - 4) {
+              return external_react_default.a.createElement(Button["default"], {
+                className: Object(utils["a" /* getClassName */])("".concat(Pagination_prefixClass, "_btn"), current === index + 1 ? utils["b" /* prefix */] + 'select' : ''),
+                key: index,
+                disabled: disabled,
+                onClick: _this2.handleChange.bind(_this2, index + 1)
+              }, index + 1);
+            }
+
+            if (Math.abs(current - (index + 1)) === 3) {
               return external_react_default.a.createElement(Button["default"], {
                 className: Object(utils["a" /* getClassName */])("".concat(Pagination_prefixClass, "_btn ").concat(utils["b" /* prefix */], "notline"), current === index + 1 ? utils["b" /* prefix */] + 'select' : ''),
+                disabled: disabled,
                 key: index
               }, external_react_default.a.createElement(Icon["a" /* default */], {
                 icon: "ios-more",
@@ -3849,22 +3855,7 @@ function (_Component) {
               return external_react_default.a.createElement(Button["default"], {
                 className: Object(utils["a" /* getClassName */])("".concat(Pagination_prefixClass, "_btn"), current === index + 1 ? utils["b" /* prefix */] + 'select' : ''),
                 key: index,
-                onClick: _this2.handleChange.bind(_this2, index + 1)
-              }, index + 1);
-            }
-
-            if (current === index + 1) {
-              return external_react_default.a.createElement(Button["default"], {
-                className: Object(utils["a" /* getClassName */])("".concat(Pagination_prefixClass, "_btn"), current === index + 1 ? utils["b" /* prefix */] + 'select' : ''),
-                key: index,
-                onClick: _this2.handleChange.bind(_this2, index + 1)
-              }, index + 1);
-            }
-
-            if (current === 2 && index + 1 === 5) {
-              return external_react_default.a.createElement(Button["default"], {
-                className: Object(utils["a" /* getClassName */])("".concat(Pagination_prefixClass, "_btn"), current === index + 1 ? utils["b" /* prefix */] + 'select' : ''),
-                key: index,
+                disabled: disabled,
                 onClick: _this2.handleChange.bind(_this2, index + 1)
               }, index + 1);
             }
@@ -3872,16 +3863,19 @@ function (_Component) {
         } else {
           return external_react_default.a.createElement(Button["default"], {
             className: Object(utils["a" /* getClassName */])("".concat(Pagination_prefixClass, "_btn"), current === index + 1 ? utils["b" /* prefix */] + 'select' : ''),
-            key: index
+            key: index,
+            disabled: disabled,
+            onClick: _this2.handleChange.bind(_this2, index + 1)
           }, index + 1);
         }
       }), external_react_default.a.createElement(Button["default"], {
         className: Object(utils["a" /* getClassName */])("".concat(Pagination_prefixClass, "_btn")),
-        disabled: current === num ? true : false
+        disabled: current === num || disabled ? true : false,
+        onClick: this.handleChange.bind(this, current + 1)
       }, external_react_default.a.createElement(Icon["a" /* default */], {
         icon: "ios-arrow-forward",
         fontSize: "18px",
-        color: current === num ? '#d9d9d9' : 'rgba(0, 0, 0, 0.65)'
+        color: current === num || disabled ? '#d9d9d9' : 'rgba(0, 0, 0, 0.65)'
       })));
     }
   }]);
@@ -3895,6 +3889,30 @@ Object(defineProperty["a" /* default */])(Pagination_Pagination, "defaultProps",
   total: 10
 });
 
+
+// EXTERNAL MODULE: ./components/lib/ScrollView/style/index.ts
+var ScrollView_style = __webpack_require__("Ajw/");
+
+// EXTERNAL MODULE: ./components/lib/ScrollView/index.tsx
+var ScrollView = __webpack_require__("xwo2");
+
+// EXTERNAL MODULE: ./components/lib/Image/style/index.ts
+var Image_style = __webpack_require__("zltQ");
+
+// EXTERNAL MODULE: ./components/lib/Image/index.tsx + 3 modules
+var Image = __webpack_require__("HKQd");
+
+// EXTERNAL MODULE: ./components/lib/TabBar/style/index.ts
+var TabBar_style = __webpack_require__("BSRw");
+
+// EXTERNAL MODULE: ./components/lib/TabBar/index.tsx + 2 modules
+var TabBar = __webpack_require__("9cIs");
+
+// EXTERNAL MODULE: ./components/lib/BoxLine/style/index.ts
+var BoxLine_style = __webpack_require__("YFqO");
+
+// EXTERNAL MODULE: ./components/lib/BoxLine/index.tsx
+var BoxLine = __webpack_require__("/S2g");
 
 // EXTERNAL MODULE: ./components/lib/Drag/style/index.less
 var Drag_style = __webpack_require__("nk2/");
@@ -4785,6 +4803,7 @@ function (_Component) {
       components: [],
       icons: [],
       images: [],
+      total: 0,
       componentName: '',
       selected: 0,
       type: 'LForm',
@@ -4802,6 +4821,12 @@ function (_Component) {
     Object(defineProperty["a" /* default */])(Object(assertThisInitialized["a" /* default */])(_this), "exFun", null);
 
     Object(defineProperty["a" /* default */])(Object(assertThisInitialized["a" /* default */])(_this), "loading", false);
+
+    Object(defineProperty["a" /* default */])(Object(assertThisInitialized["a" /* default */])(_this), "handleCurrent", function (val) {
+      _this.setState({
+        pageCurrent: val
+      });
+    });
 
     Object(defineProperty["a" /* default */])(Object(assertThisInitialized["a" /* default */])(_this), "handleTabBarChange",
     /*#__PURE__*/
@@ -4832,7 +4857,8 @@ function (_Component) {
                 _this.loading = false;
 
                 _this.setState({
-                  images: Object(toConsumableArray["a" /* default */])(_data.data)
+                  images: Object(toConsumableArray["a" /* default */])(_data.data.images),
+                  total: _data.data.total
                 });
 
                 _context.next = 15;
@@ -5141,7 +5167,8 @@ function (_Component) {
           icons = _this$state.icons,
           uploadDialog = _this$state.uploadDialog,
           images = _this$state.images,
-          pageCurrent = _this$state.pageCurrent;
+          pageCurrent = _this$state.pageCurrent,
+          total = _this$state.total;
       return external_react_default.a.createElement(PageHead["a" /* default */], {
         title: "\u5C0F\u7A0B\u5E8F-\u9875\u9762\u8BBE\u8BA1"
       }, external_react_default.a.createElement(PageLayout["a" /* default */], {
@@ -5203,16 +5230,7 @@ function (_Component) {
             }, provided.draggableProps, provided.dragHandleProps), _this2.getComponentsView(item, index));
           });
         }), provided.placeholder);
-      })))), external_react_default.a.createElement(Pagination_Pagination, {
-        current: pageCurrent,
-        total: 500,
-        pageSize: 20,
-        onChange: function onChange(val) {
-          _this2.setState({
-            pageCurrent: val
-          });
-        }
-      }))), external_react_default.a.createElement(Dialog["a" /* default */], {
+      })))))), external_react_default.a.createElement(Dialog["a" /* default */], {
         visible: searchSelect,
         title: "\u5B57\u4F53/\u56FE\u7247",
         style: {
@@ -5270,6 +5288,15 @@ function (_Component) {
           src: axios["a" /* baseUrl */] + i.previewUrl,
           className: apps_design["image_item"]
         })));
+      })), external_react_default.a.createElement("div", {
+        className: "flex"
+      }, external_react_default.a.createElement("div", {
+        className: "flex_1"
+      }), external_react_default.a.createElement(Pagination_Pagination, {
+        current: pageCurrent,
+        total: total,
+        pageSize: 20,
+        onChange: this.handleCurrent
       }))))), external_react_default.a.createElement(Dialog["a" /* default */], {
         title: "\u4E0A\u4F20\u56FE\u7247",
         footer: null,

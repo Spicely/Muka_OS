@@ -53,6 +53,7 @@ interface IState {
     searchSelect: boolean
     uploadDialog: boolean
     pageCurrent: number
+    total: number
 }
 
 const reorder = (list: IComponents[], startIndex: number, endIndex: number) => {
@@ -81,6 +82,7 @@ class AppsDesign extends Component<IProps, IState> {
         components: [],
         icons: [],
         images: [],
+        total: 0,
         componentName: '',
         selected: 0,
         type: 'LForm',
@@ -101,7 +103,7 @@ class AppsDesign extends Component<IProps, IState> {
 
     public render(): JSX.Element {
         const { componentData } = this.props
-        const { searchSelect, icons, uploadDialog, images, pageCurrent } = this.state
+        const { searchSelect, icons, uploadDialog, images, pageCurrent, total } = this.state
         return (
             <PageHead title="小程序-页面设计">
                 <PageLayout
@@ -162,7 +164,6 @@ class AppsDesign extends Component<IProps, IState> {
                                     </DragDropContext>
                                 </Drag.Box>
                             </div>
-                            <Pagination current={pageCurrent} total={500} pageSize={20} onChange={(val) => { this.setState({ pageCurrent: val }) }} />
                         </div>
                     </div>
                     <Dialog visible={searchSelect} title="字体/图片" style={{ width: 1088, height: 756 }} onClose={this.handleCloseDialog.bind(this, 'searchSelect')} onFirstShow={this.getDialogData}>
@@ -209,6 +210,10 @@ class AppsDesign extends Component<IProps, IState> {
                                         })
                                     }
                                 </ScrollView>
+                                <div className="flex">
+                                    <div className="flex_1"/>
+                                    <Pagination current={pageCurrent} total={total} pageSize={20} onChange={this.handleCurrent} />
+                                </div>
                             </TabBar.Item>
                         </TabBar>
                     </Dialog>
@@ -227,6 +232,12 @@ class AppsDesign extends Component<IProps, IState> {
         )
     }
 
+    private handleCurrent = (val: number) => {
+        this.setState({
+            pageCurrent: val
+        })
+    }
+
     private handleTabBarChange = async (val: string | number | undefined) => {
         const { images } = this.state
         if (val === 1 && images.length === 0 && !this.loading) {
@@ -235,7 +246,8 @@ class AppsDesign extends Component<IProps, IState> {
                 const data: IRresItems = await http('image/globalFind')
                 this.loading = false
                 this.setState({
-                    images: [...data.data]
+                    images: [...data.data.images],
+                    total: data.data.total
                 })
             } catch (msg) {
                 this.loading = false

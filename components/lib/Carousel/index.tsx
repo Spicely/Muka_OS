@@ -64,6 +64,7 @@ export default class Carousel extends Component<ICarouselProps, IState> {
     public render(): JSX.Element {
         const { className, children, dotPosition, dotClassName, dots, effect, style, autoplay, value, dotType, dotColor } = this.props
         const { selectIndex, left, top, animate } = this.state
+        console.log(selectIndex,' 222222222222222')
         const length = Children.count(value || children)
         const cssStyle: CSSProperties = {}
         const dotStyle: CSSProperties = {}
@@ -172,15 +173,13 @@ export default class Carousel extends Component<ICarouselProps, IState> {
                 this.timer = undefined
             }
         }
-        if (isNumber(selected) && selected !== nextProps.selected) {
+        if (isNumber(nextProps.selected) && selected !== nextProps.selected) {
             clearInterval(this.timer)
-            const time = setTimeout(() => {
-                clearTimeout(time)
-                this.setState({
-                    selectIndex: selected
-                })
-                this.interval(true)
-            }, 900)
+            this.setState({
+                selectIndex: nextProps.selected || 0
+            }, () => {
+               this.interval(nextProps.autoplay || false)
+            })
         }
     }
 

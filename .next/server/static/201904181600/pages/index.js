@@ -232,7 +232,7 @@ function (_Component) {
               });
               return val ? false : true;
             });
-            var length = lists.length - 1;
+            var length = lists.length;
 
             _this.setState({
               lists: [].concat(Object(_babel_runtime_corejs2_helpers_esm_toConsumableArray__WEBPACK_IMPORTED_MODULE_4__[/* default */ "a"])(lists), Object(_babel_runtime_corejs2_helpers_esm_toConsumableArray__WEBPACK_IMPORTED_MODULE_4__[/* default */ "a"])(newData)),
@@ -538,6 +538,7 @@ function (_Component) {
           left = _this$state.left,
           top = _this$state.top,
           animate = _this$state.animate;
+      console.log(selectIndex, ' 222222222222222');
       var length = react__WEBPACK_IMPORTED_MODULE_11__["Children"].count(value || children);
       var cssStyle = {};
       var dotStyle = {};
@@ -645,17 +646,13 @@ function (_Component) {
         }
       }
 
-      if (Object(muka_lib_isNumber__WEBPACK_IMPORTED_MODULE_3__[/* default */ "a"])(selected) && selected !== nextProps.selected) {
+      if (Object(muka_lib_isNumber__WEBPACK_IMPORTED_MODULE_3__[/* default */ "a"])(nextProps.selected) && selected !== nextProps.selected) {
         clearInterval(this.timer);
-        var time = setTimeout(function () {
-          clearTimeout(time);
-
-          _this3.setState({
-            selectIndex: selected
-          });
-
-          _this3.interval(true);
-        }, 900);
+        this.setState({
+          selectIndex: nextProps.selected || 0
+        }, function () {
+          _this3.interval(nextProps.autoplay || false);
+        });
       }
     }
   }, {

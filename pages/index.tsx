@@ -64,7 +64,7 @@ export default class Index extends Component<any, any> {
                         })
                         return val ? false : true
                     })
-                    const length = lists.length - 1
+                    const length = lists.length
                     this.setState({
                         lists: [
                             ...lists,

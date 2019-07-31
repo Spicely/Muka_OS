@@ -48,12 +48,16 @@ export default class Pagination extends Component<IPaginationProps, IState> {
     }
 
     public render(): JSX.Element {
-        const { className, current, total } = this.props
+        const { className, current, total, disabled } = this.props
         const { pageSize } = this.state
         const num = Math.ceil(total / pageSize)
         return (
             <div className={getClassName(`${prefixClass}`, className)}>
-                <Button className={getClassName(`${prefixClass}_btn`)} disabled={current === 1 ? true : false}>
+                <Button
+                    className={getClassName(`${prefixClass}_btn`)}
+                    disabled={(current === 1 || disabled) ? true : false}
+                    onClick={this.handleChange.bind(this, current - 1)}
+                >
                     <Icon icon="ios-arrow-back" fontSize="18px" color={current === 1 ? '#d9d9d9' : 'rgba(0, 0, 0, 0.65)'} />
                 </Button>
                 {
@@ -64,6 +68,7 @@ export default class Pagination extends Component<IPaginationProps, IState> {
                                     <Button
                                         className={getClassName(`${prefixClass}_btn`, current === index + 1 ? prefix + 'select' : '')}
                                         key={index}
+                                        disabled={disabled}
                                         onClick={this.handleChange.bind(this, index + 1)}
                                     >
                                         {index + 1}
@@ -74,6 +79,7 @@ export default class Pagination extends Component<IPaginationProps, IState> {
                                     <Button
                                         className={getClassName(`${prefixClass}_btn`, current === index + 1 ? prefix + 'select' : '')}
                                         key={index}
+                                        disabled={disabled}
                                         onClick={this.handleChange.bind(this, index + 1)}
                                     >
                                         {index + 1}
@@ -85,6 +91,7 @@ export default class Pagination extends Component<IPaginationProps, IState> {
                                         <Button
                                             className={getClassName(`${prefixClass}_btn`, current === index + 1 ? prefix + 'select' : '')}
                                             key={index}
+                                            disabled={disabled}
                                             onClick={this.handleChange.bind(this, index + 1)}
                                         >
                                             {index + 1}
@@ -94,6 +101,7 @@ export default class Pagination extends Component<IPaginationProps, IState> {
                                     return (
                                         <Button
                                             className={getClassName(`${prefixClass}_btn ${prefix}notline`, current === index + 1 ? prefix + 'select' : '')}
+                                            disabled={disabled}
                                             key={index}
                                         >
                                             <Icon icon="ios-more" fontSize="18px" color="rgba(0, 0, 0, 0.65)" />
@@ -101,11 +109,12 @@ export default class Pagination extends Component<IPaginationProps, IState> {
                                     )
                                 }
                             } else if (current === num) {
-                                if (index + 1 > num - 5) {
+                                if (index + 1 >= num - 4) {
                                     return (
                                         <Button
                                             className={getClassName(`${prefixClass}_btn`, current === index + 1 ? prefix + 'select' : '')}
                                             key={index}
+                                            disabled={disabled}
                                             onClick={this.handleChange.bind(this, index + 1)}
                                         >
                                             {index + 1}
@@ -115,6 +124,7 @@ export default class Pagination extends Component<IPaginationProps, IState> {
                                     return (
                                         <Button
                                             className={getClassName(`${prefixClass}_btn ${prefix}notline`, current === index + 1 ? prefix + 'select' : '')}
+                                            disabled={disabled}
                                             key={index}
                                         >
                                             <Icon icon="ios-more" fontSize="18px" color="rgba(0, 0, 0, 0.65)" />
@@ -122,21 +132,48 @@ export default class Pagination extends Component<IPaginationProps, IState> {
                                     )
                                 }
                             } else {
-                                if (current === num - 1 && index + 1 === num - 4) {
+                                if (current === 2 || current === num - 1) {
+                                    if (Math.abs(current - (index + 1)) === 4) {
+                                        return (
+                                            <Button
+                                                className={getClassName(`${prefixClass}_btn ${prefix}notline`, current === index + 1 ? prefix + 'select' : '')}
+                                                disabled={disabled}
+                                                key={index}
+                                            >
+                                                <Icon icon="ios-more" fontSize="18px" color="rgba(0, 0, 0, 0.65)" />
+                                            </Button>
+                                        )
+                                    }
+                                }
+                                if (current <= 3 && index + 1 <= 5) {
                                     return (
                                         <Button
                                             className={getClassName(`${prefixClass}_btn`, current === index + 1 ? prefix + 'select' : '')}
                                             key={index}
+                                            disabled={disabled}
                                             onClick={this.handleChange.bind(this, index + 1)}
                                         >
                                             {index + 1}
                                         </Button>
                                     )
                                 }
-                                if (Math.abs(current - index) === 4) {
+                                if (current >= num - 2 && index + 1 >= num - 4) {
+                                    return (
+                                        <Button
+                                            className={getClassName(`${prefixClass}_btn`, current === index + 1 ? prefix + 'select' : '')}
+                                            key={index}
+                                            disabled={disabled}
+                                            onClick={this.handleChange.bind(this, index + 1)}
+                                        >
+                                            {index + 1}
+                                        </Button>
+                                    )
+                                }
+                                if (Math.abs(current - (index + 1)) === 3) {
                                     return (
                                         <Button
                                             className={getClassName(`${prefixClass}_btn ${prefix}notline`, current === index + 1 ? prefix + 'select' : '')}
+                                            disabled={disabled}
                                             key={index}
                                         >
                                             <Icon icon="ios-more" fontSize="18px" color="rgba(0, 0, 0, 0.65)" />
@@ -148,28 +185,7 @@ export default class Pagination extends Component<IPaginationProps, IState> {
                                         <Button
                                             className={getClassName(`${prefixClass}_btn`, current === index + 1 ? prefix + 'select' : '')}
                                             key={index}
-                                            onClick={this.handleChange.bind(this, index + 1)}
-                                        >
-                                            {index + 1}
-                                        </Button>
-                                    )
-                                }
-                                if (current === index + 1) {
-                                    return (
-                                        <Button
-                                            className={getClassName(`${prefixClass}_btn`, current === index + 1 ? prefix + 'select' : '')}
-                                            key={index}
-                                            onClick={this.handleChange.bind(this, index + 1)}
-                                        >
-                                            {index + 1}
-                                        </Button>
-                                    )
-                                }
-                                if (current === 2 && index + 1 === 5) {
-                                    return (
-                                        <Button
-                                            className={getClassName(`${prefixClass}_btn`, current === index + 1 ? prefix + 'select' : '')}
-                                            key={index}
+                                            disabled={disabled}
                                             onClick={this.handleChange.bind(this, index + 1)}
                                         >
                                             {index + 1}
@@ -179,13 +195,24 @@ export default class Pagination extends Component<IPaginationProps, IState> {
                             }
                         } else {
                             return (
-                                <Button className={getClassName(`${prefixClass}_btn`, current === index + 1 ? prefix + 'select' : '')} key={index}>{index + 1}</Button>
+                                <Button
+                                    className={getClassName(`${prefixClass}_btn`, current === index + 1 ? prefix + 'select' : '')}
+                                    key={index}
+                                    disabled={disabled}
+                                    onClick={this.handleChange.bind(this, index + 1)}
+                                >
+                                    {index + 1}
+                                </Button>
                             )
                         }
                     })
                 }
-                <Button className={getClassName(`${prefixClass}_btn`)} disabled={current === num ? true : false}>
-                    <Icon icon="ios-arrow-forward" fontSize="18px" color={current === num ? '#d9d9d9' : 'rgba(0, 0, 0, 0.65)'} />
+                <Button
+                    className={getClassName(`${prefixClass}_btn`)}
+                    disabled={(current === num || disabled) ? true : false}
+                    onClick={this.handleChange.bind(this, current + 1)}
+                >
+                    <Icon icon="ios-arrow-forward" fontSize="18px" color={(current === num || disabled) ? '#d9d9d9' : 'rgba(0, 0, 0, 0.65)'} />
                 </Button>
             </div>
         )

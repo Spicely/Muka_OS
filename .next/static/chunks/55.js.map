@@ -1,0 +1,1 @@
+{"version":3,"file":"static/chunks/55.js","sources":["webpack:///./components/lib/Icon/md/home.ts"],"sourcesContent":["export default {\r\n    path: [\r\n        'M208 448V320h96v128h97.6V256H464L256 64 48 256h62.4v192z'\r\n    ],\r\n    viewBox: '0 0 512 512',\r\n    name: 'md-home'\r\n}\r\n"],"mappings":";;;;;;;;;;AAAA;AAAA;AACA;AAGA;AACA;AALA;;;;A","sourceRoot":""}
