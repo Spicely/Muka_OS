@@ -38,8 +38,8 @@ export default class Index extends Component<any, any> {
 
     private getData = async () => {
         Axios({
-            // url: 'http://www.snplay.top:8080/fs/getimages',
-            url: 'http://localhost:4000/api/fs/getimages',
+            url: 'http://www.snplay.top:8080/fs/getimages',
+            // url: 'http://localhost:4000/api/fs/getimages',
             method: 'POST'
         }).then((data) => {
             this.setState({
@@ -52,8 +52,8 @@ export default class Index extends Component<any, any> {
     private reload = () => {
         setInterval(() => {
             Axios({
-                // url: 'http://www.snplay.top:8080/fs/getimages',
-                url: 'http://localhost:4000/api/fs/getimages',
+                url: 'http://www.snplay.top:8080/fs/getimages',
+                // url: 'http://localhost:4000/api/fs/getimages',
                 method: 'POST'
             }).then((data) => {
                 const { lists } = this.state

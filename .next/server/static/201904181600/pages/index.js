@@ -197,8 +197,8 @@ function (_Component) {
           switch (_context.prev = _context.next) {
             case 0:
               axios__WEBPACK_IMPORTED_MODULE_15___default()({
-                // url: 'http://www.snplay.top:8080/fs/getimages',
-                url: 'http://localhost:4000/api/fs/getimages',
+                url: 'http://www.snplay.top:8080/fs/getimages',
+                // url: 'http://localhost:4000/api/fs/getimages',
                 method: 'POST'
               }).then(function (data) {
                 _this.setState({
@@ -219,8 +219,8 @@ function (_Component) {
     Object(_babel_runtime_corejs2_helpers_esm_defineProperty__WEBPACK_IMPORTED_MODULE_13__[/* default */ "a"])(Object(_babel_runtime_corejs2_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_11__[/* default */ "a"])(_this), "reload", function () {
       setInterval(function () {
         axios__WEBPACK_IMPORTED_MODULE_15___default()({
-          // url: 'http://www.snplay.top:8080/fs/getimages',
-          url: 'http://localhost:4000/api/fs/getimages',
+          url: 'http://www.snplay.top:8080/fs/getimages',
+          // url: 'http://localhost:4000/api/fs/getimages',
           method: 'POST'
         }).then(function (data) {
           var lists = _this.state.lists;
