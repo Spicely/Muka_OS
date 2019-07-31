@@ -93,7 +93,7 @@ export default class Login extends Component<IProps, any> {
         // }
     }
 
-    private login = async (params: IValue) => {
+    private login = async (params: { [name: string]: any }) => {
         const hist = Cookies.get('hist')
         try {
             const data: IRresItem<any> = await http('user/login', params)

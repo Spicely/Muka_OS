@@ -5,7 +5,7 @@ import { getClassName, prefix } from '../utils'
 import Icon, { iconType } from '../Icon'
 import Image from '../Image'
 
-interface ISearchBarRightIcon {
+export interface INavBarRightIcon {
     type: 'icon'
     url: iconType
     link?: string
@@ -13,7 +13,7 @@ interface ISearchBarRightIcon {
     onClick?: () => boolean
 }
 
-interface ISearchBarRightImage {
+export interface INavBarRightImage {
     type: 'image'
     url: string
     link?: string
@@ -29,7 +29,7 @@ export interface INavBarProps {
     style?: CSSProperties
     left?: string | JSX.Element | null
     title?: string | JSX.Element
-    right?: string | JSX.Element | null | (ISearchBarRightIcon | ISearchBarRightImage)[]
+    right?: string | JSX.Element | null | (INavBarRightIcon | INavBarRightImage)[]
     fixed?: boolean
     endVal?: number
     divider?: boolean
@@ -48,14 +48,14 @@ export default class NavBar extends Component<INavBarProps, any> {
         const { className, left, divider, title, right, fixed, goBack, leftClassName, titleCenter, titleClassName, rightClassName, style, onRightClick } = this.props
         let rightValue: any
         if (isArray(right)) {
-            rightValue = right.map((item: ISearchBarRightIcon | ISearchBarRightImage, index: number) => {
+            rightValue = right.map((item: INavBarRightIcon | INavBarRightImage, index: number) => {
                 if (item.type === 'icon') {
                     return (
                         <Icon icon={item.url} color={item.color} onClick={this.handleClick.bind(this, item.link, item.onClick)} key={index} />
                     )
                 } else if (item.type === "image") {
                     return (
-                        <Image src={item.url} onClick={this.handleClick.bind(this, item.link, item.onClick)} key={index} />
+                        <Image className={getClassName('nav_bar_right__img')} src={item.url} onClick={this.handleClick.bind(this, item.link, item.onClick)} key={index} />
                     )
                 }
             })

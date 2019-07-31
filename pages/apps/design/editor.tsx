@@ -7,16 +7,16 @@ import PageHead from 'layouts/PageHead'
 import PageLayout from 'layouts/PageLayout'
 import { omit, isArray, isString } from 'muka'
 import { IInitState } from 'store/state'
-import { Alert, Carousel, Dialog, Drag, Icon, LabelHeader, Label, NavBar, TabBar, ILFormItem, LForm, ILFormFun, Input, Button, Radio, SearchBar } from 'components'
+import { Alert, BoxLine, Button, Carousel, Dialog, Drag, Icon, Image, Label, LabelHeader, NavBar, TabBar, ILFormItem, LForm, ILFormFun, Pagination, ScrollView, SearchBar, INavBarRightIcon, INavBarRightImage, Upload } from 'components'
 import { IValue } from 'components/lib/utils'
-import http, { IinitProps, IRresItems } from 'utils/axios'
+import http, { IinitProps, IRresItems, initErrorToView, baseUrl, deviaDecrypt, decrypt } from 'utils/axios'
 import { connect } from 'react-redux'
 import { SET_COMPONENT_DATA, IComponentData, actions } from 'store/action/design'
 import componentViewData from '../../../data/componentData'
 import EditComponent from '../editComponent'
 import { nav_bar } from 'layouts/PageLayout/index.less'
 import { app_view, tpl_phone, m_tit, cri, lon, m_scroll_view, com, com_actions, com_bar, com_label, form_style, label_list, label_list_btn, label_list_int, label_view, label_view_list, label_list_icon } from '../index.less'
-import { component_label, component_list } from './index.less'
+import { component_label, component_list, icons_items, nav_color, image, image_item, uploadViewClassName, scroll_view } from './index.less'
 
 const { confirm } = Modal
 
@@ -48,7 +48,11 @@ interface IState {
     componentName: string
     selected: number
     type: typeList
+    icons: any[]
+    images: any[]
     searchSelect: boolean
+    uploadDialog: boolean
+    pageCurrent: number
 }
 
 const reorder = (list: IComponents[], startIndex: number, endIndex: number) => {
@@ -61,32 +65,43 @@ const reorder = (list: IComponents[], startIndex: number, endIndex: number) => {
 
 class AppsDesign extends Component<IProps, IState> {
     public static async getInitialProps(ctx: IinitProps) {
-        const componentData: IRresItems = await http('apps/findPageProps', {
+        const data: IRresItems = await http('apps/findPageProps', {
             classifyId: ctx.query.classifyId
         }, {
                 headers: { cookie: ctx.req && ctx.req.headers.cookie }
             })
-        ctx.store.dispatch({ type: SET_COMPONENT_DATA, data: componentData.data })
+        if (data.status === 203 && ctx.res) {
+            return initErrorToView(ctx)
+        }
+        ctx.store.dispatch({ type: SET_COMPONENT_DATA, data: data.data })
         return {}
     }
 
     public state: IState = {
         components: [],
+        icons: [],
+        images: [],
         componentName: '',
         selected: 0,
         type: 'LForm',
-        searchSelect: false
+        searchSelect: false,
+        uploadDialog: false,
+        pageCurrent: 1
     }
 
     private index: number = 0
+
+    private listIndex: number = 0
 
     private componentType: IComponentType = ''
 
     private exFun: ILFormFun | null = null
 
+    private loading: boolean = false
+
     public render(): JSX.Element {
         const { componentData } = this.props
-        const { searchSelect } = this.state
+        const { searchSelect, icons, uploadDialog, images, pageCurrent } = this.state
         return (
             <PageHead title="小程序-页面设计">
                 <PageLayout
@@ -147,17 +162,96 @@ class AppsDesign extends Component<IProps, IState> {
                                     </DragDropContext>
                                 </Drag.Box>
                             </div>
+                            <Pagination current={pageCurrent} total={500} pageSize={20} onChange={(val) => { this.setState({ pageCurrent: val }) }} />
                         </div>
                     </div>
-                    <Dialog visible={searchSelect} title="字体/图片" style={{ width: 1088, height: 756 }} onClose={this.handleCloseDialog.bind(this, 'searchSelect')}>
-                        <TabBar tabBarClassName="mk_divider">
-                            <TabBar.Item label="字体">111</TabBar.Item>
-                            <TabBar.Item label="服务器图片">111</TabBar.Item>
+                    <Dialog visible={searchSelect} title="字体/图片" style={{ width: 1088, height: 756 }} onClose={this.handleCloseDialog.bind(this, 'searchSelect')} onFirstShow={this.getDialogData}>
+                        <TabBar tabBarClassName="mk_divider" style={{ height: '100%' }} onChange={this.handleTabBarChange}>
+                            <TabBar.Item label="字体">
+                                <BoxLine >
+                                    {
+                                        icons.map((i) => {
+                                            return (
+                                                <div
+                                                    className={`flex_center ${icons_items}`}
+                                                    key={i.id}
+                                                    onClick={this.setComProps.bind(this, { type: 'icon', 'url': i.name }, 'searchSelect')}
+                                                >
+                                                    <Icon icon={i.name} />
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </BoxLine>
+                            </TabBar.Item>
+                            <TabBar.Item label="服务器图片">
+                                <NavBar
+                                    className={nav_color}
+                                    left={null}
+                                    right={
+                                        <Button mold="primary" onClick={this.handleShowUpload.bind(this, 'uploadDialog')}>上传图片</Button>
+                                    }
+                                />
+                                <ScrollView scrollY className={scroll_view}>
+                                    {
+                                        images.map((i, index) => {
+                                            return (
+                                                <div
+                                                    className={image}
+                                                    key={index}
+                                                    onClick={this.setComProps.bind(this, { type: 'image', 'url': baseUrl + i.previewUrl }, 'searchSelect')}
+                                                >
+                                                    <div className="flex_justify" style={{ width: '100%', height: '100%' }}>
+                                                        <Image src={baseUrl + i.previewUrl} className={image_item} />
+                                                    </div>
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </ScrollView>
+                            </TabBar.Item>
                         </TabBar>
+                    </Dialog>
+                    <Dialog title="上传图片" footer={null} visible={uploadDialog} onClose={this.handleCloseDialog.bind(this, 'uploadDialog')}>
+                        <Upload.Dragger
+                            style={{ marginTop: '10px' }}
+                            action={`/os/image/globalUpload`}
+                            baserUrl={baseUrl}
+                            withCredentials
+                            onUploadSuccess={this.handleUploadSuccess}
+                            uploadViewClassName={uploadViewClassName}
+                        />
                     </Dialog>
                 </PageLayout>
             </PageHead>
         )
+    }
+
+    private handleTabBarChange = async (val: string | number | undefined) => {
+        const { images } = this.state
+        if (val === 1 && images.length === 0 && !this.loading) {
+            this.loading = true
+            try {
+                const data: IRresItems = await http('image/globalFind')
+                this.loading = false
+                this.setState({
+                    images: [...data.data]
+                })
+            } catch (msg) {
+                this.loading = false
+                console.log(msg)
+            }
+        }
+    }
+
+    private handleUploadSuccess = (val: any, data: any) => {
+        const { images } = this.state
+        const devia = deviaDecrypt(data.devia)
+        data = JSON.parse(decrypt(data.value, data.secret, devia))
+        images.unshift(data.data)
+        this.setState({
+            images
+        })
     }
 
     private getItem = (exFun: ILFormFun): ILFormItem[] => {
@@ -168,6 +262,22 @@ class AppsDesign extends Component<IProps, IState> {
         }
         const data: any = componentViewData(this)
         return data[componentName]
+    }
+
+    private handleShowUpload = (field: any) => {
+        this.setState({
+            [field]: true
+        })
+    }
+    private getDialogData = async () => {
+        try {
+            const data: IRresItems = await http('icons/find')
+            this.setState({
+                icons: data.data
+            })
+        } catch (msg) {
+            console.log(msg)
+        }
 
     }
 
@@ -225,7 +335,7 @@ class AppsDesign extends Component<IProps, IState> {
         }
     }
 
-    private handleCloseDialog(field: any) {
+    private handleCloseDialog(field: 'searchSelect' | 'uploadDialog') {
         this.setState({
             [field]: false
         })
@@ -236,6 +346,17 @@ class AppsDesign extends Component<IProps, IState> {
         const pageProps: any = [...componentData.pagePorps]
         pageProps[this.index].props[field] = e.target.value
         setComponentData({ ...componentData })
+    }
+
+    private setComProps = (data: INavBarRightIcon | INavBarRightImage, dialogName: 'searchSelect') => {
+        const { componentData, setComponentData }: any = this.props
+        const right = componentData.pagePorps[this.index].props.right
+        right[this.listIndex] = data
+        this.setState({
+            [dialogName]: false
+        }, () => {
+            setComponentData(cloneDeep(componentData))
+        })
     }
 
     private getComponentsView(data: IComponents, index: number) {
@@ -464,7 +585,8 @@ class AppsDesign extends Component<IProps, IState> {
         }]
     }
 
-    private handleSelectView = () => {
+    private handleSelectView = (index: number) => {
+        this.listIndex = index
         this.setState({
             searchSelect: true
         })

@@ -12,12 +12,13 @@ export interface ICarouselProps {
     dotClassName?: string
     value?: string[]
     dots?: boolean
-    autoPlay?: boolean
+    autoplay?: boolean
     defaultSelected?: number
     style?: CSSProperties
     time?: number
     onChnage?: (selected: number) => void
     effect?: 'scrollx' | 'scrolly' | 'fade'
+    selected?: number
 }
 
 interface IState {
@@ -34,7 +35,7 @@ export default class Carousel extends Component<ICarouselProps, IState> {
     constructor(props: ICarouselProps) {
         super(props)
         if (isNumber(props.defaultSelected)) {
-            this.state.selectIndex = props.defaultSelected
+            this.state.selectIndex = props.selected || props.defaultSelected
         }
     }
 
@@ -43,7 +44,7 @@ export default class Carousel extends Component<ICarouselProps, IState> {
         dotType: 'rectangle',
         dots: true,
         time: 2000,
-        autoPlay: false,
+        autoplay: false,
         effect: 'scrollx'
     }
 
@@ -61,7 +62,7 @@ export default class Carousel extends Component<ICarouselProps, IState> {
     private animateNode: Element | null = null
 
     public render(): JSX.Element {
-        const { className, children, dotPosition, dotClassName, dots, effect, style, autoPlay, value, dotType, dotColor } = this.props
+        const { className, children, dotPosition, dotClassName, dots, effect, style, autoplay, value, dotType, dotColor } = this.props
         const { selectIndex, left, top, animate } = this.state
         const length = Children.count(value || children)
         const cssStyle: CSSProperties = {}
@@ -103,7 +104,7 @@ export default class Carousel extends Component<ICarouselProps, IState> {
                         )
                     })
                 }
-                {autoPlay && effect !== 'fade' && Children.map(value || children, (child, index) => {
+                {autoplay && effect !== 'fade' && Children.map(value || children, (child, index) => {
                     if (index === 0) {
                         return (
                             <div
@@ -147,7 +148,7 @@ export default class Carousel extends Component<ICarouselProps, IState> {
     }
 
     public componentDidMount() {
-        const { autoPlay } = this.props
+        const { autoplay } = this.props
         if (this.carouselNode) {
             const obj = this.carouselNode.getBoundingClientRect()
             this.setState({
@@ -158,18 +159,28 @@ export default class Carousel extends Component<ICarouselProps, IState> {
         if (this.animateNode) {
             this.animateNode.addEventListener('transitionend', this.handleAnimate)
         }
-        this.interval(autoPlay || false)
+        this.interval(autoplay || false)
     }
 
     public componentWillReceiveProps(nextProps: ICarouselProps) {
-        const { autoPlay } = this.props
-        if (autoPlay !== nextProps.autoPlay) {
-            if (nextProps.autoPlay && !this.timer) {
+        const { autoplay, selected } = this.props
+        if (autoplay !== nextProps.autoplay) {
+            if (nextProps.autoplay && !this.timer) {
                 this.interval(true)
             } else {
                 clearInterval(this.timer)
                 this.timer = undefined
             }
+        }
+        if (isNumber(selected) && selected !== nextProps.selected) {
+            clearInterval(this.timer)
+            const time = setTimeout(() => {
+                clearTimeout(time)
+                this.setState({
+                    selectIndex: selected
+                })
+                this.interval(true)
+            }, 900)
         }
     }
 

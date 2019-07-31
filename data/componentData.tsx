@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { isArray } from 'muka'
-import { Button, Icon, Input, } from 'components'
-import { label_box } from './index.less'
+import { Button, Icon, Image, Input, } from 'components'
+import { label_box, label_image } from './index.less'
 import { label_list_btn, label_list_int, label_view_list, label_list_icon, label_view, label_list_view, label_list_view_bot } from '../pages/apps/index.less'
 
 const componentData = function (self: any) {
@@ -120,8 +120,9 @@ const componentData = function (self: any) {
                                 className={`flex ${label_view_list}`}
                                 key={index}
                             >
-                                <div className={`${label_list_view} flex_center`} onClick={self.handleSelectView}>
+                                <div className={`${label_list_view} flex_center`} onClick={self.handleSelectView.bind(self, index)}>
                                     {item.type === 'icon' && <Icon icon={item.url} color={item.color} />}
+                                    {item.type === 'image' && <Image className={label_image} src={item.url} />}
                                     <div className={label_list_view_bot}>图片/字体</div>
                                 </div>
                                 <div className="flex_1">

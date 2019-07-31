@@ -110,6 +110,16 @@ export default class ShopList extends Component<IShopListProps, IState> {
         )
     }
 
+    public componentWillReceiveProps(nextProps: IShopListProps) {
+        const { dataList } = this.props
+        if (dataList.length !== nextProps.dataList.length) {
+            const result = this.getResultData(nextProps.dataList)
+            if (isFunction(nextProps.onChange)) {
+                nextProps.onChange(nextProps.dataList, result)
+            }
+        }
+    }
+
     private handelChange(index: number, value: number) {
         const { dataList, onChange } = this.props
         const data = cloneDeep(dataList)

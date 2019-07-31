@@ -2,6 +2,7 @@
 import React, { Component, CSSProperties } from 'react'
 import { PreLoad, browser } from 'muka'
 import { getClassName } from '../utils'
+import { Consumer } from '../ScrollView'
 
 export interface IImageProps {
     className?: string
@@ -46,14 +47,29 @@ export default class Image extends Component<IImageProps, IState> {
     private loading?: PreLoad
 
     public render(): JSX.Element {
-        const { className, style, loadingIndicatorSource, onClick } = this.props
+        const { className, style, loadingIndicatorSource, onClick, controller } = this.props
         const { animation, uri, show } = this.state
         const opacity = uri || loadingIndicatorSource
-        return <img className={getClassName(`image${opacity ? '' : ' opacity'}${animation && !show ? ' an_fadeIn' : ''}${show ? ' show' : ''}`, className)} src={uri || loadingIndicatorSource || imgObj.src} onClick={onClick} ref={(e: HTMLImageElement) => { this.imageNode = e }} style={style} />
+        return (
+            <Consumer>
+                {
+                    (val) => {
+                        this.controller = controller || val.controller
+                        return (
+                            <img className={getClassName(`image${opacity ? '' : ' opacity'}${animation && !show ? ' an_fadeIn' : ''}${show ? ' show' : ''}`, className)} src={uri || loadingIndicatorSource || imgObj.src} onClick={onClick} ref={(e: HTMLImageElement) => { this.imageNode = e }} style={style} />
+                        )
+                    }
+                }
+            </Consumer>
+        )
     }
 
     public componentWillReceiveProps(nextProps: IImageProps) {
         const { src } = this.props
+        if (this.controller) {
+            this.controller.removeEventListener('scroll', this.handleScroll)
+            this.controller.addEventListener('scroll', this.handleScroll)
+        }
         if (src !== nextProps.src) {
             if (this.loading) {
                 this.loading.clearAsync()
@@ -68,14 +84,17 @@ export default class Image extends Component<IImageProps, IState> {
     }
 
     public componentDidMount() {
-        const { controller } = this.props
-        this.controller = controller ? controller : window
-        this.handleScroll()
-        this.controller.addEventListener('scroll', this.handleScroll)
+        this.controller = this.controller ? this.controller : window
+        if (this.controller) {
+            this.handleScroll()
+            this.controller.addEventListener('scroll', this.handleScroll)
+        }
     }
 
     public componentWillUnmount() {
-        this.controller.removeEventListener('scroll', this.handleScroll)
+        if (this.controller) {
+            this.controller.removeEventListener('scroll', this.handleScroll)
+        }
     }
 
     private completeURI(uri?: string | ArrayBuffer | null) {
@@ -88,7 +107,7 @@ export default class Image extends Component<IImageProps, IState> {
     private handleSuccess(url?: string | ArrayBuffer | null, loading?: PreLoad) {
         const { uri } = this.state
         if (uri && uri === url) {
-            this.controller.removeEventListener('scroll', this.handleScroll)
+            this.controller && this.controller.removeEventListener('scroll', this.handleScroll)
             return
         }
         this.setState({
@@ -98,15 +117,15 @@ export default class Image extends Component<IImageProps, IState> {
         if (loading) {
             loading.clearAsync()
         }
-        this.controller.removeEventListener('scroll', this.handleScroll)
+        this.controller && this.controller.removeEventListener('scroll', this.handleScroll)
     }
 
     private handleScroll = () => {
-        const { offsetBottom, src, controller } = this.props
+        const { offsetBottom, src } = this.props
         const { animation } = this.state
         let top: number = 0
-        if (controller) {
-            top = this.controller.scrollTop + browser.GL_SC_HEIGHT
+        if (this.controller) {
+            top = (this.controller.scrollTop || 0) + browser.GL_SC_HEIGHT
         } else {
             top = (document.documentElement && document.documentElement.scrollTop || document.body.scrollTop) + browser.GL_SC_HEIGHT
         }

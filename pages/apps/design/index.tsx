@@ -1,9 +1,9 @@
 import { Component, Fragment } from 'react'
-import { Button, Dialog, Empty, Label, LabelHeader, Icon, Image, Input, NavBar, TabBar, Select, } from 'components'
+import { Button, Dialog, Empty, Label, LabelHeader, Icon, Image, Input, NavBar, TabBar, Select} from 'components'
 import Link from 'next/link'
 import PageHead from 'layouts/PageHead'
 import PageLayout from 'layouts/PageLayout'
-import http, { IinitProps, IRresItems } from 'utils/axios'
+import http, { IinitProps, IRresItems, initErrorToView } from 'utils/axios'
 import { nav_bar } from 'layouts/PageLayout/index.less'
 import { app_view, app_view_tab_item, app_view_diy, app_view_dialog } from '../index.less'
 
@@ -28,6 +28,9 @@ export default class Design extends Component<IProps, IState> {
         const tabLists: IRresItems = await http('apps/findPageClassify', {}, {
             headers: { cookie: ctx.req && ctx.req.headers.cookie },
         })
+        if (tabLists.status === 203 && ctx.res) {
+            return initErrorToView(ctx)
+        }
         return {
             tabLists: tabLists.data
         }
@@ -57,7 +60,7 @@ export default class Design extends Component<IProps, IState> {
                         <div className="flex">
                             <div className="flex_1">
                                 <Button mold="primary" style={{ width: '90px' }} onClick={this.handleSetDialog.bind(this, true)}>
-                                    <Icon icon="md-add" color="#fff" fontSize="14px" style={{ position: 'relative', bottom: '2px', verticalAlign: 'middle'  }} />立即创建
+                                    <Icon icon="md-add" color="#fff" fontSize="14px" style={{ position: 'relative', bottom: '2px', verticalAlign: 'middle' }} />立即创建
                                 </Button>
                             </div>
                             <Select isSearchable options={tabLists.map((item, index) => {
@@ -86,7 +89,7 @@ export default class Design extends Component<IProps, IState> {
                             className={app_view_dialog}
                             visible={visible}
                             onClose={this.handleSetDialog}
-                            footer={<Fragment/>}
+                            footer={<Fragment />}
                         >
                             <div style={{ padding: '20px 0' }}>
                                 {

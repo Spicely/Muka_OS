@@ -2,7 +2,7 @@ import React, { Component, MouseEvent, CSSProperties, HtmlHTMLAttributes } from 
 import { getClassName } from '../utils'
 import { omit } from 'muka'
 
-export type iconType = 'logo-google' | 'ios-refresh' | 'md-refresh' | 'ios-document' | 'md-document' | 'md-more' | 'md-arrow-down' | 'ios-image' | 'ios-more' | 'ios-paper-plane' | 'ios-arrow-forward' | 'md-close-circle' | 'ios-arrow-down' | 'md-thumbs-up' | 'md-thumbs-down' | 'ios-home' | 'md-home' | 'ios-arrow-dropdown' | 'md-arrow-dropdown' | 'custom-service' | 'md-volume-mute' | 'ios-volume-high' | 'menu-open' | 'menu-close' | 'ios-close-circle-outline' | 'ios-close' | 'md-close' | 'md-checkmark' | 'ios-checkmark' | 'md-add' | 'ios-add' | 'loading' | 'ios-menu' | 'ios-settings' | 'ios-settings-outline' | 'md-settings' | 'ios-keypad' | 'ios-arrow-back-outline' | 'md-create' | 'ios-arrow-back' | 'md-arrow-back' | 'md-search' | 'ios-search' | 'ios-search-outline' | 'md-exit' | 'ios-exit' | 'shop' | 'double-arrow-left' | 'double-arrow-right' | 'shopping' | 'md-person' | 'ios-person' | 'shop-setting' | 'md-gift' | 'ios-gift' | 'purse' | 'md-trending-up' | 'ios-trending-up' | 'small-routine' | 'md-apps' | 'ios-apps' | 'md-remove' | 'ios-remove' | 'md-close-circle-outline' | 'ios-close-circle-outline' | 'md-expand' | 'ios-expand' | 'md-contract' | 'ios-contract' | 'msg'
+export type iconType = 'logo-google' | 'ios-refresh' | 'md-refresh' | 'ios-document' | 'md-document' | 'md-more' | 'md-arrow-down' | 'ios-image' | 'ios-more' | 'ios-paper-plane' | 'ios-arrow-forward' | 'md-close-circle' | 'ios-arrow-down' | 'md-thumbs-up' | 'md-thumbs-down' | 'ios-home' | 'md-home' | 'ios-arrow-dropdown' | 'md-arrow-dropdown' | 'custom-service' | 'md-volume-mute' | 'ios-volume-high' | 'menu-open' | 'menu-close' | 'ios-close-circle-outline' | 'ios-close' | 'md-close' | 'md-checkmark' | 'ios-checkmark' | 'md-add' | 'ios-add' | 'loading' | 'ios-menu' | 'ios-settings' | 'ios-settings-outline' | 'md-settings' | 'ios-keypad' | 'ios-arrow-back-outline' | 'md-create' | 'ios-arrow-back' | 'md-arrow-back' | 'md-search' | 'ios-search' | 'ios-search-outline' | 'md-exit' | 'ios-exit' | 'shop' | 'double-arrow-left' | 'double-arrow-right' | 'shopping' | 'md-person' | 'ios-person' | 'shop-setting' | 'md-gift' | 'ios-gift' | 'purse' | 'md-trending-up' | 'ios-trending-up' | 'small-routine' | 'md-apps' | 'ios-apps' | 'md-remove' | 'ios-remove' | 'md-close-circle-outline' | 'ios-close-circle-outline' | 'md-expand' | 'ios-expand' | 'md-contract' | 'ios-contract' | 'msg' | 'file_box'
 
 export interface IIconProps extends HtmlHTMLAttributes<any> {
     icon?: iconType
@@ -52,6 +52,10 @@ const paths: any = {
     'ios-add': import('./ios/add').then((data) => data.default),
     'md-remove': import('./md/remove').then((data) => data.default),
     'ios-remove': import('./ios/remove').then((data) => data.default),
+    'md-more': import('./md/more').then((data) => data.default),
+    'ios-more': import('./ios/more').then((data) => data.default),
+    'md-arrow-forward': import('./md/arrow-forward').then((data) => data.default),
+    'ios-arrow-forward': import('./ios/arrow-forward').then((data) => data.default),
     'md-checkmark': import('./md/checkmark').then((data) => data.default),
     'ios-checkmark': import('./ios/checkmark').then((data) => data.default),
     'md-close-circle-outline': import('./md/close-circle-outline').then((data) => data.default),
@@ -69,7 +73,8 @@ const paths: any = {
     'small-routine': import('./global/small-routine').then((data) => data.default),
     'double-arrow-left': import('./global/double-arrow-left').then((data) => data.default),
     'double-arrow-right': import('./global/double-arrow-right').then((data) => data.default),
-    'msg':  import('./global/msg').then((data) => data.default),
+    'msg': import('./global/msg').then((data) => data.default),
+    'file_box': import('./global/file_box').then((data) => data.default),
 }
 
 export default class Icon extends Component<IIconProps, IState> {
@@ -110,20 +115,22 @@ export default class Icon extends Component<IIconProps, IState> {
             fontSize,
         }
         return (
-            <svg
-                {...props}
-                style={styles}
-                className={getClassName(`icon${shake ? ' shake' : ''}${beat ? ' beat' : ''}${rotate ? ' rotate' : ''}`, className)}
-                fill={color}
-                width={fontSize}
-                height={fontSize}
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox={viewBox}
-                onClick={onClick}
-                rotate={rotate ? 1 : 0}
-            >
-                <path d={path} />
-            </svg>
+            <i className={getClassName('icon')}>
+                <svg
+                    {...props}
+                    style={styles}
+                    className={getClassName(`icon${shake ? ' shake' : ''}${beat ? ' beat' : ''}${rotate ? ' rotate' : ''}`, className)}
+                    fill={color}
+                    width={fontSize}
+                    height={fontSize}
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox={viewBox}
+                    onClick={onClick}
+                    rotate={rotate ? 1 : 0}
+                >
+                    <path d={path} />
+                </svg>
+            </i>
         )
     }
 

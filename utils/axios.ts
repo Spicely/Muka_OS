@@ -29,6 +29,16 @@ const getCertificate = async () => {
     })
 }
 
+export const initErrorToView = (ctx: any, url: string = '/login') => {
+    ctx.res.writeHead(302, { Location: url })
+    setCookie(ctx, 'hist', ctx.pathname, {
+        maxAge: 60 * 60,
+        path: '/',
+    })
+    ctx.res && ctx.res.end()
+    return {}
+}
+
 export interface IRresItem<T = any> {
     msg: string
     status: number
@@ -81,7 +91,7 @@ export const encrypt = (data: IValue) => {
     return encrypted.toString()
 }
 
-const decrypt = (data: string, key: any, iv: any) => {
+export const decrypt = (data: string, key: any, iv: any) => {
     const decrypt = CryptoJS.AES.decrypt(data, key, {
         iv: iv,
         mode: CryptoJS.mode.CFB,
@@ -91,7 +101,7 @@ const decrypt = (data: string, key: any, iv: any) => {
     return decryptedStr.toString()
 }
 
-const deviaDecrypt = (data: string) => {
+export const deviaDecrypt = (data: string) => {
     const decrypt = CryptoJS.AES.decrypt(data, 'devia', {
         iv: '1C599FE5BA22EEC2',
         mode: CryptoJS.mode.CBC,
@@ -112,6 +122,11 @@ instance.interceptors.response.use(async function (res: any) {
             return
         }
         return res.data
+    } else if (res.data.status === 503) {
+        if (typeof document !== 'undefined') {
+            redirect('/404')
+            return
+        }
     } else {
         const data = res.data
         if (data) {
@@ -123,13 +138,7 @@ instance.interceptors.response.use(async function (res: any) {
             //     message: '网络堵塞, 请稍后再试'
             // })
         }
-        // if (typeof document === 'undefined') {
-        //     throw Error(JSON.parse(res.data))
-        // }
-        if (typeof document !== 'undefined') {
-            redirect('404')
-            return
-        }
+
         return Promise.reject(res.data)
     }
 })

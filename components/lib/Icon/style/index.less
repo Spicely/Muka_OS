@@ -2,6 +2,15 @@
 @import '../../style/mixin/index.less';
 
 .@{prefix}icon {
+    display: inline-block;
+    color: inherit;
+    font-style: normal;
+    line-height: 0;
+    text-align: center;
+    text-transform: none;
+    vertical-align: -2 * @unit;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
     font-size: 18 * @unit;
     .transition(0.5s);
 

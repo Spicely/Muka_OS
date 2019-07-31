@@ -1,6 +1,6 @@
 import React, { Component, Fragment, CSSProperties } from 'react'
 import { createPortal } from 'react-dom'
-import { isFunction } from 'muka'
+import { isFunction, isNull, isUndefined } from 'muka'
 import { getClassName, prefix } from '../utils'
 import Button from '../Button'
 import NavBar from '../NavBar'
@@ -13,9 +13,10 @@ export interface IDialogProps {
     style?: CSSProperties
     animateInClass?: string
     animateOutClass?: string
-    footer?: JSX.Element
+    footer?: JSX.Element | null
     onClose?: (val: boolean) => void
     onOk?: () => void
+    onFirstShow?: () => void
 }
 
 interface IState {
@@ -39,6 +40,8 @@ export default class Dialog extends Component<IDialogProps, IState> {
         if (props.visible) {
             this.state.animate = props.visible
             this.state.visible = props.visible
+            this.status = true
+            this.index++
         }
 
         if (typeof document !== 'undefined') {
@@ -58,6 +61,8 @@ export default class Dialog extends Component<IDialogProps, IState> {
         }
     }
 
+    private index: number = 0
+
     public state: IState = {
         visible: false,
         animate: false
@@ -69,6 +74,8 @@ export default class Dialog extends Component<IDialogProps, IState> {
 
     private timer: any
 
+    private status: boolean = false
+
     public componentWillReceiveProps(nextProps: IDialogProps) {
         const { visible } = this.state
         if (visible !== nextProps.visible) {
@@ -77,14 +84,17 @@ export default class Dialog extends Component<IDialogProps, IState> {
             }
             if (nextProps.visible) {
                 obj.visible = nextProps.visible
+                this.index++
+                this.status = true
             }
-            this.setState(obj)
-        }
-    }
-
-    public componentDidMount() {
-        if (this.animateNode) {
-            this.animateNode.addEventListener('animationend', this.handelAnimate, false)
+            this.setState(obj, () => {
+                if (this.animateNode) {
+                    this.animateNode.removeEventListener('animationend', this.handelAnimate, false)
+                }
+                if (this.animateNode) {
+                    this.animateNode.addEventListener('animationend', this.handelAnimate, false)
+                }
+            })
         }
     }
 
@@ -100,7 +110,7 @@ export default class Dialog extends Component<IDialogProps, IState> {
     public render(): JSX.Element {
         const { className, title, children, footer, animateInClass, animateOutClass, style } = this.props
         const { visible, animate } = this.state
-        if (this.node) {
+        if (this.node && this.status) {
             return createPortal(
                 <div className={getClassName(`${prefixClass} flex_center ${animate ? 'fadeIn' : 'fadeOut'}`)} style={{ display: visible ? '' : 'none' }}>
                     <div className={getClassName(`${prefixClass}_content flex_column ${animate ? animateInClass : animateOutClass}`, className)} ref={(e) => this.animateNode = e} style={style}>
@@ -121,13 +131,13 @@ export default class Dialog extends Component<IDialogProps, IState> {
                             right={
                                 <div className="flex">
                                     {
-                                        footer ? footer :
+                                        isNull(footer) ? null : isUndefined(footer) ?
                                             (
                                                 <Fragment>
                                                     <Button onClick={this.handleClose} style={{ marginRight: '10px' }}>取消</Button>
                                                     <Button mold="primary" onClick={this.handelOk}>确定</Button>
                                                 </Fragment>
-                                            )
+                                            ) : footer
                                     }
                                 </div>
                             }
@@ -141,6 +151,7 @@ export default class Dialog extends Component<IDialogProps, IState> {
     }
 
     private handelAnimate = () => {
+        const { onFirstShow } = this.props
         const { animate } = this.state
         if (!animate) {
             this.timer = setTimeout(() => {
@@ -149,6 +160,9 @@ export default class Dialog extends Component<IDialogProps, IState> {
                     visible: false
                 })
             }, 200)
+        }
+        if (animate && this.index === 1 && isFunction(onFirstShow)) {
+            onFirstShow()
         }
     }
 
