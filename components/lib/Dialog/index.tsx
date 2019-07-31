@@ -83,8 +83,8 @@ export default class Dialog extends Component<IDialogProps, IState> {
                 animate: nextProps.visible || false,
             }
             if (nextProps.visible) {
-                obj.visible = nextProps.visible
                 this.index++
+                obj.visible = nextProps.visible
                 this.status = true
             }
             this.setState(obj, () => {
@@ -162,6 +162,7 @@ export default class Dialog extends Component<IDialogProps, IState> {
             }, 200)
         }
         if (animate && this.index === 1 && isFunction(onFirstShow)) {
+            this.index++
             onFirstShow()
         }
     }

@@ -195,11 +195,11 @@ class AppsDesign extends Component<IProps, IState> {
                                 />
                                 <ScrollView scrollY className={scroll_view}>
                                     {
-                                        images.map((i, index) => {
+                                        images.map((i) => {
                                             return (
                                                 <div
                                                     className={image}
-                                                    key={index}
+                                                    key={i.id}
                                                     onClick={this.setComProps.bind(this, { type: 'image', 'url': baseUrl + i.previewUrl }, 'searchSelect')}
                                                 >
                                                     <div className="flex_justify" style={{ width: '100%', height: '100%' }}>
@@ -211,7 +211,7 @@ class AppsDesign extends Component<IProps, IState> {
                                     }
                                 </ScrollView>
                                 <div className="flex">
-                                    <div className="flex_1"/>
+                                    <div className="flex_1" />
                                     <Pagination current={pageCurrent} total={total} pageSize={20} onChange={this.handleCurrent} />
                                 </div>
                             </TabBar.Item>
@@ -232,10 +232,22 @@ class AppsDesign extends Component<IProps, IState> {
         )
     }
 
-    private handleCurrent = (val: number) => {
-        this.setState({
-            pageCurrent: val
-        })
+    private handleCurrent = async (val: number) => {
+        if (this.loading) return
+        this.loading = true
+        try {
+            const data: IRresItems = await http('image/globalFind', {
+                total: val
+            })
+            this.loading = false
+            this.setState({
+                pageCurrent: val,
+                images: [...data.data.images],
+                total: data.data.total
+            })
+        } catch (msg) {
+            this.loading = false
+        }
     }
 
     private handleTabBarChange = async (val: string | number | undefined) => {
@@ -243,7 +255,9 @@ class AppsDesign extends Component<IProps, IState> {
         if (val === 1 && images.length === 0 && !this.loading) {
             this.loading = true
             try {
-                const data: IRresItems = await http('image/globalFind')
+                const data: IRresItems = await http('image/globalFind', {
+                    total: 1
+                })
                 this.loading = false
                 this.setState({
                     images: [...data.data.images],
