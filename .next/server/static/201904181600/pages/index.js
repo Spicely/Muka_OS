@@ -485,6 +485,13 @@ function (_Component) {
 
     Object(_babel_runtime_corejs2_helpers_esm_defineProperty__WEBPACK_IMPORTED_MODULE_10__[/* default */ "a"])(Object(_babel_runtime_corejs2_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_8__[/* default */ "a"])(_this), "animateNode", null);
 
+    Object(_babel_runtime_corejs2_helpers_esm_defineProperty__WEBPACK_IMPORTED_MODULE_10__[/* default */ "a"])(Object(_babel_runtime_corejs2_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_8__[/* default */ "a"])(_this), "domAddEvent", function (index, animateNode) {
+      if (index === 0 && animateNode) {
+        animateNode.removeEventListener('transitionend', _this.handleAnimate);
+        animateNode.addEventListener('transitionend', _this.handleAnimate);
+      }
+    });
+
     Object(_babel_runtime_corejs2_helpers_esm_defineProperty__WEBPACK_IMPORTED_MODULE_10__[/* default */ "a"])(Object(_babel_runtime_corejs2_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_8__[/* default */ "a"])(_this), "handleAnimate", function () {
       var _this$props = _this.props,
           children = _this$props.children,
@@ -504,8 +511,6 @@ function (_Component) {
             });
           }, 20);
         });
-
-        return;
       }
     });
 
@@ -538,7 +543,6 @@ function (_Component) {
           left = _this$state.left,
           top = _this$state.top,
           animate = _this$state.animate;
-      console.log(selectIndex, ' 222222222222222');
       var length = react__WEBPACK_IMPORTED_MODULE_11__["Children"].count(value || children);
       var cssStyle = {};
       var dotStyle = {};
@@ -568,9 +572,7 @@ function (_Component) {
           style: Object(_babel_runtime_corejs2_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_2__[/* default */ "a"])({}, cssStyle, {
             opacity: effect === 'fade' ? index === selectIndex ? 1 : 0 : 1
           }),
-          ref: function ref(e) {
-            return _this2.animateNode = e;
-          },
+          ref: _this2.domAddEvent.bind(_this2, index),
           key: index
         }, Object(muka_lib_isString__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"])(child) ? react__WEBPACK_IMPORTED_MODULE_11___default.a.createElement(_Image__WEBPACK_IMPORTED_MODULE_13__[/* default */ "a"], {
           className: Object(_utils__WEBPACK_IMPORTED_MODULE_14__[/* getClassName */ "a"])("".concat(prefixClass, "__item_image")),

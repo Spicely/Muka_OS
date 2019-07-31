@@ -25,19 +25,6 @@
       }
     }
   ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!pages/shop/index.less": [
-    {
-      "modules": {
-        "byIdentifier": {},
-        "usedIds": {}
-      },
-      "chunks": {
-        "byName": {},
-        "bySource": {},
-        "usedIds": []
-      }
-    }
-  ],
   "mini-css-extract-plugin node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!pages/apps/design/index.less": [
     {
       "modules": {
@@ -116,19 +103,6 @@
       }
     }
   ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/modal/style/index.less": [
-    {
-      "modules": {
-        "byIdentifier": {},
-        "usedIds": {}
-      },
-      "chunks": {
-        "byName": {},
-        "bySource": {},
-        "usedIds": []
-      }
-    }
-  ],
   "mini-css-extract-plugin node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!layouts/PageHead/index.less": [
     {
       "modules": {
@@ -155,7 +129,7 @@
       }
     }
   ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Label/style/index.less": [
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Dialog/style/index.less": [
     {
       "modules": {
         "byIdentifier": {},
@@ -168,20 +142,7 @@
       }
     }
   ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Alert/style/index.less": [
-    {
-      "modules": {
-        "byIdentifier": {},
-        "usedIds": {}
-      },
-      "chunks": {
-        "byName": {},
-        "bySource": {},
-        "usedIds": []
-      }
-    }
-  ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/button/style/index.less": [
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/LForm/style/index.less": [
     {
       "modules": {
         "byIdentifier": {},
@@ -195,6 +156,45 @@
     }
   ],
   "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/NavBar/style/index.less": [
+    {
+      "modules": {
+        "byIdentifier": {},
+        "usedIds": {}
+      },
+      "chunks": {
+        "byName": {},
+        "bySource": {},
+        "usedIds": []
+      }
+    }
+  ],
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/LabelHeader/style/index.less": [
+    {
+      "modules": {
+        "byIdentifier": {},
+        "usedIds": {}
+      },
+      "chunks": {
+        "byName": {},
+        "bySource": {},
+        "usedIds": []
+      }
+    }
+  ],
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Label/style/index.less": [
+    {
+      "modules": {
+        "byIdentifier": {},
+        "usedIds": {}
+      },
+      "chunks": {
+        "byName": {},
+        "bySource": {},
+        "usedIds": []
+      }
+    }
+  ],
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/button/style/index.less": [
     {
       "modules": {
         "byIdentifier": {},
@@ -259,20 +259,7 @@
       }
     }
   ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Layout/style/index.less": [
-    {
-      "modules": {
-        "byIdentifier": {},
-        "usedIds": {}
-      },
-      "chunks": {
-        "byName": {},
-        "bySource": {},
-        "usedIds": []
-      }
-    }
-  ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Menu/style/index.less": [
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Radio/style/index.less": [
     {
       "modules": {
         "byIdentifier": {},
@@ -298,20 +285,7 @@
       }
     }
   ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/LabelHeader/style/index.less": [
-    {
-      "modules": {
-        "byIdentifier": {},
-        "usedIds": {}
-      },
-      "chunks": {
-        "byName": {},
-        "bySource": {},
-        "usedIds": []
-      }
-    }
-  ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Item/style/index.less": [
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Layout/style/index.less": [
     {
       "modules": {
         "byIdentifier": {},
@@ -337,7 +311,7 @@
       }
     }
   ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Dialog/style/index.less": [
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Menu/style/index.less": [
     {
       "modules": {
         "byIdentifier": {},
@@ -350,20 +324,7 @@
       }
     }
   ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/LForm/style/index.less": [
-    {
-      "modules": {
-        "byIdentifier": {},
-        "usedIds": {}
-      },
-      "chunks": {
-        "byName": {},
-        "bySource": {},
-        "usedIds": []
-      }
-    }
-  ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Dropdown/style/index.less": [
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Item/style/index.less": [
     {
       "modules": {
         "byIdentifier": {},
@@ -389,7 +350,7 @@
       }
     }
   ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/date-picker/style/index.less": [
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/modal/style/index.less": [
     {
       "modules": {
         "byIdentifier": {},
@@ -402,7 +363,7 @@
       }
     }
   ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/upload/style/index.less": [
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!pages/settings/router/index.less": [
     {
       "modules": {
         "byIdentifier": {},
@@ -415,20 +376,7 @@
       }
     }
   ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Radio/style/index.less": [
-    {
-      "modules": {
-        "byIdentifier": {},
-        "usedIds": {}
-      },
-      "chunks": {
-        "byName": {},
-        "bySource": {},
-        "usedIds": []
-      }
-    }
-  ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/ImagePicker/style/index.less": [
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!pages/settings/icon/index.less": [
     {
       "modules": {
         "byIdentifier": {},
@@ -454,6 +402,19 @@
       }
     }
   ],
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/ImagePicker/style/index.less": [
+    {
+      "modules": {
+        "byIdentifier": {},
+        "usedIds": {}
+      },
+      "chunks": {
+        "byName": {},
+        "bySource": {},
+        "usedIds": []
+      }
+    }
+  ],
   "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Colors/style/index.less": [
     {
       "modules": {
@@ -467,7 +428,7 @@
       }
     }
   ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/message/style/index.less": [
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Alert/style/index.less": [
     {
       "modules": {
         "byIdentifier": {},
@@ -493,7 +454,7 @@
       }
     }
   ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/BoxLine/style/index.less": [
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/TabBar/style/index.less": [
     {
       "modules": {
         "byIdentifier": {},
@@ -506,7 +467,7 @@
       }
     }
   ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/TabBar/style/index.less": [
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/BoxLine/style/index.less": [
     {
       "modules": {
         "byIdentifier": {},
@@ -546,6 +507,97 @@
     }
   ],
   "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/SearchBar/style/index.less": [
+    {
+      "modules": {
+        "byIdentifier": {},
+        "usedIds": {}
+      },
+      "chunks": {
+        "byName": {},
+        "bySource": {},
+        "usedIds": []
+      }
+    }
+  ],
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/message/style/index.less": [
+    {
+      "modules": {
+        "byIdentifier": {},
+        "usedIds": {}
+      },
+      "chunks": {
+        "byName": {},
+        "bySource": {},
+        "usedIds": []
+      }
+    }
+  ],
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/date-picker/style/index.less": [
+    {
+      "modules": {
+        "byIdentifier": {},
+        "usedIds": {}
+      },
+      "chunks": {
+        "byName": {},
+        "bySource": {},
+        "usedIds": []
+      }
+    }
+  ],
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/upload/style/index.less": [
+    {
+      "modules": {
+        "byIdentifier": {},
+        "usedIds": {}
+      },
+      "chunks": {
+        "byName": {},
+        "bySource": {},
+        "usedIds": []
+      }
+    }
+  ],
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Table/style/index.less": [
+    {
+      "modules": {
+        "byIdentifier": {},
+        "usedIds": {}
+      },
+      "chunks": {
+        "byName": {},
+        "bySource": {},
+        "usedIds": []
+      }
+    }
+  ],
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!pages/shop/index.less": [
+    {
+      "modules": {
+        "byIdentifier": {},
+        "usedIds": {}
+      },
+      "chunks": {
+        "byName": {},
+        "bySource": {},
+        "usedIds": []
+      }
+    }
+  ],
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!styles/global.less": [
+    {
+      "modules": {
+        "byIdentifier": {},
+        "usedIds": {}
+      },
+      "chunks": {
+        "byName": {},
+        "bySource": {},
+        "usedIds": []
+      }
+    }
+  ],
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Progress/style/index.less": [
     {
       "modules": {
         "byIdentifier": {},
@@ -610,7 +662,7 @@
       }
     }
   ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Progress/style/index.less": [
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/table/style/index.less": [
     {
       "modules": {
         "byIdentifier": {},
@@ -623,33 +675,7 @@
       }
     }
   ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!pages/settings/router/index.less": [
-    {
-      "modules": {
-        "byIdentifier": {},
-        "usedIds": {}
-      },
-      "chunks": {
-        "byName": {},
-        "bySource": {},
-        "usedIds": []
-      }
-    }
-  ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!pages/settings/icon/index.less": [
-    {
-      "modules": {
-        "byIdentifier": {},
-        "usedIds": {}
-      },
-      "chunks": {
-        "byName": {},
-        "bySource": {},
-        "usedIds": []
-      }
-    }
-  ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!styles/global.less": [
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/radio/style/index.less": [
     {
       "modules": {
         "byIdentifier": {},
@@ -714,46 +740,7 @@
       }
     }
   ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/radio/style/index.less": [
-    {
-      "modules": {
-        "byIdentifier": {},
-        "usedIds": {}
-      },
-      "chunks": {
-        "byName": {},
-        "bySource": {},
-        "usedIds": []
-      }
-    }
-  ],
   "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/dropdown/style/index.less": [
-    {
-      "modules": {
-        "byIdentifier": {},
-        "usedIds": {}
-      },
-      "chunks": {
-        "byName": {},
-        "bySource": {},
-        "usedIds": []
-      }
-    }
-  ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Table/style/index.less": [
-    {
-      "modules": {
-        "byIdentifier": {},
-        "usedIds": {}
-      },
-      "chunks": {
-        "byName": {},
-        "bySource": {},
-        "usedIds": []
-      }
-    }
-  ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Empty/style/index.less": [
     {
       "modules": {
         "byIdentifier": {},
@@ -779,46 +766,7 @@
       }
     }
   ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/divider/style/index.less": [
-    {
-      "modules": {
-        "byIdentifier": {},
-        "usedIds": {}
-      },
-      "chunks": {
-        "byName": {},
-        "bySource": {},
-        "usedIds": []
-      }
-    }
-  ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/breadcrumb/style/index.less": [
-    {
-      "modules": {
-        "byIdentifier": {},
-        "usedIds": {}
-      },
-      "chunks": {
-        "byName": {},
-        "bySource": {},
-        "usedIds": []
-      }
-    }
-  ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/table/style/index.less": [
-    {
-      "modules": {
-        "byIdentifier": {},
-        "usedIds": {}
-      },
-      "chunks": {
-        "byName": {},
-        "bySource": {},
-        "usedIds": []
-      }
-    }
-  ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/checkbox/style/index.less": [
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Empty/style/index.less": [
     {
       "modules": {
         "byIdentifier": {},
@@ -844,7 +792,7 @@
       }
     }
   ],
-  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/pagination/style/index.less": [
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/checkbox/style/index.less": [
     {
       "modules": {
         "byIdentifier": {},
@@ -870,7 +818,59 @@
       }
     }
   ],
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/pagination/style/index.less": [
+    {
+      "modules": {
+        "byIdentifier": {},
+        "usedIds": {}
+      },
+      "chunks": {
+        "byName": {},
+        "bySource": {},
+        "usedIds": []
+      }
+    }
+  ],
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/breadcrumb/style/index.less": [
+    {
+      "modules": {
+        "byIdentifier": {},
+        "usedIds": {}
+      },
+      "chunks": {
+        "byName": {},
+        "bySource": {},
+        "usedIds": []
+      }
+    }
+  ],
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/divider/style/index.less": [
+    {
+      "modules": {
+        "byIdentifier": {},
+        "usedIds": {}
+      },
+      "chunks": {
+        "byName": {},
+        "bySource": {},
+        "usedIds": []
+      }
+    }
+  ],
   "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/select/style/index.less": [
+    {
+      "modules": {
+        "byIdentifier": {},
+        "usedIds": {}
+      },
+      "chunks": {
+        "byName": {},
+        "bySource": {},
+        "usedIds": []
+      }
+    }
+  ],
+  "mini-css-extract-plugin node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Dropdown/style/index.less": [
     {
       "modules": {
         "byIdentifier": {},
@@ -902,31 +902,31 @@
       "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/tooltip/style/index.less 0": 14,
       "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Input/style/index.less 0": 15,
       "css node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!layouts/PageLayout/index.less 0": 16,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/icon/style/index.less 0": 17,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Dialog/style/index.less 0": 18,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Colors/style/index.less 0": 19,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/ImagePicker/style/index.less 0": 20,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Textarea/style/index.less 0": 21,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Radio/style/index.less 0": 22,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/slider/style/index.less 0": 23,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/LForm/style/index.less 0": 24,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Table/style/index.less 0": 25,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/table/style/index.less 0": 26,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/empty/style/index.less 0": 27,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/radio/style/index.less 0": 28,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/checkbox/style/index.less 0": 29,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/dropdown/style/index.less 0": 30,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/button/style/index.less 0": 31,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/spin/style/index.less 0": 32,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/pagination/style/index.less 0": 33,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/select/style/index.less 0": 34,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/notification/style/index.less 0": 35,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Label/style/index.less 0": 36,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/modal/style/index.less 0": 37,
-      "css node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!pages/settings/router/index.less 0": 38,
-      "css node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!styles/global.less 0": 39,
-      "css node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!pages/shop/index.less 0": 40,
-      "css node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!pages/login/index.less 0": 41,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Colors/style/index.less 0": 17,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/ImagePicker/style/index.less 0": 18,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Dialog/style/index.less 0": 19,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Textarea/style/index.less 0": 20,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Radio/style/index.less 0": 21,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/slider/style/index.less 0": 22,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/LForm/style/index.less 0": 23,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/notification/style/index.less 0": 24,
+      "css node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!pages/login/index.less 0": 25,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/icon/style/index.less 0": 26,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Table/style/index.less 0": 27,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/table/style/index.less 0": 28,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/empty/style/index.less 0": 29,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/radio/style/index.less 0": 30,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/checkbox/style/index.less 0": 31,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/dropdown/style/index.less 0": 32,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/button/style/index.less 0": 33,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/spin/style/index.less 0": 34,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/pagination/style/index.less 0": 35,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/select/style/index.less 0": 36,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Label/style/index.less 0": 37,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/modal/style/index.less 0": 38,
+      "css node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!pages/settings/router/index.less 0": 39,
+      "css node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!styles/global.less 0": 40,
+      "css node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!pages/shop/index.less 0": 41,
       "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/SearchBar/style/index.less 0": 42,
       "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Progress/style/index.less 0": 43,
       "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Upload/style/index.less 0": 44,
@@ -938,15 +938,15 @@
       "css node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!pages/apps/design/index.less 0": 50,
       "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Empty/style/index.less 0": 51,
       "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Select/style/index.less 0": 52,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/message/style/index.less 0": 53,
-      "css node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!pages/settings/icon/index.less 0": 54,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/menu/style/index.less 0": 55,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/page-header/style/index.less 0": 56,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/divider/style/index.less 0": 57,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/breadcrumb/style/index.less 0": 58,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/tree/style/index.less 0": 59,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/collapse/style/index.less 0": 60,
-      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Dropdown/style/index.less 0": 61,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!components/lib/Dropdown/style/index.less 0": 53,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/message/style/index.less 0": 54,
+      "css node_modules/css-loader/index.js??ref--7-1!node_modules/typed-css-modules-loader/index.js??ref--7-2!node_modules/less-loader/dist/cjs.js??ref--7-3!pages/settings/icon/index.less 0": 55,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/menu/style/index.less 0": 56,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/page-header/style/index.less 0": 57,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/divider/style/index.less 0": 58,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/breadcrumb/style/index.less 0": 59,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/tree/style/index.less 0": 60,
+      "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/collapse/style/index.less 0": 61,
       "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/date-picker/style/index.less 0": 62,
       "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/input/style/index.less 0": 63,
       "css node_modules/css-loader/index.js??ref--8-1!node_modules/less-loader/dist/cjs.js??ref--8-2!node_modules/antd/lib/time-picker/style/index.less 0": 64,

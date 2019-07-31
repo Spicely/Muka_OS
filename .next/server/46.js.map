@@ -1,1 +1,0 @@
-{"version":3,"file":"46.js","sources":["webpack:///./components/lib/Icon/md/checkmark.ts"],"sourcesContent":["export default {\r\n    path: [\r\n        'M186.301 339.893L96 249.461l-32 30.507L186.301 402 448 140.506 416 110z'\r\n    ],\r\n    viewBox: '0 0 512 512',\r\n    name: 'md-checkmark'\r\n}\r\n"],"mappings":";;;;;;;;;;;AAAA;AAAA;AACA;AAGA;AACA;AALA;;;;A","sourceRoot":""}

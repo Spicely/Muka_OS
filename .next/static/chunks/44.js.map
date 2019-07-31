@@ -1,1 +1,0 @@
-{"version":3,"file":"static/chunks/44.js","sources":["webpack:///./components/lib/Icon/md/arrow-down.ts"],"sourcesContent":["export default {\r\n    path: [\r\n        'M128 192l128 128 128-128z'\r\n    ],\r\n    viewBox: '0 0 512 512',\r\n    name: 'md-arrow-down'\r\n}\r\n"],"mappings":";;;;;;;;;;AAAA;AAAA;AACA;AAGA;AACA;AALA;;;;A","sourceRoot":""}

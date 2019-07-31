@@ -64,7 +64,6 @@ export default class Carousel extends Component<ICarouselProps, IState> {
     public render(): JSX.Element {
         const { className, children, dotPosition, dotClassName, dots, effect, style, autoplay, value, dotType, dotColor } = this.props
         const { selectIndex, left, top, animate } = this.state
-        console.log(selectIndex,' 222222222222222')
         const length = Children.count(value || children)
         const cssStyle: CSSProperties = {}
         const dotStyle: CSSProperties = {}
@@ -95,7 +94,7 @@ export default class Carousel extends Component<ICarouselProps, IState> {
                                     opacity: effect === 'fade' ? index === selectIndex ? 1 : 0 : 1
 
                                 }}
-                                ref={(e) => this.animateNode = e}
+                                ref={this.domAddEvent.bind(this, index)}
                                 key={index}
                             >
                                 {
@@ -163,6 +162,13 @@ export default class Carousel extends Component<ICarouselProps, IState> {
         this.interval(autoplay || false)
     }
 
+    private domAddEvent = (index: number, animateNode: HTMLDivElement) => {
+        if (index === 0 && animateNode) {
+            animateNode.removeEventListener('transitionend', this.handleAnimate)
+            animateNode.addEventListener('transitionend', this.handleAnimate)
+        }
+    }
+
     public componentWillReceiveProps(nextProps: ICarouselProps) {
         const { autoplay, selected } = this.props
         if (autoplay !== nextProps.autoplay) {
@@ -178,7 +184,7 @@ export default class Carousel extends Component<ICarouselProps, IState> {
             this.setState({
                 selectIndex: nextProps.selected || 0
             }, () => {
-               this.interval(nextProps.autoplay || false)
+                this.interval(nextProps.autoplay || false)
             })
         }
     }
@@ -219,7 +225,6 @@ export default class Carousel extends Component<ICarouselProps, IState> {
                     })
                 }, 20)
             })
-            return
         }
     }
 

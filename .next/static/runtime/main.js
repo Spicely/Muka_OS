@@ -11,5 +11,5 @@ module.exports = dll_7aff549c98b978433226;
 
 /***/ })
 
-},[["./node_modules/next/dist/client/next-dev.js","static/runtime/webpack.js",5]]]);
+},[["./node_modules/next/dist/client/next-dev.js","static/runtime/webpack.js","styles"]]]);
 //# sourceMappingURL=main.js.map
