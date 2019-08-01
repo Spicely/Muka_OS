@@ -170,7 +170,7 @@ export default class Carousel extends Component<ICarouselProps, IState> {
     }
 
     public componentWillReceiveProps(nextProps: ICarouselProps) {
-        const { autoplay, selected } = this.props
+        const { autoplay, selected, time } = this.props
         if (autoplay !== nextProps.autoplay) {
             if (nextProps.autoplay && !this.timer) {
                 this.interval(true)
@@ -178,6 +178,10 @@ export default class Carousel extends Component<ICarouselProps, IState> {
                 clearInterval(this.timer)
                 this.timer = undefined
             }
+        }
+        if (nextProps.autoplay && time !== nextProps.time) {
+            clearInterval(this.timer)
+            this.interval(true)
         }
         if (isNumber(nextProps.selected) && selected !== nextProps.selected) {
             clearInterval(this.timer)

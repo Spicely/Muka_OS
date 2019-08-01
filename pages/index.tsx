@@ -5,19 +5,32 @@ import Axios from 'axios'
 interface IState {
     lists: any[]
     selected: number
+    time: string
+    autoplay: boolean
+    timeDur: number
 }
 
 export default class Index extends Component<any, any> {
 
     public state: IState = {
         lists: [],
-        selected: 0
+        autoplay: true,
+        selected: 0,
+        time: '',
+        timeDur: 10000
     }
 
     public render(): JSX.Element {
-        const { lists, selected } = this.state
+        const { lists, selected, autoplay, timeDur } = this.state
         return (
-            <Carousel autoplay selected={selected} time={5000} style={{ width: '100vw', height: '100vh' }} dots={false} >
+            <Carousel
+                autoplay={autoplay}
+                selected={selected}
+                time={timeDur}
+                style={{ width: '100vw', height: '100vh' }}
+                dots={false}
+                onChnage={this.handleTabChange}
+            >
                 {
                     lists.map((i: any, index: number) => {
                         return (
@@ -36,44 +49,51 @@ export default class Index extends Component<any, any> {
         this.getData()
     }
 
+    private handleTabChange = (val: number) => {
+        const { lists, timeDur } = this.state
+        if (lists.length - 1 === val) {
+            this.setState({
+                selected: val,
+                autoplay: false
+            }, () => {
+                setTimeout(() => {
+                    this.reload()
+                }, timeDur - 1000)
+            })
+
+        }
+    }
+
     private getData = async () => {
         Axios({
             url: 'http://www.snplay.top:8080/fs/getimages',
-            // url: 'http://localhost:4000/api/fs/getimages',
-            method: 'POST'
+            method: 'GET'
         }).then((data) => {
             this.setState({
-                lists: data.data.data
+                lists: data.data.data,
+                time: data.data.time,
+                timeDur: data.data.timeDur
             })
         })
-        this.reload()
     }
 
     private reload = () => {
-        setInterval(() => {
-            Axios({
-                url: 'http://www.snplay.top:8080/fs/getimages',
-                // url: 'http://localhost:4000/api/fs/getimages',
-                method: 'POST'
-            }).then((data) => {
-                const { lists } = this.state
-                if (lists.length !== data.data.data.length) {
-                    const newData = data.data.data.filter((i: any) => {
-                        const val = lists.find((k) => {
-                            return i.id === k.id
-                        })
-                        return val ? false : true
-                    })
-                    const length = lists.length
-                    this.setState({
-                        lists: [
-                            ...lists,
-                            ...newData,
-                        ],
-                        selected: length
-                    })
-                }
+        const { time } = this.state
+        console.log(time)
+        Axios({
+            url: 'http://www.snplay.top:8080/fs/getimages',
+            method: 'GET',
+            params: {
+                startTime: time
+            }
+        }).then((data) => {
+            this.setState({
+                lists: data.data.data,
+                selected: 0,
+                autoplay: true,
+                time: data.data.time,
+                timeDur: data.data.timeDur
             })
-        }, 10000)
+        })
     }
 }
