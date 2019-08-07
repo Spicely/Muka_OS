@@ -30,11 +30,11 @@ const getCertificate = async () => {
 }
 
 export const initErrorToView = (ctx: any, url: string = '/login') => {
-    ctx.res.writeHead(302, { Location: url })
     setCookie(ctx, 'hist', ctx.pathname, {
         maxAge: 60 * 60,
         path: '/',
     })
+    ctx.res.writeHead(302, { Location: url })
     ctx.res && ctx.res.end()
     return {}
 }

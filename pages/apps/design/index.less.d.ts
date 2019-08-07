@@ -6,3 +6,5 @@ export const image: string;
 export const image_item: string;
 export const uploadViewClassName: string;
 export const scroll_view: string;
+export const link_view: string;
+export const link_view_btn: string;

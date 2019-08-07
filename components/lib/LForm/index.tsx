@@ -434,7 +434,7 @@ export default class LForm extends Component<ILFormProps, IState> {
                 return (
                     <div className={getClassName(`${prefixClass}__list flex_justify`, className)} key={field}>
                         <div className="flex">
-                            {label && <div className={getClassName(`${prefixClass}__list_label`)}>{label}</div>}
+                            {label && <div className={getClassName(`${prefixClass}__list_label`)} style={{ paddingTop: '5px' }}>{label}</div>}
                             <div className="flex_1">
                                 <View
                                     {...vProps}
@@ -541,17 +541,20 @@ export default class LForm extends Component<ILFormProps, IState> {
                 const vProps = omit(props, ['value', 'onChange', 'className'])
                 const _porps: any = props
                 return (
-                    <div className={getClassName(`l_form_label flex`, _porps.className)} key={field}>
-                        {_porps.label && <div className="flex_justify" style={{ marginRight: '0.4rem' }}>{_porps.label}</div>}
-                        <div className="flex_1 flex_justify">
-                            <View
-                                {...vProps}
-                                style={{ paddingTop: '0', paddingBottom: '0' }}
-                                key={field}
-                            >
-                                {_porps.value}
-                            </View>
+                    <div className={getClassName(`${prefixClass}__list flex_justify`, className)} key={field}>
+                        <div className="flex">
+                            {label && <div className={getClassName(`${prefixClass}__list_label`)} style={{ paddingTop: '5px' }}>{label}</div>}
+                            <div className="flex_1">
+                                <View
+                                    {...vProps}
+                                    style={{ paddingTop: '0', paddingBottom: '0' }}
+                                    key={field}
+                                >
+                                    {_porps.value}
+                                </View>
+                            </div>
                         </div>
+                        {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
                     </div>
                 )
             }

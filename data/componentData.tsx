@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { isArray } from 'muka'
-import { Button, Icon, Image, Input, } from 'components'
+import { Button, Icon, Image, Input, Colors, } from 'components'
 import { label_box, label_image } from './index.less'
 import { label_list_btn, label_list_int, label_view_list, label_list_icon, label_view, label_list_view, label_list_view_bot } from '../pages/apps/index.less'
+import { baseUrl } from 'utils/axios'
 
 const componentData = function (self: any) {
     const { componentData } = self.props
@@ -120,35 +121,37 @@ const componentData = function (self: any) {
                                 className={`flex ${label_view_list}`}
                                 key={index}
                             >
-                                <div className={`${label_list_view} flex_center`} onClick={self.handleSelectView.bind(self, index)}>
+                                <div className={`${label_list_view} flex_center`} onClick={self.handleSelectView.bind(self, index, 'searchSelect')}>
                                     {item.type === 'icon' && <Icon icon={item.url} color={item.color} />}
                                     {item.type === 'image' && <Image className={label_image} src={item.url} />}
                                     <div className={label_list_view_bot}>图片/字体</div>
                                 </div>
                                 <div className="flex_1">
-                                    {/* <div className="flex">
-                                <div className={`flex_justify ${label_list}`}>选项卡文字</div>
-                                <Input
-                                    className={`flex_1 ${label_list_int}`}
-                                    maxLength={5}
-                                    showMaxLength
-                                />
-                            </div> */}
                                     <div className="flex">
-                                        <Input className={`flex_1 ${label_list_int}`} placeholder="请选择链接地址" disabled closeIconShow={false} style={{ borderRight: 0 }} />
-                                        <Button className={`flex_justify ${label_list_btn}`} mold="primary">选择链接</Button>
+                                        <Input className={`flex_1 ${label_list_int}`} value={item.link} placeholder="请选择链接地址" disabled closeIconShow={false} style={{ borderRight: 0 }} />
+                                        <Button className={`flex_justify ${label_list_btn}`} onClick={self.showLinkDialog.bind(self, index)} mold="primary">选择链接</Button>
                                     </div>
+                                    {item.type === 'icon' && <Colors initColor={item.color} style={{ marginTop: '7px' }} onChange={self.handleNavBarRightColor.bind(self, index)} />}
                                 </div>
                                 <Icon
                                     className={label_list_icon}
                                     icon="md-close-circle"
                                     color="rgba(0, 0, 0, 0.3)"
                                     style={{ cursor: 'pointer' }}
-                                // onClick={this.handleTabBarDel.bind(this, index)}
+                                    onClick={self.handleNavBarRightDel.bind(self, index)}
                                 />
                             </div>
                         )
                     })}
+                    {
+                        props.right.length < 2 && (
+                            <Button style={{ width: '100%' }} onClick={self.addNavRight}>
+                                <Icon icon="ios-add" />
+                                添加一个
+                            </Button>
+                        )
+                    }
+
                 </div>
             ) : (
                     <div className={label_view}>
@@ -172,8 +175,8 @@ const componentData = function (self: any) {
             props: {
                 onChange: self.handleFormChange,
                 min: 100,
-                max: 200,
-                defaultValue: 200
+                max: 170,
+                defaultValue: 170
             },
             field: 'style.height'
         }, {
@@ -262,14 +265,14 @@ const componentData = function (self: any) {
                 }],
                 value: false
             },
-            field: 'autoPlay'
+            field: 'autoplay'
         }, {
             component: 'Radio',
             label: '播放方式：',
             props: {
                 onChange: self.handleFormChange,
                 options: [{
-                    label: '向右', value: 'scrollx',
+                    label: '向左', value: 'scrollx',
                 }, {
                     label: '向下', value: 'scrolly',
                 }, {
@@ -279,16 +282,49 @@ const componentData = function (self: any) {
             },
             field: 'effect'
         }, {
-            component: 'ImagePicker',
+            component: 'Label',
             label: '图片设置：',
-            props: {
-                onChange: self.handlePickerChange,
-                value: [{
-                    url: '/static/banner-1.jpg'
-                }, {
-                    url: '/static/banner-2.jpg'
-                }]
-            }
+            field: 'image',
+            additional: (
+                <div className={label_view}>
+                    {
+                        (props.value || []).map((item: any, index: number) => {
+                            return (
+                                <div className={`flex ${label_view_list}`} key={item.url + index}>
+                                    <div className={`${label_list_view} flex_center`}>
+                                        <Image className={label_image} src={baseUrl + item.url} style={{width: '88px'}} key={item.url + index} />
+                                    </div>
+                                    <div className="flex_1">
+                                        <div className="flex_1">
+                                            <div className="flex">
+                                                <Input className={`flex_1 ${label_list_int}`} value={item.url} placeholder="请选择图片地址" disabled closeIconShow={false} style={{ borderRight: 0 }} />
+                                                <Button className={`flex_justify ${label_list_btn}`} onClick={self.handleSelectView.bind(self, index, 'imagesDialog')} mold="primary">选择图片</Button>
+                                            </div>
+                                        </div>
+                                        <div className="flex_1" style={{ marginTop: '7px' }}>
+                                            <div className="flex">
+                                                <Input className={`flex_1 ${label_list_int}`} value={item.link} placeholder="请选择链接地址" disabled closeIconShow={false} style={{ borderRight: 0 }} />
+                                                <Button className={`flex_justify ${label_list_btn}`} onClick={self.showLinkDialog.bind(self, index)} mold="primary">选择链接</Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <Icon
+                                        className={label_list_icon}
+                                        icon="md-close-circle"
+                                        color="rgba(0, 0, 0, 0.3)"
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={self.handleNavBarRightDel.bind(self, index)}
+                                    />
+                                </div>
+                            )
+                        })
+                    }
+
+                    <Button style={{ width: '100%' }} onClick={self.addNavRight}>
+                        <Icon icon="ios-add" />添加一个
+                    </Button>
+                </div>
+            )
         }],
         'TabBar': [{
             component: 'Slider',

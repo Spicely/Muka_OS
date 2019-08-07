@@ -7,7 +7,7 @@ import PageHead from 'layouts/PageHead'
 import PageLayout from 'layouts/PageLayout'
 import { omit, isArray, isString } from 'muka'
 import { IInitState } from 'store/state'
-import { Alert, BoxLine, Button, Carousel, Dialog, Drag, Icon, Image, Label, LabelHeader, NavBar, TabBar, ILFormItem, LForm, ILFormFun, Pagination, ScrollView, SearchBar, INavBarRightIcon, INavBarRightImage, Upload } from 'components'
+import { Alert, BoxLine, Button, Carousel, Dialog, Drag, Icon, Image, Label, LabelHeader, NavBar, TabBar, ILFormItem, LForm, ILFormFun, Pagination, ScrollView, SearchBar, INavBarRightIcon, INavBarRightImage, Upload, ColorResult } from 'components'
 import { IValue } from 'components/lib/utils'
 import http, { IinitProps, IRresItems, initErrorToView, baseUrl, deviaDecrypt, decrypt } from 'utils/axios'
 import { connect } from 'react-redux'
@@ -16,7 +16,7 @@ import componentViewData from '../../../data/componentData'
 import EditComponent from '../editComponent'
 import { nav_bar } from 'layouts/PageLayout/index.less'
 import { app_view, tpl_phone, m_tit, cri, lon, m_scroll_view, com, com_actions, com_bar, com_label, form_style, label_list, label_list_btn, label_list_int, label_view, label_view_list, label_list_icon } from '../index.less'
-import { component_label, component_list, icons_items, nav_color, image, image_item, uploadViewClassName, scroll_view } from './index.less'
+import { component_label, component_list, icons_items, nav_color, image, image_item, uploadViewClassName, scroll_view, link_view, link_view_btn } from './index.less'
 
 const { confirm } = Modal
 
@@ -49,11 +49,14 @@ interface IState {
     selected: number
     type: typeList
     icons: any[]
+    links: any[]
     images: any[]
     searchSelect: boolean
     uploadDialog: boolean
+    imagesDialog: boolean
     pageCurrent: number
     total: number
+    linkDialog: boolean
 }
 
 const reorder = (list: IComponents[], startIndex: number, endIndex: number) => {
@@ -80,6 +83,7 @@ class AppsDesign extends Component<IProps, IState> {
 
     public state: IState = {
         components: [],
+        links: [],
         icons: [],
         images: [],
         total: 0,
@@ -88,12 +92,16 @@ class AppsDesign extends Component<IProps, IState> {
         type: 'LForm',
         searchSelect: false,
         uploadDialog: false,
-        pageCurrent: 1
+        imagesDialog: false,
+        pageCurrent: 1,
+        linkDialog: false
     }
 
     private index: number = 0
 
     private listIndex: number = 0
+
+    private selectIndex: number = 0
 
     private componentType: IComponentType = ''
 
@@ -103,7 +111,7 @@ class AppsDesign extends Component<IProps, IState> {
 
     public render(): JSX.Element {
         const { componentData } = this.props
-        const { searchSelect, icons, uploadDialog, images, pageCurrent, total } = this.state
+        const { searchSelect, icons, uploadDialog, images, pageCurrent, total, linkDialog, links, imagesDialog } = this.state
         return (
             <PageHead title="小程序-页面设计">
                 <PageLayout
@@ -217,6 +225,40 @@ class AppsDesign extends Component<IProps, IState> {
                             </TabBar.Item>
                         </TabBar>
                     </Dialog>
+                    <Dialog visible={imagesDialog} title="图片" style={{ width: 1088, height: 756 }} onClose={this.handleCloseDialog.bind(this, 'imagesDialog')} onFirstShow={this.getImage}>
+                        <TabBar tabBarClassName="mk_divider" style={{ height: '100%' }} onChange={this.handleTabBarChange}>
+                            <TabBar.Item label="服务器图片">
+                                <NavBar
+                                    className={nav_color}
+                                    left={null}
+                                    right={
+                                        <Button mold="primary" onClick={this.handleShowUpload.bind(this, 'uploadDialog')}>上传图片</Button>
+                                    }
+                                />
+                                <ScrollView scrollY className={scroll_view}>
+                                    {
+                                        images.map((i) => {
+                                            return (
+                                                <div
+                                                    className={image}
+                                                    key={i.id}
+                                                    onClick={this.setCarouselUrl.bind(this, i.previewUrl, 'value', 'imagesDialog')}
+                                                >
+                                                    <div className="flex_justify" style={{ width: '100%', height: '100%' }}>
+                                                        <Image src={baseUrl + i.previewUrl} className={image_item} />
+                                                    </div>
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </ScrollView>
+                                <div className="flex">
+                                    <div className="flex_1" />
+                                    <Pagination current={pageCurrent} total={total} pageSize={20} onChange={this.handleCurrent} />
+                                </div>
+                            </TabBar.Item>
+                        </TabBar>
+                    </Dialog>
                     <Dialog title="上传图片" footer={null} visible={uploadDialog} onClose={this.handleCloseDialog.bind(this, 'uploadDialog')}>
                         <Upload.Dragger
                             style={{ marginTop: '10px' }}
@@ -226,6 +268,29 @@ class AppsDesign extends Component<IProps, IState> {
                             onUploadSuccess={this.handleUploadSuccess}
                             uploadViewClassName={uploadViewClassName}
                         />
+                    </Dialog>
+                    <Dialog title="选择链接" style={{ width: 1088, height: 756 }} onFirstShow={this.handleLinkDialog} footer={null} visible={linkDialog} onClose={this.handleCloseDialog.bind(this, 'linkDialog')}>
+                        <ScrollView scrollY style={{ height: '100%' }}>
+                            <Alert title="如果底部菜单中已经选择该链接，页面中选择后点击无效" style={{ marginTop: '10px' }} inheritColor />
+                            {
+                                links.map((i) => {
+                                    return (
+                                        <div key={i.id}>
+                                            <div className={`${link_view} flex_justify`}>
+                                                <Label>{i.name}</Label>
+                                            </div>
+                                            <div>
+                                                {
+                                                    i.pages.map((v: any) => {
+                                                        return <Button className={link_view_btn} key={v.id} onClick={this.handleSetLink.bind(this, i.id)}>{v.name}</Button>
+                                                    })
+                                                }
+                                            </div>
+                                        </div>
+                                    )
+                                })
+                            }
+                        </ScrollView>
                     </Dialog>
                 </PageLayout>
             </PageHead>
@@ -250,26 +315,75 @@ class AppsDesign extends Component<IProps, IState> {
         }
     }
 
+    private handleSetLink = (id: string) => {
+        const { componentData, setComponentData } = this.props
+        const pageProps: any = [...componentData.pagePorps]
+        pageProps[this.index].props.right[this.selectIndex].link = `/pages/${id}`
+        setComponentData({ ...componentData })
+        this.setState({
+            linkDialog: false
+        })
+    }
+
     private handleTabBarChange = async (val: string | number | undefined) => {
         const { images } = this.state
         if (val === 1 && images.length === 0 && !this.loading) {
-            this.loading = true
-            try {
-                const data: IRresItems = await http('image/globalFind', {
-                    total: 1
-                })
-                this.loading = false
-                this.setState({
-                    images: [...data.data.images],
-                    total: data.data.total
-                })
-            } catch (msg) {
-                this.loading = false
-                console.log(msg)
-            }
+            this.getImage()
         }
     }
 
+    private getImage = async () => {
+        try {
+            this.loading = true
+            const data: IRresItems = await http('image/globalFind', {
+                total: 1
+            })
+            this.loading = false
+            this.setState({
+                images: [...data.data.images],
+                total: data.data.total
+            })
+        } catch (msg) {
+            this.loading = false
+            console.log(msg)
+        }
+    }
+
+    private addNavRight = () => {
+        const { componentData, setComponentData } = this.props
+        const pageProps: any = [...componentData.pagePorps]
+        pageProps[this.index].props.right.push({
+            type: 'icon',
+            url: 'msg',
+            color: '#fff'
+        })
+        setComponentData({ ...componentData })
+    }
+
+    private handleNavBarRightDel = (index: number) => {
+        const { componentData, setComponentData } = this.props
+        const pageProps: any = [...componentData.pagePorps]
+        pageProps[this.index].props.right.splice(index, 1)
+        setComponentData({ ...componentData })
+    }
+
+    private handleNavBarRightColor(index: number, val: ColorResult) {
+        const { componentData, setComponentData } = this.props
+        const pageProps: any = [...componentData.pagePorps]
+        pageProps[this.index].props.right[index].color = val.hex
+        setComponentData({ ...componentData })
+    }
+
+    private handleLinkDialog = async () => {
+        try {
+            const data: IRresItems = await http('apps/findPageClassifyAll')
+            this.setState({
+                links: data.data
+            })
+        } catch (msg) {
+            console.log(msg)
+        }
+    }
     private handleUploadSuccess = (val: any, data: any) => {
         const { images } = this.state
         const devia = deviaDecrypt(data.devia)
@@ -337,12 +451,14 @@ class AppsDesign extends Component<IProps, IState> {
                 if (componentName === 'SearchBar' && key[0] === 'extendRadio') {
                     if (val[i] === 'label' && !isString(val['right'])) {
                         data['right'] = '搜索'
-                    } else if (val[i] === 'actions' && !isArray(val['right'])) {
-                        data['right'] = [{
-                            type: 'icon',
-                            url: 'msg',
-                            color: '#fff'
-                        }]
+                    } else if (val[i] === 'actions') {
+                        if (!isArray(pageProps[this.index].props.right)) {
+                            data['right'] = [{
+                                type: 'icon',
+                                url: 'msg',
+                                color: '#fff'
+                            }]
+                        }
                     }
                 }
             })
@@ -360,8 +476,14 @@ class AppsDesign extends Component<IProps, IState> {
             default: return val
         }
     }
+    private showLinkDialog = (index: number) => {
+        this.selectIndex = index
+        this.setState({
+            linkDialog: true
+        })
+    }
 
-    private handleCloseDialog(field: 'searchSelect' | 'uploadDialog') {
+    private handleCloseDialog(field: 'searchSelect' | 'uploadDialog' | 'linkDialog' | 'imagesDialog') {
         this.setState({
             [field]: false
         })
@@ -378,6 +500,17 @@ class AppsDesign extends Component<IProps, IState> {
         const { componentData, setComponentData }: any = this.props
         const right = componentData.pagePorps[this.index].props.right
         right[this.listIndex] = data
+        this.setState({
+            [dialogName]: false
+        }, () => {
+            setComponentData(cloneDeep(componentData))
+        })
+    }
+
+    private setCarouselUrl = (url: string, field: string, dialogName: 'imagesDialog') => {
+        const { componentData, setComponentData }: any = this.props
+        const right = componentData.pagePorps[this.index].props[field]
+        right[this.listIndex].url = url
         this.setState({
             [dialogName]: false
         }, () => {
@@ -417,7 +550,7 @@ class AppsDesign extends Component<IProps, IState> {
                     onEdit={this.handleEditStart.bind(this, data, index, 'Carousel')}
                     onDelete={this.handleDelete.bind(this, index)}
                 >
-                    <Carousel {...data.props} />
+                    <Carousel {...data.props} baseUrl={baseUrl} />
                 </EditComponent>
             )
             case 'TabBar': {
@@ -497,8 +630,8 @@ class AppsDesign extends Component<IProps, IState> {
                         <NavBar />
                     </Drag>
                     <Label className={com_label} color="#999">轮播</Label>
-                    <Drag data={{ component: 'Carousel', props: { value: ['/static/banner-1.jpg', '/static/banner-2.jpg'] }, edit: false }}>
-                        <Carousel value={['/static/banner-1.jpg', '/static/banner-2.jpg']}>
+                    <Drag data={{ component: 'Carousel', props: { value: [{ url: `${baseUrl}/images/os/banner-1.jpg` }, { url: `${baseUrl}/images/os/banner-2.jpg` }] }, edit: false }}>
+                        <Carousel value={[{ url: `${baseUrl}/images/os/banner-1.jpg` }, { url: `${baseUrl}/images/os/banner-2.jpg` }]}>
                         </Carousel>
                     </Drag>
                     <Label className={com_label} color="#999">选项卡</Label>
@@ -611,10 +744,10 @@ class AppsDesign extends Component<IProps, IState> {
         }]
     }
 
-    private handleSelectView = (index: number) => {
+    private handleSelectView = (index: number, field: any) => {
         this.listIndex = index
         this.setState({
-            searchSelect: true
+            [field]: true
         })
     }
 
