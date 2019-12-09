@@ -1,24 +1,31 @@
 {
   "compilerOptions": {
-    "experimentalDecorators": true,
-    "allowJs": true,
-    "allowSyntheticDefaultImports": true,
-    "jsx": "preserve",
+    "target": "es5",
     "lib": [
       "dom",
-      "es2017"
+      "dom.iterable",
+      "esnext"
     ],
-    "baseUrl": "./",
+    "rootDir": "src",
+    "baseUrl": ".",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "module": "esnext",
     "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
     "noEmit": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "preserveConstEnums": true,
-    "removeComments": false,
-    "skipLibCheck": true,
-    "sourceMap": true,
-    "strict": true,
-    "target": "esnext"
-  }
+    "jsx": "react",
+    "paths": {
+      "components": ["src/components/"],
+      "store": ["src/store/"]
+    }
+  },
+  "include": [
+    "src"
+  ]
 }

@@ -1,8 +1,0 @@
-{
-    "baseUrl": "http://localhost:1337",
-    "imgUrl": "http://localhost:1337",
-    "modify": {
-        "primary-color": "#0693e3",
-        "border-radius-base": 0
-    }
-}

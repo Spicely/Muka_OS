@@ -1,2 +1,0 @@
-(window["webpackJsonp"] = window["webpackJsonp"] || []).push([["static/runtime/amp.js"],[],[["./node_modules/next/dist/client/amp-dev.js","static/runtime/webpack.js",53]]]);
-//# sourceMappingURL=amp.js.map
