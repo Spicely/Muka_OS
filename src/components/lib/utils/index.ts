@@ -1,5 +1,6 @@
 import ThemeData from './ThemeData'
 import { isNumber } from 'lodash'
+export { default as Border, BorderStyle } from './Border'
 export { default as Color } from './Color'
 export { default as Padding } from './Padding'
 export { default as ThemeData } from './ThemeData'

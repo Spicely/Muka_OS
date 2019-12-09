@@ -12,8 +12,10 @@ import { connect } from 'react-redux'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { ColorResult } from 'react-color'
 import { GlobalView } from 'src/utils/node'
-import { NavBarThemeData, Color } from 'src/components/lib/utils'
+import { NavBarThemeData, Color, getRatioUnit, Border, BorderStyle } from 'src/components/lib/utils'
 import { IComponentData } from 'src/store/reducers/componentData'
+import styled, { css } from 'styled-components'
+import EditComponent from './editComponent'
 
 const { confirm } = Modal
 
@@ -53,6 +55,47 @@ interface IState {
     total: number
     linkDialog: boolean
 }
+
+const TplPhone = styled.div`
+    background: #fff;
+    ${() => css`${Border.all({ width: 1, style: BorderStyle.solid, color: Color.fromRGB(220, 220, 220) }).toString()}`};
+    cursor: move;
+    transition: transform .5s 0.1s;
+    border-radius: ${getRatioUnit(15)};
+    height: ${getRatioUnit(550)};
+    width: ${getRatioUnit(310)};
+    padding: 0 ${getRatioUnit(5)} ${getRatioUnit(5)} ${getRatioUnit(5)};
+    overflow: hidden;
+`
+
+const TplTit = styled.div`
+    height: ${getRatioUnit(24)};
+    text-align: center;
+    span {
+        display: inline-block;
+        margin-top: ${getRatioUnit(12)};
+        background: #cfcfcf;
+    }
+`
+
+const TplTitCri = styled.span`
+    width: ${getRatioUnit(4)};
+    height: ${getRatioUnit(4)};
+    border-radius: 100%;
+    margin-right: ${getRatioUnit(10)};
+`
+
+const TplTitLon = styled.span`
+    width: ${getRatioUnit(48)};
+    height: ${getRatioUnit(4)};
+    border-radius: ${getRatioUnit(7)};
+`
+
+const TplScrollView = styled(Drag.Box)`
+   ${() => css`${Border.all({ width: 1, style: BorderStyle.solid, color: Color.fromRGB(220, 220, 220) }).toString()}`};
+    border-radius: ${getRatioUnit(5)};
+    overflow: auto;
+`
 
 const reorder = (list: IComponents[], startIndex: number, endIndex: number) => {
     const result = Array.from(list)
@@ -113,14 +156,14 @@ class AppsDesign extends Component<IProps, any> {
                     title="小程序说明"
                     message="小程序是微信小程序的管理后台，可在此设置个性化首页排版、基本设置、设置微信支付、审核发布。"
                 />
-                {/* <div className="flex flex_center" style={{ marginTop: '2rem' }}>
-                    <div className={`${tpl_phone} flex_column`}>
-                        <div className={m_tit} onClick={this.handleTabComponent.bind(this, 'Page')}>
-                            <span className={cri}></span>
-                            <span className={lon}></span>
-                        </div>
-                        <Drag.Box
-                            className={`flex_1 ${m_scroll_view}`}
+                <div className="flex flex_center" style={{ marginTop: '2rem' }}>
+                    <TplPhone className="flex_column">
+                        <TplTit onClick={this.handleTabComponent.bind(this, 'Page')}>
+                            <TplTitCri />
+                            <TplTitLon />
+                        </TplTit>
+                        <TplScrollView
+                            className="flex_1"
                             style={{ background: componentData.pageColor }}
                             onDragEnter={this.handleDragEnter}
                             onDragSuccess={this.handleDragSuccess}
@@ -141,7 +184,7 @@ class AppsDesign extends Component<IProps, any> {
                                                             {...provided.draggableProps}
                                                             {...provided.dragHandleProps}
                                                         >
-                                                            {this.getComponentsView(item, index)}
+                                                            {/* {this.getComponentsView(item, index)} */}
                                                         </div>
                                                     )}
                                                 </Draggable>
@@ -151,10 +194,10 @@ class AppsDesign extends Component<IProps, any> {
                                     )}
                                 </Droppable>
                             </DragDropContext>
-                        </Drag.Box>
-                    </div>
+                        </TplScrollView>
+                    </TplPhone>
                 </div>
-                <Dialog visible={searchSelect} title="字体/图片" style={{ width: 1088, height: 756 }} onClose={this.handleCloseDialog.bind(this, 'searchSelect')} onFirstShow={this.getDialogData}>
+                {/* <Dialog visible={searchSelect} title="字体/图片" style={{ width: 1088, height: 756 }} onClose={this.handleCloseDialog.bind(this, 'searchSelect')} onFirstShow={this.getDialogData}>
                     <TabBar tabBarClassName="mk_divider" style={{ height: '100%' }} onChange={this.handleTabBarChange}>
                         <TabBar.Item label="字体">
                             <BoxLine >
@@ -499,77 +542,77 @@ class AppsDesign extends Component<IProps, any> {
         })
     }
 
-    // private getComponentsView(data: IComponents, index: number) {
-    //     switch (data.component) {
-    //         case 'NavBar': return (
-    //             <EditComponent
-    //                 edit={data.edit}
-    //                 key={index}
-    //                 onClick={this.handleEdit.bind(this, data, index)}
-    //                 onEdit={this.handleEditStart.bind(this, data, index, 'LForm')}
-    //                 onDelete={this.handleDelete.bind(this, index)}
-    //             >
-    //                 <NavBar {...data.props} />
-    //             </EditComponent>
-    //         )
-    //         case 'SearchBar': return (
-    //             <EditComponent
-    //                 edit={data.edit}
-    //                 key={index}
-    //                 onClick={this.handleEdit.bind(this, data, index)}
-    //                 onEdit={this.handleEditStart.bind(this, data, index, 'LForm')}
-    //                 onDelete={this.handleDelete.bind(this, index)}
-    //             >
-    //                 <SearchBar {...data.props} />
-    //             </EditComponent>
-    //         )
-    //         case 'Notice': return (
-    //             <EditComponent
-    //                 edit={data.edit}
-    //                 key={index}
-    //                 onClick={this.handleEdit.bind(this, data, index)}
-    //                 onEdit={this.handleEditStart.bind(this, data, index, 'LForm')}
-    //                 onDelete={this.handleDelete.bind(this, index)}
-    //             >
-    //                 <Notice {...data.props} logo={baseUrl + data.props.logo} value={data.props.getType === 'read' ? [{ label: '内容将从数据库读取' }] : data.props.value} />
-    //             </EditComponent>
-    //         )
-    //         case 'Carousel': return (
-    //             <EditComponent
-    //                 edit={data.edit}
-    //                 key={index}
-    //                 onClick={this.handleEdit.bind(this, data, index)}
-    //                 onEdit={this.handleEditStart.bind(this, data, index, 'Carousel')}
-    //                 onDelete={this.handleDelete.bind(this, index)}
-    //             >
-    //                 <Carousel {...data.props} baseUrl={baseUrl} />
-    //             </EditComponent>
-    //         )
-    //         case 'TabBar': {
-    //             const value: ITabBarValue[] = data.props.value || []
-    //             omit(data.props, ['value'])
-    //             return (
-    //                 <EditComponent
-    //                     edit={data.edit}
-    //                     key={index}
-    //                     onClick={this.handleEdit.bind(this, data, index)}
-    //                     onEdit={this.handleEditStart.bind(this, data, index, 'Carousel')}
-    //                     onDelete={this.handleDelete.bind(this, index)}
-    //                 >
-    //                     <TabBar {...data.props} >
-    //                         {
-    //                             value.map((i: any, index: number) => {
-    //                                 return (
-    //                                     <TabBar.Item label={i.label || <Label color="red">未设置</Label>} key={index}>{i.content}</TabBar.Item>
-    //                                 )
-    //                             })
-    //                         }
-    //                     </TabBar>
-    //                 </EditComponent>
-    //             )
-    //         }
-    //     }
-    // }
+    private getComponentsView(data: IComponents, index: number) {
+        switch (data.component) {
+            case 'NavBar': return (
+                <EditComponent
+                    edit={data.edit}
+                    key={index}
+                    onClick={this.handleEdit.bind(this, data, index)}
+                    onEdit={this.handleEditStart.bind(this, data, index, 'LForm')}
+                    onDelete={this.handleDelete.bind(this, index)}
+                >
+                    <NavBar {...data.props} />
+                </EditComponent>
+            )
+            case 'SearchBar': return (
+                <EditComponent
+                    edit={data.edit}
+                    key={index}
+                    onClick={this.handleEdit.bind(this, data, index)}
+                    onEdit={this.handleEditStart.bind(this, data, index, 'LForm')}
+                    onDelete={this.handleDelete.bind(this, index)}
+                >
+                    <SearchBar {...data.props} />
+                </EditComponent>
+            )
+            case 'Notice': return (
+                <EditComponent
+                    edit={data.edit}
+                    key={index}
+                    onClick={this.handleEdit.bind(this, data, index)}
+                    onEdit={this.handleEditStart.bind(this, data, index, 'LForm')}
+                    onDelete={this.handleDelete.bind(this, index)}
+                >
+                    <Notice {...data.props} logo={baseUrl + data.props.logo} value={data.props.getType === 'read' ? [{ label: '内容将从数据库读取' }] : data.props.value} />
+                </EditComponent>
+            )
+            case 'Carousel': return (
+                <EditComponent
+                    edit={data.edit}
+                    key={index}
+                    onClick={this.handleEdit.bind(this, data, index)}
+                    onEdit={this.handleEditStart.bind(this, data, index, 'Carousel')}
+                    onDelete={this.handleDelete.bind(this, index)}
+                >
+                    <Carousel {...data.props} baseUrl={baseUrl} />
+                </EditComponent>
+            )
+            case 'TabBar': {
+                const value: ITabBarValue[] = data.props.value || []
+                omit(data.props, ['value'])
+                return (
+                    <EditComponent
+                        edit={data.edit}
+                        key={index}
+                        onClick={this.handleEdit.bind(this, data, index)}
+                        onEdit={this.handleEditStart.bind(this, data, index, 'Carousel')}
+                        onDelete={this.handleDelete.bind(this, index)}
+                    >
+                        {/* <TabBar {...data.props} >
+                            {
+                                value.map((i: any, index: number) => {
+                                    return (
+                                        <TabBar.Item label={i.label || <Label color="red">未设置</Label>} key={index}>{i.content}</TabBar.Item>
+                                    )
+                                })
+                            }
+                        </TabBar> */}
+                    </EditComponent>
+                )
+            }
+        }
+    }
 
     private handleDelete(index: number) {
         const { componentData, setComponentData } = this.props
