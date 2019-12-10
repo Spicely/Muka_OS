@@ -2,7 +2,7 @@ import React, { Component, CSSProperties } from 'react'
 import styled, { css } from 'styled-components'
 import { isArray, isNumber, isNull, isFunction, isString } from 'lodash'
 import { Consumer } from '../ThemeProvider'
-import { IStyledProps, NavBarThemeData, ThemeData } from '../utils'
+import { IStyledProps, NavBarThemeData, ThemeData, getUnit, getRatioUnit } from '../utils'
 import Icon, { iconType } from '../Icon'
 import Image from '../Image'
 
@@ -46,8 +46,9 @@ interface IStyleProps extends IStyledProps {
 }
 const Nav = styled.div<IStyleProps>`
     background: ${({ navBarTheme, theme }) => navBarTheme.navBarColor || theme.primarySwatch};
-    height: ${({ navBarTheme }) => navBarTheme.height * ThemeData.ratio + ThemeData.unit};
-    padding: 0 ${({ theme }) => 14 * ThemeData.ratio + ThemeData.unit};
+    height: ${({ navBarTheme }) => getUnit(navBarTheme.height)};
+    width: ${({ navBarTheme }) => getUnit(navBarTheme.width)};
+    padding: 0 ${() => getRatioUnit(14)};
     box-sizing: border-box;
     z-index: 8;
     ${({ fixed }) => {
@@ -56,26 +57,26 @@ const Nav = styled.div<IStyleProps>`
 `
 
 const NavLeft = styled.div<IStyledProps>`
-    padding-right: ${({ theme }) => 10 * ThemeData.ratio + ThemeData.unit};
-    min-width: ${({ theme }) => 28 * ThemeData.ratio + ThemeData.unit};
+    padding-right: ${() => getRatioUnit(10)};
+    min-width: ${() => getRatioUnit(28)};
 `
 
 const NavTitle = styled.div<IStyledProps>`
-    font-size: ${({ theme }) => 14 * ThemeData.ratio + ThemeData.unit};
+    font-size: ${() => getRatioUnit(14)};
 `
 
 const NavRight = styled.div<IStyledProps>`
-    padding-left: ${({ theme }) => 10 * ThemeData.ratio + ThemeData.unit};
-    min-width: ${({ theme }) => 28 * ThemeData.ratio + ThemeData.unit};
+    padding-left: ${() => getRatioUnit(10)};
+    min-width: ${() => getRatioUnit(28)};
 
     &__img {
-        width: ${({ theme }) => 22 * ThemeData.ratio + ThemeData.unit};
-        height: ${({ theme }) => 22 * ThemeData.ratio + ThemeData.unit};
+        width: ${() => getRatioUnit(22)};
+        height: ${() => getRatioUnit(22)};
     }
 
     &__item {
         display: inline-block;
-        margin-right: ${({ theme }) => 5 * ThemeData.ratio + ThemeData.unit};
+        margin-right: ${() => getRatioUnit(5)};
 
         &:last-child {
             margin-right: 0;
@@ -83,13 +84,13 @@ const NavRight = styled.div<IStyledProps>`
     }
 `
 
-const NavImg = styled(Image) <IStyledProps>`
-    width: ${({ theme }) => 22 * ThemeData.ratio + ThemeData.unit};
-    height: ${({ theme }) => 22 * ThemeData.ratio + ThemeData.unit};
+const NavImg = styled(Image)<IStyledProps>`
+    width: ${() => getRatioUnit(22)};
+    height: ${() => getRatioUnit(22)};
 `
 const NavItem = styled.div<IStyledProps>`
     display: inline-block;
-    margin-right: ${({ theme }) => 5 * ThemeData.ratio + ThemeData.unit};
+    margin-right: ${() => getRatioUnit(5)};
 
     &:last-child {
         margin-right: 0;

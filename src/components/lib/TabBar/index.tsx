@@ -13,10 +13,13 @@ export interface ITabBarProps {
     type?: IType
     theme?: TabBarThemeData
     style?: CSSProperties
+    selected?: number
 }
 
 interface IDefaultValue {
     theme: TabBarThemeData
+    selected?: number | string
+    itemChange?: (field: number | undefined) => void
 }
 
 const defaultValue: IDefaultValue = { theme: new TabBarThemeData() }
@@ -52,6 +55,7 @@ const TabBarItemView = styled.div<ITabBarItemViewProps>`
 
 const TabBarItemTabView = styled.div`
     overflow: hidden;
+    ${transition(0.5)}
 `
 
 const TabBarItemScrollView = styled.div`
@@ -65,16 +69,21 @@ interface ITabBarItemProps {
     className?: string
     icon?: JSX.Element
     selectedIcon?: JSX.Element
+    field?: number
     tooltipTitle?: string | JSX.Element
     placement?: any //TooltipPlacement
 }
 
 interface ITabBarItem {
     tabBarTheme: TabBarThemeData
+    selected: boolean
 }
 
 const TabBarItemBox = styled.div<ITabBarItem>`
     ${({ tabBarTheme }) => css`${tabBarTheme.itemPadding.toString()}`};
+    ${({ selected, tabBarTheme, theme }) => {
+        if (selected) return css`background: ${tabBarTheme.itemSelectColor || theme.primarySwatch};`
+    }}
     cursor: pointer;
     ${transition(0.5)};
     &:hover {
@@ -89,37 +98,52 @@ const TabBarIcon = styled.div`
 export class TabBarItem extends Component<ITabBarItemProps, any> {
 
     public render(): JSX.Element {
-        const { title, icon, className } = this.props
+        const { title, icon, className, field } = this.props
+
         return (
-            <Consumer>
+            <ThemeConsumer>
                 {
                     (value) => (
-                        <TabBarItemBox
-                            className={getClassName(className, 'flex flex_center')}
-                            tabBarTheme={value.theme}
-                            onClick={this.handleTabItem}
-                        >
+                        <Consumer>
                             {
-                                icon ? (
-                                    <TabBarIcon className="flex_center">
-                                        {icon}
-                                    </TabBarIcon>
-                                ) : null
+                                (val) => (
+                                    <TabBarItemBox
+                                        className={getClassName(className, 'flex flex_center')}
+                                        tabBarTheme={val.theme || value.theme.tabBarTheme}
+                                        onClick={val.itemChange ? val.itemChange.bind(this, field) : undefined}
+                                        selected={field === val.selected}
+                                    >
+                                        {
+                                            icon ? (
+                                                <TabBarIcon className="flex_center">
+                                                    {icon}
+                                                </TabBarIcon>
+                                            ) : null
+                                        }
+                                        {title}
+                                    </TabBarItemBox>
+                                )
                             }
-                            {title}
-                        </TabBarItemBox>
+                        </Consumer>
                     )
                 }
-            </Consumer>
+            </ThemeConsumer>
         )
-    }
-
-    private handleTabItem = () => {
-        console.log(1111)
     }
 }
 
-export default class TabBar extends Component<ITabBarProps, any> {
+interface ITabBarState {
+    selected?: number
+    height: number
+    width: number
+}
+
+export default class TabBar extends Component<ITabBarProps, ITabBarState> {
+
+    constructor(props: ITabBarProps) {
+        super(props)
+        this.state.selected = props.selected
+    }
 
     public static defaultProps: ITabBarProps = {
         mode: 'tab',
@@ -128,8 +152,17 @@ export default class TabBar extends Component<ITabBarProps, any> {
 
     public static Item = TabBarItem
 
+    public state: ITabBarState = {
+        selected: undefined,
+        width: 0,
+        height: 0
+    }
+
+    private node: HTMLDivElement | null = null
+
     public render(): JSX.Element {
         const { mode, type, theme, style, children } = this.props
+        const { selected, height, width } = this.state
         const tabBars: JSX.Element[] = []
         const tabViews: JSX.Element[] = []
         Children.forEach(children, (child: any, index) => {
@@ -142,15 +175,29 @@ export default class TabBar extends Component<ITabBarProps, any> {
             <ThemeConsumer>
                 {
                     (value) => (
-                        <Provider value={{ theme: theme || value.theme.tabBarTheme }}>
+                        <Provider
+                            value={{
+                                theme: theme || value.theme.tabBarTheme,
+                                selected,
+                                itemChange: this.handleTabItemChange
+                            }}
+                        >
                             <TabBarView
                                 mode={mode}
                                 className={mode === 'tab' ? type === 'horizontal' ? 'flex_column' : 'flex' : 'flex_column'}
                                 tabBarTheme={theme || value.theme.tabBarTheme}
                                 style={style}
+                                ref={(e) => this.node = e}
                             >
                                 {mode === 'tab' ? (<TabBarItemView type={type} className={type === 'vertical' ? 'flex_column' : 'flex'}>{tabBars}</TabBarItemView>) : null}
-                                <TabBarItemTabView className="flex_1 flex">{tabViews}</TabBarItemTabView>
+                                <TabBarItemTabView
+                                    className="flex_1 flex"
+                                    style={{
+                                        transform: `translate3d(${selected && type === 'horizontal' ? getRatioUnit(selected * -width) : 0}, ${selected && type === 'vertical' ? getRatioUnit(selected * -height): 0}, 0)`
+                                    }}
+                                >
+                                    {tabViews}
+                                </TabBarItemTabView>
                                 {mode === 'menu' ? (<TabBarItemView type={type} className={type === 'vertical' ? 'flex_column' : 'flex'}>{tabBars}</TabBarItemView>) : null}
                             </TabBarView>
                         </Provider>
@@ -158,6 +205,48 @@ export default class TabBar extends Component<ITabBarProps, any> {
                 }
             </ThemeConsumer>
         )
+    }
+
+    public componentDidMount() {
+        const info = this.getRootNodeInfo()
+        this.setState({
+            height: info.height,
+            width: info.width
+        })
+    }
+
+    public UNSAFE_componentWillReceiveProps(nextProps: ITabBarProps) {
+        const { selected } = this.state
+        if (!isNil(nextProps.selected) && nextProps.selected !== selected) {
+            this.setState({
+                selected: nextProps.selected
+            })
+        }
+    }
+
+    private getRootNodeInfo = () => {
+        let width = 0
+        let height = 0
+        if (this.node) {
+            const node = this.node.getBoundingClientRect()
+            width = node.width
+            height = node.height
+        }
+        return {
+            width,
+            height
+        }
+    }
+
+    private handleTabItemChange = (field?: number) => {
+        if (!isNil(field)) {
+            const info = this.getRootNodeInfo()
+            this.setState({
+                selected: field,
+                width: info.width,
+                height: info.height
+            })
+        }
     }
 
 }
