@@ -23,7 +23,6 @@ interface IPageLayout extends DispatchProp {
     router: IRouter[]
     navBar?: JSX.Element
     title?: string | JSX.Element
-    actionsView?: JSX.Element
     setRouter: (data: IRouter[]) => void
     setUserInfo: (data: IUserInfo) => void
     setJurisd: (data: IJurisd[]) => void
@@ -155,7 +154,7 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
     private fn?: IFormFun
 
     public render(): JSX.Element {
-        const { children, navBar, collapsed, title, actionsView, router, userInfo, solo } = this.props
+        const { children, navBar, collapsed, title, router, userInfo, solo } = this.props
         const { visible, selected, extendSelected } = this.state
         const items: any[] = router
         let extendRoute = []
@@ -298,9 +297,7 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                         <LayoutScroll className="flex_1">
                             {children}
                         </LayoutScroll>
-                        <div>
-                            {actionsView}
-                        </div>
+                        <div id="actions_view"></div>
                     </div>
                 </div>
                 <Dialog
@@ -481,6 +478,31 @@ export class LayoutNavBar extends Component<ILayoutNavBarProps, any> {
         if (node) {
             return createPortal(
                 <NavBar {...this.props} />,
+                node
+            )
+        }
+        return null
+    }
+}
+
+export class LayoutActions extends Component<any, any> {
+
+    public state: any = {
+        node: null
+    }
+
+    public componentDidMount() {
+        const dom = document.getElementById('actions_view')
+        this.setState({
+            node: dom
+        })
+    }
+
+    public render() {
+        const { node } = this.state
+        if (node) {
+            return createPortal(
+                this.props.children,
                 node
             )
         }

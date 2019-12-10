@@ -113,7 +113,7 @@ const DialogContent = styled.div<IDialogContentProps>`
 const DialogBox = styled.div<IStyledProps>`
     min-height: ${() => getRatioUnit(300)};
     position: relative;
-    margin: 0 ${() => getRatioUnit(20)};
+    margin: 0;
     overflow: auto;
 `
 

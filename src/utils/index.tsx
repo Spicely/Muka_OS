@@ -1,14 +1,15 @@
 import React, { PureComponent } from 'react'
 import { render } from 'react-dom'
 import { connect, Provider } from 'react-redux'
-import { Dialog, TabBar, TabBarItem } from 'src/components'
+import { ThemeProvider } from 'components'
+import { Dialog, TabBar } from 'src/components'
 import { IActionsProps } from '../saga'
 import { IInitState } from 'src/store/state'
 import { IImages } from 'src/store/reducers/images'
 import { IDialogProps } from 'src/components/lib/Dialog'
 import { store } from 'src/store'
 import { SET_IMAGE_MODAL_VISIBLE } from 'src/store/action'
-import { DialogThemeData } from 'src/components/lib/utils'
+import { DialogThemeData, TabBarThemeData } from 'src/components/lib/utils'
 
 export interface IConnectProps {
     dispatch: (actions: IActionsProps) => void
@@ -40,13 +41,13 @@ class ImageModal extends PureComponent<IProps & IImageModalProps> {
                     height: '80%'
                 })}
             >
-                <TabBar>
-                    <TabBarItem title="共享库">
-                        <div style={{color: 'red'}}>sss</div>
-                    </TabBarItem>
-                    <TabBarItem title="私人图库">
-                        <div style={{color: 'red'}}>sss</div>
-                    </TabBarItem>
+                <TabBar theme={new TabBarThemeData({ height: '100%' })}>
+                    <TabBar.Item title="共享库">
+                        <div style={{ color: 'red' }}>sss</div>
+                    </TabBar.Item>
+                    <TabBar.Item title="私人图库">
+                        <div style={{ color: 'red' }}>sss</div>
+                    </TabBar.Item>
                 </TabBar>
             </Dialog>
         )
@@ -77,5 +78,5 @@ export const imageModal = (options?: IImageModalProps) => {
     const data = store.getState()
     console.log(data)
     store.dispatch({ type: SET_IMAGE_MODAL_VISIBLE, data: true })
-    render(<Provider store={store}><ConnectImageModal /></Provider>, dom)
+    render(<Provider store={store}><ThemeProvider><ConnectImageModal /></ThemeProvider></Provider>, dom)
 }

@@ -2,8 +2,7 @@ import React, { Component, ChangeEvent } from 'react'
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd'
 import { Modal } from 'antd'
 import { assign, cloneDeep } from 'lodash'
-import { bindActionCreators } from 'redux'
-import { LayoutNavBar } from 'src/layouts/PageLayout'
+import { LayoutNavBar, LayoutActions } from 'src/layouts/PageLayout'
 import { omit, isArray, isString } from 'muka'
 import { IInitState } from 'src/store/state'
 import { Alert, BoxLine, Button, Carousel, Dialog, Drag, Icon, Image, Label, LabelHeader, NavBar, TabBar, Form, Pagination, ScrollView, SearchBar, Upload, Notice } from 'components'
@@ -12,10 +11,11 @@ import { connect } from 'react-redux'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { ColorResult } from 'react-color'
 import { GlobalView } from 'src/utils/node'
-import { NavBarThemeData, Color, getRatioUnit, Border, BorderStyle } from 'src/components/lib/utils'
+import { NavBarThemeData, Color, getRatioUnit, Border, BorderStyle, TabBarThemeData } from 'src/components/lib/utils'
 import { IComponentData } from 'src/store/reducers/componentData'
 import styled, { css } from 'styled-components'
 import EditComponent from './editComponent'
+import componentViewData from './componentData'
 
 const { confirm } = Modal
 
@@ -151,6 +151,9 @@ class AppsDesign extends Component<IProps, any> {
                     theme={new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255) })}
                     title={<LabelHeader title={this.title} line="vertical" />}
                 />
+                <LayoutActions>
+                    {this.getActionsView()}
+                </LayoutActions>
                 <Alert
                     inheritColor
                     title="小程序说明"
@@ -416,15 +419,15 @@ class AppsDesign extends Component<IProps, any> {
         })
     }
 
-    // private getItem = (exFun: IFormFun): IFormItem[] => {
-    //     const { componentName } = this.state
-    //     this.exFun = exFun
-    //     if (!componentName) {
-    //         return []
-    //     }
-    //     const data: any = componentViewData(this)
-    //     return data[componentName]
-    // }
+    private getItem = (exFun: IFormFun): IFormItem[] => {
+        const { componentName } = this.state
+        this.exFun = exFun
+        if (!componentName) {
+            return []
+        }
+        const data: any = componentViewData(this)
+        return data[componentName]
+    }
 
     private handleShowUpload = (field: any) => {
         this.setState({
@@ -687,95 +690,95 @@ class AppsDesign extends Component<IProps, any> {
         setComponentData({ ...componentData })
     }
 
-    // private getActionsView(): JSX.Element {
-    //     const { selected, componentName } = this.state
-    //     return (
-    //         <TabBar type="vertical" className={com} selected={selected} tabBarClassName={com_bar} tabItemClassName={com_actions}>
-    //             <TabBar.Item icon={<Icon icon="ios-apps" />} tooltipTitle="页面组件" placement="left">
-    //                 <Drag data={{ component: 'NavBar', props: {}, edit: false }}>
-    //                     <NavBar />
-    //                 </Drag>
-    //                 <Label className={com_label} color="#999">轮播</Label>
-    //                 <Drag data={{ component: 'Carousel', props: { value: [{ url: `/images/banner-1.jpg` }, { url: `/images/banner-2.jpg` }], baseUrl }, edit: false }}>
-    //                     <Carousel baseUrl={baseUrl} value={[{ url: `/images/banner-1.jpg` }, { url: `/images/banner-2.jpg` }]}>
-    //                     </Carousel>
-    //                 </Drag>
-    //                 <Label className={com_label} color="#999">选项卡</Label>
-    //                 <Drag data={{ component: 'TabBar', props: { value: [{ label: '选项', content: '选项', data: '' }, { label: '选项', content: '选项', data: '' }] }, edit: false }}>
-    //                     <TabBar>
-    //                         <TabBar.Item label="选项" >选项</TabBar.Item>
-    //                         <TabBar.Item label="选项" >选项</TabBar.Item>
-    //                     </TabBar>
-    //                 </Drag>
-    //             </TabBar.Item>
-    //             <TabBar.Item icon={<Icon icon="ios-arrow-back" />} tooltipTitle="参数设置" placement="left" >
-    //                 {
-    //                     componentName === 'Page' && this.getPageNode()
-    //                 }
-    //                 {
-    //                     componentName !== 'Page' && <LForm getItems={this.getItem} className={form_style} />
-    //                 }
-    //                 {/*{this.componentType === 'TabBar' ?
-    //                     (
-    //                         <DragDropContext onDragEnd={this.onDragTabBar}>
-    //                             <Droppable droppableId="tab_bar" >
-    //                                 {(provided) => (
-    //                                     <div
-    //                                         {...provided.droppableProps}
-    //                                         ref={provided.innerRef}
-    //                                         className={label_view}
-    //                                     >
-    //                                         {components[this.index].props.value.map((i: ITabBarValue, index: number) => (
-    //                                             <Draggable key={index} draggableId={'tab_bar' + index.toString()} index={index}>
-    //                                                 {(provided) => (
-    //                                                     <div
-    //                                                         className={`flex ${label_view_list}`}
-    //                                                         ref={provided.innerRef}
-    //                                                         {...provided.draggableProps}
-    //                                                         {...provided.dragHandleProps}
+    private getActionsView(): JSX.Element {
+        const { selected, componentName } = this.state
+        return (
+            <TabBar type="vertical" theme={new TabBarThemeData({ height: '100%', width: 400 })}>
+                <TabBar.Item icon={<Icon icon="ios-apps" />} tooltipTitle="页面组件" placement="left">
+                    <Drag data={{ component: 'NavBar', props: {}, edit: false }}>
+                        <NavBar />
+                    </Drag>
+                    <Label color="#999">轮播</Label>
+                    <Drag data={{ component: 'Carousel', props: { value: [{ url: `/images/banner-1.jpg` }, { url: `/images/banner-2.jpg` }], baseUrl }, edit: false }}>
+                        <Carousel baseUrl={baseUrl} value={[{ url: `/images/banner-1.jpg` }, { url: `/images/banner-2.jpg` }]}>
+                        </Carousel>
+                    </Drag>
+                    <Label color="#999">选项卡</Label>
+                    <Drag data={{ component: 'TabBar', props: { value: [{ label: '选项', content: '选项', data: '' }, { label: '选项', content: '选项', data: '' }] }, edit: false }}>
+                        <TabBar>
+                            <TabBar.Item title="选项" >选项</TabBar.Item>
+                            <TabBar.Item title="选项" >选项</TabBar.Item>
+                        </TabBar>
+                    </Drag>
+                </TabBar.Item>
+                <TabBar.Item icon={<Icon icon="ios-arrow-back" />} tooltipTitle="参数设置" placement="left" >
+                    {
+                        componentName === 'Page' && this.getPageNode()
+                    }
+                    {
+                        componentName !== 'Page' && <Form getItems={this.getItem} />
+                    }
+                    {/*{this.componentType === 'TabBar' ?
+                        (
+                            <DragDropContext onDragEnd={this.onDragTabBar}>
+                                <Droppable droppableId="tab_bar" >
+                                    {(provided) => (
+                                        <div
+                                            {...provided.droppableProps}
+                                            ref={provided.innerRef}
+                                            className={label_view}
+                                        >
+                                            {components[this.index].props.value.map((i: ITabBarValue, index: number) => (
+                                                <Draggable key={index} draggableId={'tab_bar' + index.toString()} index={index}>
+                                                    {(provided) => (
+                                                        <div
+                                                            className={`flex ${label_view_list}`}
+                                                            ref={provided.innerRef}
+                                                            {...provided.draggableProps}
+                                                            {...provided.dragHandleProps}
 
-    //                                                     >
-    //                                                         <div className="flex_1">
-    //                                                             <div className="flex">
-    //                                                                 <div className={`flex_justify ${label_list}`}>选项卡文字</div>
-    //                                                                 <Input
-    //                                                                     className={`flex_1 ${label_list_int}`}
-    //                                                                     value={i.label}
-    //                                                                     onChange={this.handleTabBarInt.bind(this, index)}
-    //                                                                     closeIconShow={false}
-    //                                                                     maxLength={5}
-    //                                                                     showMaxLength
-    //                                                                 />
-    //                                                             </div>
-    //                                                             <div className="flex" style={{ marginTop: 10 }}>
-    //                                                                 <Input className={`flex_1 ${label_list_int}`} value={i.data} placeholder="请选择数据" disabled closeIconShow={false} style={{ borderRight: 0 }} />
-    //                                                                 <Button className={`flex_justify ${label_list_btn}`} mold="primary">选择数据</Button>
-    //                                                             </div>
-    //                                                         </div>
-    //                                                         <div className={`${label_list_icon} flex_justify`}>
-    //                                                             <Icon
-    //                                                                 icon="md-close-circle"
-    //                                                                 color="rgba(0, 0, 0, 0.3)"
-    //                                                                 style={{ cursor: 'pointer' }}
-    //                                                                 onClick={this.handleTabBarDel.bind(this, index)}
-    //                                                             />
-    //                                                         </div>
-    //                                                     </div>
-    //                                                 )}
-    //                                             </Draggable>
-    //                                         ))}
-    //                                         {provided.placeholder}
-    //                                     </div>
-    //                                 )}
-    //                             </Droppable>
-    //                         </DragDropContext>
+                                                        >
+                                                            <div className="flex_1">
+                                                                <div className="flex">
+                                                                    <div className={`flex_justify ${label_list}`}>选项卡文字</div>
+                                                                    <Input
+                                                                        className={`flex_1 ${label_list_int}`}
+                                                                        value={i.label}
+                                                                        onChange={this.handleTabBarInt.bind(this, index)}
+                                                                        closeIconShow={false}
+                                                                        maxLength={5}
+                                                                        showMaxLength
+                                                                    />
+                                                                </div>
+                                                                <div className="flex" style={{ marginTop: 10 }}>
+                                                                    <Input className={`flex_1 ${label_list_int}`} value={i.data} placeholder="请选择数据" disabled closeIconShow={false} style={{ borderRight: 0 }} />
+                                                                    <Button className={`flex_justify ${label_list_btn}`} mold="primary">选择数据</Button>
+                                                                </div>
+                                                            </div>
+                                                            <div className={`${label_list_icon} flex_justify`}>
+                                                                <Icon
+                                                                    icon="md-close-circle"
+                                                                    color="rgba(0, 0, 0, 0.3)"
+                                                                    style={{ cursor: 'pointer' }}
+                                                                    onClick={this.handleTabBarDel.bind(this, index)}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </Draggable>
+                                            ))}
+                                            {provided.placeholder}
+                                        </div>
+                                    )}
+                                </Droppable>
+                            </DragDropContext>
 
-    //                     ) : null
-    //                 } */}
-    //             </TabBar.Item>
-    //         </TabBar>
-    //     )
-    // }
+                        ) : null
+                    } */}
+                </TabBar.Item>
+            </TabBar>
+        )
+    }
 
     private getPageComponentItem = (fn: IFormFun): IFormItem[] => {
         const { componentData } = this.props

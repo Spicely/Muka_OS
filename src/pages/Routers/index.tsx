@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { find } from 'lodash'
 import { message, Modal } from 'antd'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
-import { Button, Dialog, LabelHeader, Form, NavBar, Table, Label, Icon, Image, Tag } from 'components'
+import { Button, Dialog, LabelHeader, Form, Table, Label, Icon, Image, Tag } from 'components'
 import http, { imgUrl, httpUtils, getTitle } from '../../utils/axios'
 import { connect, DispatchProp } from 'react-redux'
 import { IFormItem, IFormFun } from 'src/components/lib/Form'
@@ -69,10 +69,10 @@ class Routers extends Component<IProps, IState> {
             const ids: string[] = []
             ids.push(data.id)
             if (data.children) {
-                data.children.map((i) => {
+                data.children.forEach((i) => {
                     ids.push(i.id)
                     if (i.children) {
-                        i.children.map((z: any) => {
+                        i.children.forEach((z: any) => {
                             ids.push(z.id)
                         })
                     }

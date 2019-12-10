@@ -2,7 +2,7 @@ import React, { InputHTMLAttributes, Component, ChangeEvent, FocusEvent, CSSProp
 import styled, { css } from 'styled-components'
 import { omit, isFunction, isEmpty, isNil, isNumber } from 'lodash'
 import InputSearch from './search'
-import { getClassName, prefix, IStyledProps, transition, InputThemeData, ThemeData, Color, getRatioUnit } from '../utils'
+import { getClassName, prefix, IStyledProps, transition, InputThemeData, Color, getRatioUnit } from '../utils'
 import { Consumer } from '../ThemeProvider'
 import Icon from '../Icon'
 

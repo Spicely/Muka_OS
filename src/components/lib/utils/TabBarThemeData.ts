@@ -6,6 +6,8 @@ interface ITabBarThemeDataProps {
     tabBarColor?: Color
     height?: number | string
     width?: number | string
+    itemPadding?: Padding
+    itemHoverColor?: Color
 }
 
 export default class TabBarThemeData {
@@ -14,6 +16,8 @@ export default class TabBarThemeData {
             if (data.tabBarColor) this.tabBarColor = data.tabBarColor
             if (!isNil(data.height)) this.height = data.height
             if (!isNil(data.width)) this.width = data.width
+            if (data.itemPadding) this.itemPadding = data.itemPadding
+            if (data.itemHoverColor) this.itemHoverColor = data.itemHoverColor
         }
     }
 
@@ -23,5 +27,7 @@ export default class TabBarThemeData {
 
     public width: number | string = '100%'
 
-    public itemPadding: Padding = Padding.symmetric({ horizontal: 10, vertical: 6 })
+    public itemPadding: Padding = Padding.symmetric({ horizontal: 10, vertical: 8 })
+
+    public itemHoverColor?: Color
 }

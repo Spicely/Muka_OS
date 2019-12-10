@@ -21,7 +21,7 @@ import { IJurisdictionOptions } from 'src/store/reducers/jurisdictionOptions'
 const { TreeNode } = Tree
 
 const FromLabel = styled.div`
-     width: ${getRatioUnit(50)};
+    width: ${getRatioUnit(50)};
     text-align: justify;
     text-align-last: justify;
 `
@@ -222,10 +222,10 @@ class Jurisdiction extends Component<IProps, IState> {
         const { routers } = this.props
         const options: string[] = data.jurisdiction.map((i: any) => i.id)
         const parentVal: string[] = []
-        routers.map((i) => {
+        routers.forEach((i) => {
             if (i.children) {
                 parentVal.push(i.id)
-                i.children.map((v) => {
+                i.children.forEach((v) => {
                     if (v.children) { parentVal.push(v.id) }
                 })
             }
