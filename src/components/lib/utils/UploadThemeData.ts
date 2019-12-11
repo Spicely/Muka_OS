@@ -1,6 +1,7 @@
 import { isNil } from 'lodash'
 import Color from './Color'
 import Border, { BorderStyle } from './Border'
+import IconThemeData from './IconThemeData'
 
 interface IUploadThemeDataProps {
     uploadColor?: Color
@@ -8,6 +9,7 @@ interface IUploadThemeDataProps {
     width?: number | string
     border?: Border
     height?: number | string
+    iconTheme?: IconThemeData
 }
 
 export default class UploadThemeData {
@@ -18,6 +20,7 @@ export default class UploadThemeData {
             if (!isNil(data.width)) this.width = data.width
             if (!isNil(data.height)) this.height = data.height
             if (data.border) this.border = data.border
+            if (data.iconTheme) this.iconTheme = data.iconTheme
         }
     }
 
@@ -33,5 +36,10 @@ export default class UploadThemeData {
         width: 1,
         style: BorderStyle.dashed,
         color: Color.fromRGB(217, 217, 217)
+    })
+
+    public iconTheme: IconThemeData = new IconThemeData({
+        size: 40,
+        color: Color.fromRGBO(6, 147, 227, 0.7)
     })
 }

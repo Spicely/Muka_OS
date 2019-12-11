@@ -1,15 +1,15 @@
 import React, { PureComponent } from 'react'
 import { render } from 'react-dom'
 import { connect, Provider } from 'react-redux'
-import { ThemeProvider, Upload } from 'components'
-import { Dialog, TabBar } from 'src/components'
+import styled from 'styled-components'
+import { ThemeProvider, Upload, Dialog, TabBar } from 'components'
 import { IActionsProps } from '../saga'
 import { IInitState } from 'src/store/state'
 import { IImages } from 'src/store/reducers/images'
 import { IDialogProps } from 'src/components/lib/Dialog'
 import { store } from 'src/store'
 import { SET_IMAGE_MODAL_VISIBLE } from 'src/store/action'
-import { DialogThemeData, TabBarThemeData } from 'src/components/lib/utils'
+import { DialogThemeData, TabBarThemeData, getRatioUnit } from 'src/components/lib/utils'
 
 export interface IConnectProps {
     dispatch: (actions: IActionsProps) => void
@@ -80,6 +80,9 @@ export const imageModal = (options?: IImageModalProps) => {
     render(<Provider store={store}><ThemeProvider><ConnectImageModal /></ThemeProvider></Provider>, dom)
 }
 
+const UploadBox = styled.div`
+    padding: ${getRatioUnit(10)};
+`
 
 class ImageUpload extends PureComponent<any> {
 
@@ -94,7 +97,9 @@ class ImageUpload extends PureComponent<any> {
                     height: 300
                 })}
             >
-                <Upload.Dragger />
+                <UploadBox>
+                    <Upload.Dragger />
+                </UploadBox>
             </Dialog>
         )
     }

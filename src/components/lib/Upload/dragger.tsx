@@ -3,10 +3,10 @@ import axios from 'axios'
 import styled, { css } from 'styled-components'
 import { Consumer as ThemeConsumer } from '../ThemeProvider'
 import { isString, isArray, isNumber, isObject, isFunction } from 'lodash'
-import { getClassName, IValue, UploadThemeData, getRatioUnit, getUnit, transition } from '../utils'
+import { IValue, UploadThemeData, getRatioUnit, getUnit, transition } from '../utils'
 import { Consumer } from '../ConfigProvider'
-import Icon, { iconType } from '../Icon'
 import Progress from '../Progress'
+import Icon, { iconType } from '../Icon'
 
 export interface IUploadFileListProps {
     file: File
@@ -43,6 +43,79 @@ const UploadViewBox = styled.div<IUploadViewBoxProps>`
     }
 `
 
+const UploadDefault = styled.div`
+    text-align: center;
+`
+
+const UploadDefaultIcon = styled.div`
+    margin: 0 0 ${getRatioUnit(20)};
+`
+
+const UploadDefaultTitle = styled.div`
+    line-height: 1.5;
+    margin: 0 0 ${getRatioUnit(4)};
+    color: rgba(0, 0, 0, 0.85);
+    font-size: ${getRatioUnit(16)};
+`
+
+const UploadDefaultLabel = styled.div`
+    color: rgba(0, 0, 0, 0.45);
+    font-size: ${getRatioUnit(14)};
+    height: ${getRatioUnit(40)};
+    text-overflow: -o-ellipsis-lastline;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+`
+
+const UploadProView = styled.div`
+    margin-top: ${getRatioUnit(10)};
+`
+
+const UploadProViewItem = styled.div<IUploadViewBoxProps>`
+    margin-top: ${getRatioUnit(5)};
+    position: relative;
+    margin-right: ${getRatioUnit(10)};
+
+    :first-child {
+        margin-top: 0;
+    }
+
+    :hover {
+        background: ${({ uploadTheme, theme }) => uploadTheme.uploadColor || theme.primarySwatch};
+    }
+    
+`
+
+const UploadProViewItemIcon = styled.div`
+    width: ${getRatioUnit(40)};
+    height: ${getRatioUnit(40)};
+    border: ${getRatioUnit(1)} solid #d9d9d9;
+`
+
+const UploadProViewItemProgress = styled.div`
+    padding-left:  ${getRatioUnit(10)};
+`
+
+const UploadProViewItemClose = styled.div`
+    display: none;
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translate(50%, -50%);
+`
+
+const IconClose = styled(Icon)`
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    :hover {
+        fill: #fff;
+    }
+`
 export interface IUploadProps {
     className?: string
     uploadViewClassName?: string
@@ -75,8 +148,6 @@ export interface IUploadProps {
 interface IState {
     fileList: IUploadFileListProps[]
 }
-
-const prefixClass = 'upload_dragger'
 
 export default class Upload extends Component<IUploadProps, IState> {
 
@@ -123,22 +194,27 @@ export default class Upload extends Component<IUploadProps, IState> {
                                             >
                                                 {
                                                     children ? children : (
-                                                        <div className={getClassName(`${prefixClass}__box_default`)}>
-                                                            <div className={getClassName(`${prefixClass}__box_default__icon`)}>
-                                                                {isString(iconProps) ? <Icon icon={iconProps || undefined} /> : iconProps}
-                                                            </div>
-                                                            <div className={getClassName(`${prefixClass}__box_default__title`)}>
+                                                        <UploadDefault>
+                                                            <UploadDefaultIcon>
+                                                                {isString(iconProps) ? (
+                                                                    <Icon
+                                                                        icon={iconProps || undefined}
+                                                                        theme={theme ? theme.iconTheme : init.theme.uploadTheme.iconTheme}
+                                                                    />
+                                                                ) : iconProps}
+                                                            </UploadDefaultIcon>
+                                                            <UploadDefaultTitle>
                                                                 {titleProps}
-                                                            </div>
-                                                            <div className={getClassName(`${prefixClass}__box_default__label`)}>
+                                                            </UploadDefaultTitle>
+                                                            <UploadDefaultLabel>
                                                                 {labelProps}
-                                                            </div>
-                                                        </div>
+                                                            </UploadDefaultLabel>
+                                                        </UploadDefault>
                                                     )
                                                 }
                                                 <input style={{ display: 'none' }} type="file" multiple={multiple} ref={(e) => this.intNode = e} onChange={this.handleFileChange} accept={(fileTypes || []).join(',')} />
                                             </UploadViewBox>
-                                            <div className={getClassName(`${prefixClass}_upload__view`, uploadViewClassName)}>
+                                            <UploadProView className={uploadViewClassName}>
                                                 {
                                                     fileList.map((i, index: number) => {
                                                         if (isFunction(renderItem)) {
@@ -148,25 +224,31 @@ export default class Upload extends Component<IUploadProps, IState> {
                                                                 return undefined
                                                             }
                                                             return (
-                                                                <div className={getClassName(`${prefixClass}_upload__view__item flex`)} key={index}>
-                                                                    <div className={getClassName(`${prefixClass}_upload__view__item__icon flex_center`)}>
+                                                                <UploadProViewItem
+                                                                    uploadTheme={theme || init.theme.uploadTheme}
+                                                                    key={index}
+                                                                >
+                                                                    <UploadProViewItemIcon className="flex_center">
                                                                         {
                                                                             this.getTypeView(i.info.type || '', i.preUrl)
                                                                         }
-                                                                    </div>
-                                                                    <div className={getClassName(`${prefixClass}_upload__view__item__progress flex_1`)}>
+                                                                    </UploadProViewItemIcon>
+                                                                    <UploadProViewItemProgress className="flex_1">
                                                                         <div>{i.info.fileName}</div>
                                                                         <Progress percent={i.info.progress} text={`${i.info.progress}%`} />
-                                                                    </div>
-                                                                    <div className={getClassName(`${prefixClass}_upload__view__item__close`)}>
-                                                                        <Icon icon="ios-close" onClick={this.handleItemClose.bind(this, index)} />
-                                                                    </div>
-                                                                </div>
+                                                                    </UploadProViewItemProgress>
+                                                                    <UploadProViewItemClose>
+                                                                        <IconClose
+                                                                            icon="ios-close"
+                                                                            onClick={this.handleItemClose.bind(this, index)}
+                                                                        />
+                                                                    </UploadProViewItemClose>
+                                                                </UploadProViewItem>
                                                             )
                                                         }
                                                     })
                                                 }
-                                            </div>
+                                            </UploadProView>
                                         </UploadView>
                                     )
                                 }

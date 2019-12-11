@@ -54,6 +54,7 @@ const TabBarItemView = styled.div<ITabBarItemViewProps>`
         else return css`width: ${getRatioUnit(50)}; ${TabBarItemBox} { width: ${getRatioUnit(50)}; height: ${getRatioUnit(50)};&:hover { background: ${Color.setOpacity(theme.primarySwatch, 0.2).toString()}}}`
     }}
     overflow: auto;
+    position: relative;
     -webkit-overflow-scrolling: touch;
 `
 
@@ -74,6 +75,42 @@ const TabBarItemScrollView = styled.div<ITabBarItemScrollViewProps>`
     ${transition(0.5)}
 `
 
+interface ITabBarItem {
+    tabBarTheme: TabBarThemeData
+    selected: boolean
+}
+
+const TabBarItemBox = styled.div<ITabBarItem>`
+    ${({ tabBarTheme }) => css`${tabBarTheme.itemPadding.toString()}`};
+    ${({ selected, tabBarTheme, theme }) => {
+        if (selected) return css`color: ${tabBarTheme.itemSelectColor || theme.primarySwatch};`
+    }}
+    cursor: pointer;
+    ${transition(0.5)};
+    &:hover {
+        color: ${({ tabBarTheme, theme }) => tabBarTheme.itemHoverColor || theme.primarySwatch};
+    }
+`
+
+const TabBarIcon = styled.div``
+
+interface IActiveBarProps {
+    tabBarTheme: TabBarThemeData
+    type?: IType
+    activeNum: number
+    selectIndex?: number
+}
+
+const ActiveBar = styled.div<IActiveBarProps>`
+    ${transition(0.3, 'top,left')};
+    ${({ type, activeNum, selectIndex }) => {
+        if (type === 'horizontal') return css`height: ${getRatioUnit(2)};width: ${getRatioUnit(activeNum)};bottom: 0;left: ${getRatioUnit((selectIndex || 0) * activeNum)};`
+        else return css`width: ${getRatioUnit(2)};height: ${getRatioUnit(activeNum)};left: 0;top: ${getRatioUnit((selectIndex || 0) * activeNum)};`
+    }}
+    background: ${({ tabBarTheme, theme }) => tabBarTheme.activeBarColor || theme.primarySwatch};
+    position: absolute;
+`
+
 interface ITabBarItemProps {
     title?: string | JSX.Element
     className?: string
@@ -84,32 +121,10 @@ interface ITabBarItemProps {
     placement?: any //TooltipPlacement
 }
 
-interface ITabBarItem {
-    tabBarTheme: TabBarThemeData
-    selected: boolean
-}
-
-const TabBarItemBox = styled.div<ITabBarItem>`
-    ${({ tabBarTheme }) => css`${tabBarTheme.itemPadding.toString()}`};
-    ${({ selected, tabBarTheme, theme }) => {
-        if (selected) return css`background: ${tabBarTheme.itemSelectColor || theme.primarySwatch};`
-    }}
-    cursor: pointer;
-    ${transition(0.5)};
-    &:hover {
-        color: ${({ tabBarTheme, theme }) => tabBarTheme.itemHoverColor || theme.primarySwatch};
-    }
-`
-
-const TabBarIcon = styled.div`
-    
-`
-
 export class TabBarItem extends Component<ITabBarItemProps, any> {
 
     public render(): JSX.Element {
         const { title, icon, className, field } = this.props
-
         return (
             <ThemeConsumer>
                 {
@@ -146,13 +161,14 @@ interface ITabBarState {
     selected?: number
     height: number
     width: number
+    activeNum: number
 }
 
 export default class TabBar extends Component<ITabBarProps, ITabBarState> {
 
     constructor(props: ITabBarProps) {
         super(props)
-        this.state.selected = props.selected
+        this.state.selected = props.selected || 0
     }
 
     public static defaultProps: ITabBarProps = {
@@ -165,19 +181,20 @@ export default class TabBar extends Component<ITabBarProps, ITabBarState> {
     public state: ITabBarState = {
         selected: undefined,
         width: 0,
-        height: 0
+        height: 0,
+        activeNum: 0
     }
 
     private node: HTMLDivElement | null = null
 
     public render(): JSX.Element {
         const { mode, type, theme, style, children, tabViewClassName, tabViewBarClassName, itemBarClassName, itemClassName } = this.props
-        const { selected, height, width } = this.state
+        const { selected, height, width, activeNum } = this.state
         const tabBars: JSX.Element[] = []
         const tabViews: JSX.Element[] = []
         Children.forEach(children, (child: any, index) => {
             if (child && child.type === TabBarItem) {
-                tabBars.push(cloneElement(child, { key: index, field: index, className: itemClassName }))
+                tabBars.push(cloneElement(child, { key: index, field: index, className: getClassName('tab_ev_item', itemClassName) }))
                 tabViews.push(child.props.children)
             }
         })
@@ -202,9 +219,15 @@ export default class TabBar extends Component<ITabBarProps, ITabBarState> {
                                 {mode === 'tab' ? (
                                     <TabBarItemView
                                         type={type}
-                                        className={getClassName(type === 'vertical' ? 'flex_column' : 'flex', itemBarClassName)}
+                                        className={getClassName(`${type === 'vertical' ? 'flex_column' : 'flex'}`, itemBarClassName)}
                                     >
                                         {tabBars}
+                                        <ActiveBar
+                                            activeNum={activeNum}
+                                            selectIndex={selected}
+                                            type={type}
+                                            tabBarTheme={theme || value.theme.tabBarTheme}
+                                        />
                                     </TabBarItemView>
                                 ) : null}
                                 <TabBarItemTabView
@@ -243,19 +266,37 @@ export default class TabBar extends Component<ITabBarProps, ITabBarState> {
 
     public componentDidMount() {
         const info = this.getRootNodeInfo()
+        const itemInfo = this.getSelectedNodeInfo()
         this.setState({
             height: info.height,
-            width: info.width
+            width: info.width,
+            activeNum: itemInfo
         })
     }
 
     public UNSAFE_componentWillReceiveProps(nextProps: ITabBarProps) {
         const { selected } = this.state
         if (!isNil(nextProps.selected) && nextProps.selected !== selected) {
+            const itemInfo = this.getSelectedNodeInfo(nextProps.selected)
             this.setState({
+                activeNum: itemInfo,
                 selected: nextProps.selected
             })
         }
+    }
+
+    public getSelectedNodeInfo = (index?: number) => {
+        const { selected } = this.state
+        const { type } = this.props
+        let value = 0
+        if (this.node && !isNil(selected)) {
+            const node = this.node.querySelectorAll('.tab_ev_item')[index || selected]
+            if (node) {
+                const rect = node.getBoundingClientRect()
+                value = type === 'horizontal' ? rect.width : rect.height
+            }
+        }
+        return value
     }
 
     private getRootNodeInfo = () => {
@@ -273,14 +314,17 @@ export default class TabBar extends Component<ITabBarProps, ITabBarState> {
     }
 
     private handleTabItemChange = (field?: number) => {
+        const { selected } = this.state
+        if (selected === field) return
         if (!isNil(field)) {
             const info = this.getRootNodeInfo()
+            const itemInfo = this.getSelectedNodeInfo()
             this.setState({
                 selected: field,
                 width: info.width,
-                height: info.height
+                height: info.height,
+                activeNum: itemInfo
             })
         }
     }
-
 }

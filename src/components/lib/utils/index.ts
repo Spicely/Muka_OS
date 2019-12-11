@@ -40,6 +40,10 @@ export interface IStyledProps {
 
 
 export const transition = function (time: number, tag?: string): string {
+    if (tag) {
+        const arr = tag.split(',')
+        return `transition: ${arr.map((i) => `${i} ${time}s`).toString()}`
+    }
     return `transition: ${tag || 'all'} ${time}s`
 }
 
