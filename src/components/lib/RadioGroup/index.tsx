@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { isUndefined, isFunction } from 'lodash'
-import styled from 'styled-components'
+import styled, { CSSProperties } from 'styled-components'
 import Radio, { IRadioType } from '../Radio'
 import { Consumer } from '../ThemeProvider'
 import { IValue, RadioThemeData, getRatioUnit } from '../utils'
@@ -16,6 +16,7 @@ export interface IRadioGroupProps {
     type?: IRadioType
     value?: string | number | boolean
     options: IRadioGroupOptions[]
+    itemStyle?: CSSProperties
     onChange?: (value: string | number | boolean, data: IValue) => void
     theme?: RadioThemeData
 }
@@ -26,6 +27,9 @@ interface IState {
 
 const RadioItem = styled(Radio)`
     margin-right: ${getRatioUnit(10)};
+    &:last-child {
+        margin-right: 0;
+    }
 `
 
 export default class RadioGroup extends Component<IRadioGroupProps, IState> {
@@ -44,7 +48,7 @@ export default class RadioGroup extends Component<IRadioGroupProps, IState> {
     }
 
     public render(): JSX.Element {
-        const { className, options, type, theme } = this.props
+        const { className, options, type, theme, itemStyle } = this.props
         const { value } = this.state
         return (
             <Consumer>
@@ -59,6 +63,7 @@ export default class RadioGroup extends Component<IRadioGroupProps, IState> {
                                         key={index} type={type}
                                         onChange={this.handleRadioChange.bind(this, i.value, i)}
                                         checked={i.value === value}
+                                        style={itemStyle}
                                     >
                                         {i.label}
                                     </RadioItem>

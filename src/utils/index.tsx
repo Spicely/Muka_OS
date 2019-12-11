@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { render } from 'react-dom'
 import { connect, Provider } from 'react-redux'
-import { ThemeProvider } from 'components'
+import { ThemeProvider, Upload } from 'components'
 import { Dialog, TabBar } from 'src/components'
 import { IActionsProps } from '../saga'
 import { IInitState } from 'src/store/state'
@@ -25,7 +25,6 @@ interface IProps extends IDialogProps {
 }
 
 class ImageModal extends PureComponent<IProps & IImageModalProps> {
-
 
     public render(): JSX.Element {
         const { images, imageModalVisible } = this.props
@@ -79,4 +78,38 @@ export const imageModal = (options?: IImageModalProps) => {
     console.log(data)
     store.dispatch({ type: SET_IMAGE_MODAL_VISIBLE, data: true })
     render(<Provider store={store}><ThemeProvider><ConnectImageModal /></ThemeProvider></Provider>, dom)
+}
+
+
+class ImageUpload extends PureComponent<any> {
+
+    public render(): JSX.Element {
+        return (
+            <Dialog
+                visible={true}
+                title="图片上传"
+                onClose={this.handleClose}
+                theme={new DialogThemeData({
+                    width: 600,
+                    height: 300
+                })}
+            >
+                <Upload.Dragger />
+            </Dialog>
+        )
+    }
+
+    private handleClose = () => {
+        console.log(222)
+    }
+}
+
+export const uploadModal = (options?: IImageModalProps) => {
+    let dom = document.querySelector('.image_modal')
+    if (!dom) {
+        dom = document.createElement('div')
+        dom.className = 'image_modal'
+        document.body.appendChild(dom)
+    }
+    render(<ThemeProvider><ImageUpload /></ThemeProvider>, dom)
 }

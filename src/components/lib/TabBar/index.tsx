@@ -14,6 +14,10 @@ export interface ITabBarProps {
     theme?: TabBarThemeData
     style?: CSSProperties
     selected?: number
+    tabViewClassName?: string
+    tabViewBarClassName?: string
+    itemBarClassName?: string
+    itemClassName?: string
 }
 
 interface IDefaultValue {
@@ -55,13 +59,19 @@ const TabBarItemView = styled.div<ITabBarItemViewProps>`
 
 const TabBarItemTabView = styled.div`
     overflow: hidden;
-    ${transition(0.5)}
 `
 
-const TabBarItemScrollView = styled.div`
+interface ITabBarItemScrollViewProps {
+    tabBarTheme: TabBarThemeData
+}
+
+const TabBarItemScrollView = styled.div<ITabBarItemScrollViewProps>`
     width: 100%;
     height: 100%;
     flex-shrink: 0;
+    overflow: auto;
+    ${({ tabBarTheme }) => tabBarTheme.tabViewPadding.toString()};
+    ${transition(0.5)}
 `
 
 interface ITabBarItemProps {
@@ -161,14 +171,14 @@ export default class TabBar extends Component<ITabBarProps, ITabBarState> {
     private node: HTMLDivElement | null = null
 
     public render(): JSX.Element {
-        const { mode, type, theme, style, children } = this.props
+        const { mode, type, theme, style, children, tabViewClassName, tabViewBarClassName, itemBarClassName, itemClassName } = this.props
         const { selected, height, width } = this.state
         const tabBars: JSX.Element[] = []
         const tabViews: JSX.Element[] = []
         Children.forEach(children, (child: any, index) => {
             if (child && child.type === TabBarItem) {
-                tabBars.push(cloneElement(child, { key: index, field: index }))
-                tabViews.push(<TabBarItemScrollView key={index}>{child.props.children}</TabBarItemScrollView>)
+                tabBars.push(cloneElement(child, { key: index, field: index, className: itemClassName }))
+                tabViews.push(child.props.children)
             }
         })
         return (
@@ -189,16 +199,40 @@ export default class TabBar extends Component<ITabBarProps, ITabBarState> {
                                 style={style}
                                 ref={(e) => this.node = e}
                             >
-                                {mode === 'tab' ? (<TabBarItemView type={type} className={type === 'vertical' ? 'flex_column' : 'flex'}>{tabBars}</TabBarItemView>) : null}
+                                {mode === 'tab' ? (
+                                    <TabBarItemView
+                                        type={type}
+                                        className={getClassName(type === 'vertical' ? 'flex_column' : 'flex', itemBarClassName)}
+                                    >
+                                        {tabBars}
+                                    </TabBarItemView>
+                                ) : null}
                                 <TabBarItemTabView
-                                    className="flex_1 flex"
-                                    style={{
-                                        transform: `translate3d(${selected && type === 'horizontal' ? getRatioUnit(selected * -width) : 0}, ${selected && type === 'vertical' ? getRatioUnit(selected * -height): 0}, 0)`
-                                    }}
+                                    className={getClassName(`flex_1 ${type === 'vertical' ? 'flex_column' : 'flex'}`, tabViewBarClassName)}
                                 >
-                                    {tabViews}
+                                    {
+                                        tabViews.map((i, index) => (
+                                            <TabBarItemScrollView
+                                                className={tabViewClassName}
+                                                tabBarTheme={theme || value.theme.tabBarTheme}
+                                                style={{
+                                                    transform: `translate3d(${selected && type === 'horizontal' ? getRatioUnit(selected * -width) : 0}, ${selected && type === 'vertical' ? getRatioUnit(selected * -height) : 0}, 0)`
+                                                }}
+                                                key={index}
+                                            >
+                                                {i}
+                                            </TabBarItemScrollView>
+                                        ))
+                                    }
                                 </TabBarItemTabView>
-                                {mode === 'menu' ? (<TabBarItemView type={type} className={type === 'vertical' ? 'flex_column' : 'flex'}>{tabBars}</TabBarItemView>) : null}
+                                {mode === 'menu' ? (
+                                    <TabBarItemView
+                                        type={type}
+                                        className={getClassName(type === 'vertical' ? 'flex_column' : 'flex', itemBarClassName)}
+                                    >
+                                        {tabBars}
+                                    </TabBarItemView>
+                                ) : null}
                             </TabBarView>
                         </Provider>
                     )

@@ -9,6 +9,7 @@ interface ITabBarThemeDataProps {
     itemPadding?: Padding
     itemHoverColor?: Color
     itemSelectColor?: Color
+    tabViewPadding?: Padding
 }
 
 export default class TabBarThemeData {
@@ -20,6 +21,7 @@ export default class TabBarThemeData {
             if (data.itemPadding) this.itemPadding = data.itemPadding
             if (data.itemHoverColor) this.itemHoverColor = data.itemHoverColor
             if (data.itemSelectColor) this.itemSelectColor = data.itemSelectColor
+            if (data.tabViewPadding) this.tabViewPadding = data.tabViewPadding
         }
     }
 
@@ -34,4 +36,6 @@ export default class TabBarThemeData {
     public itemHoverColor?: Color
 
     public itemSelectColor?: Color
+
+    public tabViewPadding: Padding = Padding.symmetric({ horizontal: 10, vertical: 8 })
 }

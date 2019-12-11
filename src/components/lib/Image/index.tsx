@@ -3,6 +3,7 @@ import React, { Component, CSSProperties } from 'react'
 import { PreLoad, browser } from 'muka'
 import { getClassName } from '../utils'
 import { Consumer } from '../ScrollView'
+import styled, { css } from 'styled-components'
 
 export interface IImageProps {
     className?: string
@@ -23,6 +24,25 @@ interface IState {
 const imgObj: { src: string } = {
     src: ''
 }
+
+interface IImageViewProps {
+    imgOpacity: boolean
+    fadeIn: boolean
+    show: boolean
+}
+
+const ImageView = styled.img<IImageViewProps>`
+    border: 0;
+    ${({ imgOpacity }) => {
+        if (imgOpacity) return css`opacity: 0;`
+    }}
+    ${({ show }) => {
+        if (show) return css`opacity: 1;`
+    }}
+    ${({ fadeIn }) => {
+        if (fadeIn) return css`animation: fade-in 1.5s forwards;`
+    }}
+`
 
 export const setImageLoadingSource = (uri: string) => {
     imgObj.src = uri
@@ -56,7 +76,16 @@ export default class Image extends Component<IImageProps, IState> {
                     (val) => {
                         this.controller = controller || val.controller
                         return (
-                            <img className={getClassName(`image${opacity ? '' : ' opacity'}${animation && !show ? ' an_fadeIn' : ''}${show ? ' show' : ''}`, className)} src={uri || loadingIndicatorSource || imgObj.src} onClick={onClick} ref={(e: HTMLImageElement) => { this.imageNode = e }} style={style} />
+                            <ImageView
+                                className={className}
+                                imgOpacity={!opacity}
+                                fadeIn={animation && !show}
+                                show={show}
+                                src={uri || loadingIndicatorSource || imgObj.src}
+                                onClick={onClick}
+                                ref={(e: HTMLImageElement) => { this.imageNode = e }}
+                                style={style}
+                            />
                         )
                     }
                 }

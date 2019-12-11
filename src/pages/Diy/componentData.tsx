@@ -1,8 +1,39 @@
 import * as React from 'react'
 import { isArray } from 'lodash'
+import styled from 'styled-components'
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd'
 import { Button, Icon, Image, Input, Colors, } from 'components'
 import { baseUrl } from 'src/utils/axios'
+import { getRatioUnit, IconThemeData } from 'src/components/lib/utils'
+
+const LabelView = styled.div`
+    border: ${getRatioUnit(1)} solid #eee;
+    padding: ${getRatioUnit(10)};
+    margin-bottom: ${getRatioUnit(10)};
+    position: relative;
+`
+
+const LabelListView = styled.div`
+    width: ${getRatioUnit(68)};
+    height: ${getRatioUnit(68)};
+    margin-right: ${getRatioUnit(10)};
+    background: #d8d8d8;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+`
+
+const ImageView = styled(Image)`
+    width: 100%;
+    height: auto;
+`
+
+const CloseIcon = styled(Icon)`
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translate(50%, -50%);
+`
 
 const componentData = function (self: any) {
     const { componentData } = self.props
@@ -210,10 +241,13 @@ const componentData = function (self: any) {
             },
             field: 'style.marginBottom'
         }, {
-            component: 'Radio',
+            component: 'RadioGroup',
             label: '指示位置',
             props: {
                 onChange: self.handleFormChange,
+                itemStyle: {
+                    marginBottom: getRatioUnit(5)
+                },
                 options: [{
                     label: '底部', value: 'bottom',
                 }, {
@@ -231,7 +265,7 @@ const componentData = function (self: any) {
             },
             field: 'dotPosition'
         }, {
-            component: 'Radio',
+            component: 'RadioGroup',
             label: '指示样式',
             props: {
                 onChange: self.handleFormChange,
@@ -252,7 +286,7 @@ const componentData = function (self: any) {
             },
             field: 'dotColor'
         }, {
-            component: 'Radio',
+            component: 'RadioGroup',
             label: '自动播放',
             props: {
                 onChange: self.handleFormChange,
@@ -265,7 +299,7 @@ const componentData = function (self: any) {
             },
             field: 'autoplay'
         }, {
-            component: 'Radio',
+            component: 'RadioGroup',
             label: '播放方式',
             props: {
                 onChange: self.handleFormChange,
@@ -298,20 +332,20 @@ const componentData = function (self: any) {
                                                 return (
                                                     <Draggable key={index} draggableId={index.toString()} index={index}>
                                                         {(provided) => (
-                                                            <div
-                                                                className={`flex`}
+                                                            <LabelView
+                                                                className="flex"
                                                                 ref={provided.innerRef}
                                                                 {...provided.draggableProps}
                                                                 {...provided.dragHandleProps}
                                                             >
-                                                                <div className={`flex_center`} style={{ width: '88px' }}>
-                                                                    <Image src={baseUrl + item.url} key={item.url + index} />
-                                                                </div>
+                                                                <LabelListView className="flex_center">
+                                                                    <ImageView src={baseUrl + item.url} key={item.url + index} />
+                                                                </LabelListView>
                                                                 <div className="flex_1">
                                                                     <div className="flex_1">
                                                                         <div className="flex">
                                                                             <Input className={`flex_1`} value={item.url} placeholder="请选择图片地址" disabled closeIconShow={false} style={{ borderRight: 0 }} />
-                                                                            <Button className={`flex_justify`} onClick={self.handleSelectView.bind(self, index, 'imagesDialog')} mold="primary">选择图片</Button>
+                                                                            <Button className={`flex_justify`} onClick={self.handleUploadView.bind(self, index)} mold="primary">上传图片</Button>
                                                                         </div>
                                                                     </div>
                                                                     <div className="flex_1" style={{ marginTop: '7px' }}>
@@ -321,20 +355,24 @@ const componentData = function (self: any) {
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <Icon
+                                                                <CloseIcon
                                                                     icon="md-close-circle"
                                                                     color="rgba(0, 0, 0, 0.3)"
+                                                                    theme={new IconThemeData({ size: 18 })}
                                                                     style={{ cursor: 'pointer' }}
                                                                     onClick={self.handleListDel.bind(self, index, 'value')}
                                                                 />
-                                                            </div>
+                                                            </LabelView>
                                                         )}
                                                     </Draggable>
                                                 )
                                             })
                                         }
-                                        <Button style={{ width: '100%', marginTop: snapshot.isDraggingOver ? '100px' : '', transition: 'none' }} onClick={self.handleCarouselListAdd.bind(self, {url: '/images/banner-1.jpg',link: ''})}>
-                                            <Icon icon="ios-add" />添加一个
+                                        <Button style={{ width: '100%', marginTop: snapshot.isDraggingOver ? '100px' : '' }} onClick={self.handleCarouselListAdd.bind(self, { url: '/images/banner-1.jpg', link: '' })}>
+                                            <div className="flex">
+                                                <Icon icon="ios-add" />
+                                                <div className="flex_center">添加一个</div>
+                                            </div>
                                         </Button>
                                     </div>
                                 )
@@ -479,7 +517,7 @@ const componentData = function (self: any) {
                 value: props.getType
             },
             field: 'getType',
-            additional:  props.getType === 'value' && (
+            additional: props.getType === 'value' && (
                 <div>
                     <DragDropContext onDragEnd={self.onDragPropsEnd.bind(self, 'value')}>
                         <Droppable droppableId="droppable_label" >
@@ -506,7 +544,7 @@ const componentData = function (self: any) {
                                                                 <div className="flex_1">
                                                                     <div className="flex_1">
                                                                         <div className="flex">
-                                                                            <Input className={`flex_1`} value={item.label} placeholder="请输入公告标题" onChange={self.handleSetIntValue.bind(self, index, 'value', 'label')}   closeIconShow={false} style={{ borderRight: 0 }} />
+                                                                            <Input className={`flex_1`} value={item.label} placeholder="请输入公告标题" onChange={self.handleSetIntValue.bind(self, index, 'value', 'label')} closeIconShow={false} style={{ borderRight: 0 }} />
                                                                         </div>
                                                                     </div>
                                                                     <div className="flex_1" style={{ marginTop: '7px' }}>
@@ -528,7 +566,7 @@ const componentData = function (self: any) {
                                                 )
                                             })
                                         }
-                                        <Button style={{ width: '100%', marginTop: snapshot.isDraggingOver ? '100px' : '', transition: 'none' }} onClick={self.handleCarouselListAdd.bind(self, {label: '这里是自定义公告的标题', link: ''})}>
+                                        <Button style={{ width: '100%', marginTop: snapshot.isDraggingOver ? '100px' : '', transition: 'none' }} onClick={self.handleCarouselListAdd.bind(self, { label: '这里是自定义公告的标题', link: '' })}>
                                             <Icon icon="ios-add" />添加一个
                                         </Button>
                                     </div>

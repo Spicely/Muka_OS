@@ -94,7 +94,7 @@ const DialogContent = styled.div<IDialogContentProps>`
     width: ${({ dialogTheme }) => getUnit(dialogTheme.width)};
     min-width: ${() => getRatioUnit(300)};
     min-height: ${() => getRatioUnit(400)};
-    height: ${({ dialogTheme }) => isNumber(dialogTheme.height) ? `calc(100% - ${getRatioUnit(dialogTheme.height)})` : getUnit(dialogTheme.height)};
+    height: ${({ dialogTheme }) => getUnit(dialogTheme.height)};
     background: ${({ dialogTheme }) => dialogTheme.dialogColor.toString()};
     border-radius: ${({ dialogTheme, theme }) => getUnit(dialogTheme.borderRadius, theme.borderRadius)};
     overflow: hidden;

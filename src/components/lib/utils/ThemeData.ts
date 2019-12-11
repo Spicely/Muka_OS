@@ -1,6 +1,7 @@
 import { isNil } from 'lodash'
 import Color from './Color'
 import ButtonThemeData from './ButtonThemeData'
+import CarouselThemeData from './CarouselThemeData'
 import IconThemeData from './IconThemeData'
 import InputThemeData from './InputThemeData'
 import MenuThemeData from './MenuThemeData'
@@ -10,6 +11,8 @@ import NavBarThemeData from './NavBarThemeData'
 import DialogThemeData from './DialogThemeData'
 import TagThemeData from './TagThemeData'
 import AlertThemeData from './AlertThemeData'
+import ColorsThemeData from './ColorsThemeData'
+import UploadThemeData from './UploadThemeData'
 
 export type IUnit = 'px' | 'rem'
 
@@ -31,6 +34,9 @@ interface IThemeDataProps {
     radioTheme?: RadioThemeData
     tabBarTheme?: TabBarThemeData
     alertTheme?: AlertThemeData
+    carouselTheme?: CarouselThemeData
+    colorsTheme?: ColorsThemeData
+    uploadTheme?: UploadThemeData
 }
 
 export default class ThemeData {
@@ -51,8 +57,11 @@ export default class ThemeData {
             if (data.radioTheme) this.radioTheme = data.radioTheme
             if (data.tabBarTheme) this.tabBarTheme = data.tabBarTheme
             if (data.alertTheme) this.alertTheme = data.alertTheme
+            if (data.carouselTheme) this.carouselTheme = data.carouselTheme
             if (data.successColor) this.successColor = data.successColor
             if (data.warningColor) this.warningColor = data.warningColor
+            if (data.colorsTheme) this.colorsTheme = data.colorsTheme
+            if(data.uploadTheme) this.uploadTheme = data.uploadTheme
         }
     }
 
@@ -90,9 +99,15 @@ export default class ThemeData {
 
     public navBarTheme: NavBarThemeData = new NavBarThemeData()
 
+    public carouselTheme: CarouselThemeData = new CarouselThemeData()
+
     public tagTheme: TagThemeData = new TagThemeData()
 
     public alertTheme: AlertThemeData = new AlertThemeData()
+
+    public colorsTheme: ColorsThemeData = new ColorsThemeData()
+
+    public uploadTheme: UploadThemeData = new UploadThemeData()
 
     public menuGroupHeight: number = 45
 

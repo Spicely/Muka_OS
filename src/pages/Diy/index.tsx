@@ -7,21 +7,22 @@ import { omit, isArray, isString } from 'muka'
 import { IInitState } from 'src/store/state'
 import { Alert, BoxLine, Button, Carousel, Dialog, Drag, Icon, Image, Label, LabelHeader, NavBar, TabBar, Form, Pagination, ScrollView, SearchBar, Upload, Notice } from 'components'
 import http, { IRresItems, IRresItem, baseUrl, httpUtils, getTitle } from 'src/utils/axios'
-import { connect } from 'react-redux'
+import { connect, DispatchProp } from 'react-redux'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { ColorResult } from 'react-color'
 import { GlobalView } from 'src/utils/node'
-import { NavBarThemeData, Color, getRatioUnit, Border, BorderStyle, TabBarThemeData } from 'src/components/lib/utils'
+import { NavBarThemeData, Color, getRatioUnit, Border, BorderStyle, TabBarThemeData, CarouselThemeData } from 'src/components/lib/utils'
 import { IComponentData } from 'src/store/reducers/componentData'
-import styled, { css } from 'styled-components'
+import styled, { css, createGlobalStyle } from 'styled-components'
 import EditComponent from './editComponent'
 import componentViewData from './componentData'
+import { SET_COMPONENT_DATA } from 'src/store/action'
+import { uploadModal } from 'src/utils'
 
 const { confirm } = Modal
 
-interface IProps {
+interface IProps extends DispatchProp {
     componentData: IComponentData
-    setComponentData: (data: IComponentData) => void
 }
 
 interface ITabBarValue {
@@ -55,6 +56,21 @@ interface IState {
     total: number
     linkDialog: boolean
 }
+
+const GlobalDiyStyle = createGlobalStyle`
+    .tab_VE_line {
+        position: relative;
+        &::after {
+            content: '';
+            right: 0;
+            height: 100%;
+            top: 0;
+            width: ${getRatioUnit(1)};
+            background: ${Color.fromRGB(230, 230, 230).toString()};
+            position: absolute;
+        }
+    }
+`
 
 const TplPhone = styled.div`
     background: #fff;
@@ -146,6 +162,7 @@ class AppsDesign extends Component<IProps, any> {
         const { searchSelect, icons, uploadDialog, images, pageCurrent, total, linkDialog, links, imagesDialog } = this.state
         return (
             <GlobalView>
+                <GlobalDiyStyle />
                 <LayoutNavBar
                     left={null}
                     theme={new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255) })}
@@ -187,7 +204,7 @@ class AppsDesign extends Component<IProps, any> {
                                                             {...provided.draggableProps}
                                                             {...provided.dragHandleProps}
                                                         >
-                                                            {/* {this.getComponentsView(item, index)} */}
+                                                            {this.getComponentsView(item, index)}
                                                         </div>
                                                     )}
                                                 </Draggable>
@@ -341,10 +358,10 @@ class AppsDesign extends Component<IProps, any> {
     }
 
     private handleSetLink = (id: string) => {
-        const { componentData, setComponentData } = this.props
+        const { componentData, dispatch } = this.props
         const pageProps: any = [...componentData.pagePorps]
         pageProps[this.index].props[this.tagName][this.selectIndex][this.field] = `/pages/${id}`
-        setComponentData({ ...componentData })
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
         this.setState({
             linkDialog: false
         })
@@ -375,28 +392,28 @@ class AppsDesign extends Component<IProps, any> {
     }
 
     private addNavRight = () => {
-        const { componentData, setComponentData } = this.props
+        const { componentData, dispatch } = this.props
         const pageProps: any = [...componentData.pagePorps]
         pageProps[this.index].props.right.push({
             type: 'icon',
             url: 'msg',
             color: '#fff'
         })
-        setComponentData({ ...componentData })
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
     private handleNavBarRightDel = (index: number) => {
-        const { componentData, setComponentData } = this.props
+        const { componentData, dispatch } = this.props
         const pageProps: any = [...componentData.pagePorps]
         pageProps[this.index].props.right.splice(index, 1)
-        setComponentData({ ...componentData })
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
     private handleNavBarRightColor(index: number, val: ColorResult) {
-        const { componentData, setComponentData } = this.props
+        const { componentData, dispatch } = this.props
         const pageProps: any = [...componentData.pagePorps]
         pageProps[this.index].props.right[index].color = val.hex
-        setComponentData({ ...componentData })
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
     private handleLinkDialog = async () => {
@@ -453,7 +470,7 @@ class AppsDesign extends Component<IProps, any> {
     }
 
     private handleFormChange = () => {
-        const { componentData, setComponentData } = this.props
+        const { componentData, dispatch } = this.props
         const { componentName } = this.state
         const pageProps: any = [...componentData.pagePorps]
         const data: any = {}
@@ -491,7 +508,7 @@ class AppsDesign extends Component<IProps, any> {
         }
         pageProps[this.index].props = assign(pageProps[this.index].props, data)
         componentData.pagePorps = pageProps
-        setComponentData({ ...componentData })
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
     private getStyleValue(key: string, val: string) {
@@ -517,10 +534,10 @@ class AppsDesign extends Component<IProps, any> {
     }
 
     private handleFormIntChange(field: string, e: any) {
-        const { componentData, setComponentData } = this.props
+        const { componentData, dispatch } = this.props
         const pageProps: any = [...componentData.pagePorps]
         pageProps[this.index].props[field] = e.target.value
-        setComponentData({ ...componentData })
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
     // private setComProps = (data: INavBarRightIcon | INavBarRightImage, dialogName: 'searchSelect') => {
@@ -555,7 +572,7 @@ class AppsDesign extends Component<IProps, any> {
                     onEdit={this.handleEditStart.bind(this, data, index, 'LForm')}
                     onDelete={this.handleDelete.bind(this, index)}
                 >
-                    <NavBar {...data.props} />
+                    <NavBar {...data.props} theme={new NavBarThemeData({ width: '100%' })} />
                 </EditComponent>
             )
             case 'SearchBar': return (
@@ -618,23 +635,23 @@ class AppsDesign extends Component<IProps, any> {
     }
 
     private handleDelete(index: number) {
-        const { componentData, setComponentData } = this.props
+        const { componentData, dispatch } = this.props
         componentData.pagePorps.splice(index, 1)
-        setComponentData(cloneDeep(componentData))
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
     private handleListDel = (index: number, field: string) => {
-        const { componentData, setComponentData } = this.props
+        const { componentData, dispatch } = this.props
         const pageProps: any = [...componentData.pagePorps]
         pageProps[this.index].props[field].splice(index, 1)
-        setComponentData({ ...componentData })
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
     private handleCarouselListAdd = (value: any) => {
-        const { componentData, setComponentData } = this.props
+        const { componentData, dispatch } = this.props
         const pageProps: any = [...componentData.pagePorps]
         pageProps[this.index].props.value.push(value)
-        setComponentData({ ...componentData })
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
     private handleEditStart(data: IComponents, index: number, field: typeList) {
@@ -671,8 +688,12 @@ class AppsDesign extends Component<IProps, any> {
         })
     }
 
+    private handleUploadView = (index: number) => {
+        uploadModal()
+    }
+
     private handelSetType = (value: string) => {
-        const { componentData, setComponentData } = this.props
+        const { componentData, dispatch } = this.props
         const pageProps: any = [...componentData.pagePorps]
         pageProps[this.index].props['getType'] = value
         if (value === 'read') {
@@ -680,20 +701,25 @@ class AppsDesign extends Component<IProps, any> {
         } else {
             pageProps[this.index].props.value = [{ label: '这里是自定义公告的标题', link: '' }, { label: '这里是自定义公告的标题', link: '' }]
         }
-        setComponentData({ ...componentData })
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
     private handleSetIntValue = (index: number, tagName: string, val: string, event: any) => {
-        const { componentData, setComponentData } = this.props
+        const { componentData, dispatch } = this.props
         const pageProps: any = [...componentData.pagePorps]
         pageProps[this.index].props[tagName][index][val] = event.target.value
-        setComponentData({ ...componentData })
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
     private getActionsView(): JSX.Element {
         const { selected, componentName } = this.state
         return (
-            <TabBar type="vertical" theme={new TabBarThemeData({ height: '100%', width: 400 })}>
+            <TabBar
+                selected={selected}
+                type="vertical"
+                theme={new TabBarThemeData({ height: '100%', width: 400 })}
+                itemBarClassName="tab_VE_line"
+            >
                 <TabBar.Item icon={<Icon icon="ios-apps" />} tooltipTitle="页面组件" placement="left">
                     <Drag data={{ component: 'NavBar', props: {}, edit: false }}>
                         <NavBar />
@@ -854,28 +880,28 @@ class AppsDesign extends Component<IProps, any> {
         if (!result.destination) {
             return
         }
-        const { componentData, setComponentData } = this.props
+        const { componentData, dispatch } = this.props
         const items = reorder(
             componentData.pagePorps[this.index].props[field],
             result.source.index,
             result.destination.index
         )
         componentData.pagePorps[this.index].props[field] = items
-        setComponentData(cloneDeep(componentData))
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
     private onDragEnd = (result: DropResult) => {
         if (!result.destination) {
             return
         }
-        const { componentData, setComponentData } = this.props
+        const { componentData, dispatch } = this.props
         const items = reorder(
             componentData.pagePorps,
             result.source.index,
             result.destination.index
         );
         componentData.pagePorps = items
-        setComponentData(cloneDeep(componentData))
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
     private handleTabComponent = (name: string) => {
@@ -913,9 +939,9 @@ class AppsDesign extends Component<IProps, any> {
     }
 
     private handleDragSuccess = (data: any) => {
-        const { setComponentData, componentData } = this.props
+        const { dispatch, componentData } = this.props
         componentData.pagePorps.push(data)
-        setComponentData(cloneDeep(componentData))
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 }
 export default connect(

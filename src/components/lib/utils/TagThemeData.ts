@@ -6,6 +6,7 @@ interface ITagThemeDataProps {
     tagColor?: Color
     borderRadius?: number | string
     width?: number
+    border?: Border
 }
 
 export default class TagThemeData {
@@ -14,6 +15,7 @@ export default class TagThemeData {
             if (data.tagColor) this.tagColor = data.tagColor
             if (!isNil(data.borderRadius)) this.borderRadius = data.borderRadius
             if (!isNil(data.width)) this.width = data.width
+            if (data.border) this.border = data.border
         }
     }
 

@@ -32,7 +32,7 @@ export default class ButtonThemeData {
 
     public errorColor?: Color
 
-    public height: number = 30
+    public height: number = 32
 
     public disabledColor: Color = Color.fromRGB(223, 216, 216)
 

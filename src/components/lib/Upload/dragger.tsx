@@ -1,7 +1,9 @@
 import React, { Component, ChangeEvent, DragEvent, CSSProperties } from 'react'
 import axios from 'axios'
-import { isString, isArray, isNumber, isObject, isFunction } from 'muka'
-import { getClassName, IValue } from '../utils'
+import styled, { css } from 'styled-components'
+import { Consumer as ThemeConsumer } from '../ThemeProvider'
+import { isString, isArray, isNumber, isObject, isFunction } from 'lodash'
+import { getClassName, IValue, UploadThemeData, getRatioUnit, getUnit, transition } from '../utils'
 import { Consumer } from '../ConfigProvider'
 import Icon, { iconType } from '../Icon'
 import Progress from '../Progress'
@@ -18,6 +20,28 @@ export interface IUploadFileListProps {
         status: 'error' | 'done' | 'uploading'
     }
 }
+
+const UploadView = styled.div`
+    width: 100%;
+`
+
+interface IUploadViewBoxProps {
+    uploadTheme: UploadThemeData
+}
+
+const UploadViewBox = styled.div<IUploadViewBoxProps>`
+    border-radius: ${({ uploadTheme, theme }) => getUnit(uploadTheme.borderRadius || theme.borderRadius)};
+    ${({ uploadTheme }) => css`${uploadTheme.border.toString()};`}
+    height: ${({ uploadTheme }) => getUnit(uploadTheme.height)};
+    background: #fafafa;
+    position: relative;
+    cursor: pointer;
+    ${transition(0.5)};
+    padding: ${getRatioUnit(16)} 0;
+    :hover {
+        border-color: ${({ uploadTheme, theme }) => uploadTheme.uploadColor || theme.primarySwatch};
+    }
+`
 
 export interface IUploadProps {
     className?: string
@@ -45,6 +69,7 @@ export interface IUploadProps {
     onUploadItemClear?: (delVal: IUploadFileListProps, data: IUploadFileListProps[]) => void
     onUploadStart?: () => boolean
     onMaxFileSizeError?: () => void
+    theme?: UploadThemeData
 }
 
 interface IState {
@@ -74,70 +99,82 @@ export default class Upload extends Component<IUploadProps, IState> {
     }
 
     public render(): JSX.Element {
-        const { className, children, icon, title, label, iconColor, multiple, uploadViewClassName, renderItem, style, fileTypes } = this.props
+        const { className, children, icon, title, label, iconColor, multiple, uploadViewClassName, renderItem, style, fileTypes, theme } = this.props
         const { fileList } = this.state
         return (
-            <Consumer>
+            <ThemeConsumer>
                 {
-                    (value) => {
-                        const iconProps = icon || (value.uploadDraggerProps && value.uploadDraggerProps.icon)
-                        const iconColorProps = iconColor || (value.uploadDraggerProps && value.uploadDraggerProps.iconColor)
-                        const titleProps = title || (value.uploadDraggerProps && value.uploadDraggerProps.title)
-                        const labelProps = label || (value.uploadDraggerProps && value.uploadDraggerProps.label)
-                        return (
-                            <div className={getClassName(`${prefixClass}`)} style={style}>
-                                <div className={getClassName(`${prefixClass}__box`, className)} onClick={this.handleClick} onDragOver={this.handleDropOver} onDrop={this.handleFileDrop}>
-                                    {
-                                        children ? children : (
-                                            <div className={getClassName(`${prefixClass}__box_default`)}>
-                                                <div className={getClassName(`${prefixClass}__box_default__icon`)}>
-                                                    {isString(iconProps) ? <Icon icon={iconProps || undefined}  /> : iconProps}
-                                                </div>
-                                                <div className={getClassName(`${prefixClass}__box_default__title`)}>
-                                                    {titleProps}
-                                                </div>
-                                                <div className={getClassName(`${prefixClass}__box_default__label`)}>
-                                                    {labelProps}
-                                                </div>
-                                            </div>
-                                        )
-                                    }
-                                    <input style={{ display: 'none' }} type="file" multiple={multiple} ref={(e) => this.intNode = e} onChange={this.handleFileChange} accept={(fileTypes || []).join(',')} />
-                                </div>
-                                <div className={getClassName(`${prefixClass}_upload__view`, uploadViewClassName)}>
-                                    {
-                                        fileList.map((i, index: number) => {
-                                            if (isFunction(renderItem)) {
-                                                return renderItem(i)
-                                            } else {
-                                                if (!i.info.fileName && !i.info.type) {
-                                                    return undefined
+                    (init) => (
+                        <Consumer>
+                            {
+                                (value) => {
+                                    const iconProps = icon || (value.uploadDraggerProps && value.uploadDraggerProps.icon)
+                                    const iconColorProps = iconColor || (value.uploadDraggerProps && value.uploadDraggerProps.iconColor)
+                                    const titleProps = title || (value.uploadDraggerProps && value.uploadDraggerProps.title)
+                                    const labelProps = label || (value.uploadDraggerProps && value.uploadDraggerProps.label)
+                                    return (
+                                        <UploadView style={style}>
+                                            <UploadViewBox
+                                                uploadTheme={theme || init.theme.uploadTheme}
+                                                className={className}
+                                                onClick={this.handleClick}
+                                                onDragOver={this.handleDropOver}
+                                                onDrop={this.handleFileDrop}
+                                            >
+                                                {
+                                                    children ? children : (
+                                                        <div className={getClassName(`${prefixClass}__box_default`)}>
+                                                            <div className={getClassName(`${prefixClass}__box_default__icon`)}>
+                                                                {isString(iconProps) ? <Icon icon={iconProps || undefined} /> : iconProps}
+                                                            </div>
+                                                            <div className={getClassName(`${prefixClass}__box_default__title`)}>
+                                                                {titleProps}
+                                                            </div>
+                                                            <div className={getClassName(`${prefixClass}__box_default__label`)}>
+                                                                {labelProps}
+                                                            </div>
+                                                        </div>
+                                                    )
                                                 }
-                                                return (
-                                                    <div className={getClassName(`${prefixClass}_upload__view__item flex`)} key={index}>
-                                                        <div className={getClassName(`${prefixClass}_upload__view__item__icon flex_center`)}>
-                                                            {
-                                                                this.getTypeView(i.info.type || '', i.preUrl)
+                                                <input style={{ display: 'none' }} type="file" multiple={multiple} ref={(e) => this.intNode = e} onChange={this.handleFileChange} accept={(fileTypes || []).join(',')} />
+                                            </UploadViewBox>
+                                            <div className={getClassName(`${prefixClass}_upload__view`, uploadViewClassName)}>
+                                                {
+                                                    fileList.map((i, index: number) => {
+                                                        if (isFunction(renderItem)) {
+                                                            return renderItem(i)
+                                                        } else {
+                                                            if (!i.info.fileName && !i.info.type) {
+                                                                return undefined
                                                             }
-                                                        </div>
-                                                        <div className={getClassName(`${prefixClass}_upload__view__item__progress flex_1`)}>
-                                                            <div>{i.info.fileName}</div>
-                                                            <Progress percent={i.info.progress} text={`${i.info.progress}%`} />
-                                                        </div>
-                                                        <div className={getClassName(`${prefixClass}_upload__view__item__close`)}>
-                                                            <Icon icon="ios-close" onClick={this.handleItemClose.bind(this, index)} />
-                                                        </div>
-                                                    </div>
-                                                )
-                                            }
-                                        })
-                                    }
-                                </div>
-                            </div>
-                        )
-                    }
+                                                            return (
+                                                                <div className={getClassName(`${prefixClass}_upload__view__item flex`)} key={index}>
+                                                                    <div className={getClassName(`${prefixClass}_upload__view__item__icon flex_center`)}>
+                                                                        {
+                                                                            this.getTypeView(i.info.type || '', i.preUrl)
+                                                                        }
+                                                                    </div>
+                                                                    <div className={getClassName(`${prefixClass}_upload__view__item__progress flex_1`)}>
+                                                                        <div>{i.info.fileName}</div>
+                                                                        <Progress percent={i.info.progress} text={`${i.info.progress}%`} />
+                                                                    </div>
+                                                                    <div className={getClassName(`${prefixClass}_upload__view__item__close`)}>
+                                                                        <Icon icon="ios-close" onClick={this.handleItemClose.bind(this, index)} />
+                                                                    </div>
+                                                                </div>
+                                                            )
+                                                        }
+                                                    })
+                                                }
+                                            </div>
+                                        </UploadView>
+                                    )
+                                }
+                            }
+                        </Consumer>
+                    )
                 }
-            </Consumer>
+            </ThemeConsumer>
         )
     }
 
