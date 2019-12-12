@@ -18,6 +18,7 @@ import EditComponent from './editComponent'
 import componentViewData from './componentData'
 import { SET_COMPONENT_DATA } from 'src/store/action'
 import { uploadModal } from 'src/utils'
+import Axios from 'axios'
 
 const { confirm } = Modal
 
@@ -144,6 +145,8 @@ class AppsDesign extends Component<IProps, any> {
     private listIndex: number = 0
 
     private selectIndex: number = 0
+
+    private baseUrl: string = ''
 
     private tagName: string = ''
 
@@ -463,6 +466,15 @@ class AppsDesign extends Component<IProps, any> {
 
     }
 
+    public componentDidMount() {
+        this.getData()
+    }
+
+    private getData = async () => {
+        const data = await Axios.get('http://192.168.1.6:3007/o/common/pic-host')
+        this.baseUrl = data.data.data
+    }
+
     private handleDragEnter = () => {
         // this.setState({
         //     showLine: true
@@ -689,7 +701,13 @@ class AppsDesign extends Component<IProps, any> {
     }
 
     private handleUploadView = (index: number) => {
-        uploadModal()
+        uploadModal({
+            uploadSuccess: this.handleImageUploadSuccess
+        })
+    }
+
+    private handleImageUploadSuccess = (val: any, data: any) => {
+        console.log(data)
     }
 
     private handelSetType = (value: string) => {

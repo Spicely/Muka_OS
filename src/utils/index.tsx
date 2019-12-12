@@ -10,6 +10,7 @@ import { IDialogProps } from 'src/components/lib/Dialog'
 import { store } from 'src/store'
 import { SET_IMAGE_MODAL_VISIBLE } from 'src/store/action'
 import { DialogThemeData, TabBarThemeData, getRatioUnit } from 'src/components/lib/utils'
+import { IUploadFileListProps } from 'src/components/lib/Upload/dragger'
 
 export interface IConnectProps {
     dispatch: (actions: IActionsProps) => void
@@ -84,12 +85,30 @@ const UploadBox = styled.div`
     padding: ${getRatioUnit(10)};
 `
 
-class ImageUpload extends PureComponent<any> {
+interface ImageUploadProps extends IUploadModalProps {
+    visible: boolean
+}
+
+interface ImageUploadState {
+    visible: boolean
+}
+
+class ImageUpload extends PureComponent<ImageUploadProps, ImageUploadState> {
+    constructor(props: ImageUploadProps) {
+        super(props)
+        this.state.visible = props.visible
+    }
+
+    public state = {
+        visible: false
+    }
 
     public render(): JSX.Element {
+        const { uploadSuccess, uploadError } = this.props
+        const { visible } = this.state
         return (
             <Dialog
-                visible={true}
+                visible={visible}
                 title="图片上传"
                 onClose={this.handleClose}
                 theme={new DialogThemeData({
@@ -98,23 +117,55 @@ class ImageUpload extends PureComponent<any> {
                 })}
             >
                 <UploadBox>
-                    <Upload.Dragger />
+                    <Upload.Dragger
+                        action="http://192.168.1.6:3007/o/upload"
+                        name="file"
+                        data={{ module: 'fixed' }}
+                        maxLength={1}
+                        onUploadSuccess={uploadSuccess}
+                        onUploadError={uploadError}
+                    />
                 </UploadBox>
             </Dialog>
         )
     }
 
+    public UNSAFE_componentWillReceiveProps(nextProps: ImageUploadProps) {
+        const { visible } = this.state
+        if (nextProps.visible !== visible) {
+            this.setState({
+                visible: nextProps.visible
+            })
+        }
+    }
+
     private handleClose = () => {
-        console.log(222)
+        this.setState({
+            visible: false
+        })
     }
 }
 
-export const uploadModal = (options?: IImageModalProps) => {
+interface IUploadModalProps {
+    uploadSuccess?: (val: IUploadFileListProps, data: any, files: IUploadFileListProps[]) => void
+    uploadError?: (val: IUploadFileListProps, data: any, files: IUploadFileListProps[]) => void
+}
+
+export const uploadModal = (options?: IUploadModalProps) => {
     let dom = document.querySelector('.image_modal')
     if (!dom) {
         dom = document.createElement('div')
         dom.className = 'image_modal'
         document.body.appendChild(dom)
     }
-    render(<ThemeProvider><ImageUpload /></ThemeProvider>, dom)
+    render((
+        <ThemeProvider>
+            <ImageUpload
+                visible={true}
+                {...options}
+            />
+        </ThemeProvider>
+    ),
+        dom
+    )
 }

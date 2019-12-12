@@ -13,6 +13,7 @@ import TagThemeData from './TagThemeData'
 import AlertThemeData from './AlertThemeData'
 import ColorsThemeData from './ColorsThemeData'
 import UploadThemeData from './UploadThemeData'
+import ProgressThemeData from './ProgressThemeData'
 
 export type IUnit = 'px' | 'rem'
 
@@ -37,6 +38,7 @@ interface IThemeDataProps {
     carouselTheme?: CarouselThemeData
     colorsTheme?: ColorsThemeData
     uploadTheme?: UploadThemeData
+    progressTheme?: ProgressThemeData
 }
 
 export default class ThemeData {
@@ -61,7 +63,8 @@ export default class ThemeData {
             if (data.successColor) this.successColor = data.successColor
             if (data.warningColor) this.warningColor = data.warningColor
             if (data.colorsTheme) this.colorsTheme = data.colorsTheme
-            if(data.uploadTheme) this.uploadTheme = data.uploadTheme
+            if (data.uploadTheme) this.uploadTheme = data.uploadTheme
+            if (data.progressTheme) this.progressTheme = data.progressTheme
         }
     }
 
@@ -108,6 +111,8 @@ export default class ThemeData {
     public colorsTheme: ColorsThemeData = new ColorsThemeData()
 
     public uploadTheme: UploadThemeData = new UploadThemeData()
+
+    public progressTheme: ProgressThemeData = new ProgressThemeData()
 
     public menuGroupHeight: number = 45
 

@@ -1,9 +1,9 @@
 import React, { Component, ChangeEvent, DragEvent, CSSProperties } from 'react'
 import axios from 'axios'
+import { isString, isArray, isNumber, isObject, isFunction } from 'lodash'
 import styled, { css } from 'styled-components'
 import { Consumer as ThemeConsumer } from '../ThemeProvider'
-import { isString, isArray, isNumber, isObject, isFunction } from 'lodash'
-import { IValue, UploadThemeData, getRatioUnit, getUnit, transition } from '../utils'
+import { IValue, UploadThemeData, getRatioUnit, getUnit, transition, Color, IconThemeData } from '../utils'
 import { Consumer } from '../ConfigProvider'
 import Progress from '../Progress'
 import Icon, { iconType } from '../Icon'
@@ -75,6 +75,15 @@ const UploadProView = styled.div`
     margin-top: ${getRatioUnit(10)};
 `
 
+const UploadProViewItemClose = styled.div`
+    display:none;
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translate(50%, -50%);
+`
+
 const UploadProViewItem = styled.div<IUploadViewBoxProps>`
     margin-top: ${getRatioUnit(5)};
     position: relative;
@@ -85,7 +94,10 @@ const UploadProViewItem = styled.div<IUploadViewBoxProps>`
     }
 
     :hover {
-        background: ${({ uploadTheme, theme }) => uploadTheme.uploadColor || theme.primarySwatch};
+        background: ${({ uploadTheme, theme }) => Color.setOpacity(uploadTheme.uploadColor || theme.primarySwatch, 0.3).toString()};
+        ${UploadProViewItemClose} {
+            display: block;
+        }
     }
     
 `
@@ -98,15 +110,6 @@ const UploadProViewItemIcon = styled.div`
 
 const UploadProViewItemProgress = styled.div`
     padding-left:  ${getRatioUnit(10)};
-`
-
-const UploadProViewItemClose = styled.div`
-    display: none;
-    cursor: pointer;
-    position: absolute;
-    right: 0;
-    top: 0;
-    transform: translate(50%, -50%);
 `
 
 const IconClose = styled(Icon)`
@@ -225,6 +228,7 @@ export default class Upload extends Component<IUploadProps, IState> {
                                                             }
                                                             return (
                                                                 <UploadProViewItem
+                                                                    className="flex"
                                                                     uploadTheme={theme || init.theme.uploadTheme}
                                                                     key={index}
                                                                 >
@@ -241,6 +245,7 @@ export default class Upload extends Component<IUploadProps, IState> {
                                                                         <IconClose
                                                                             icon="ios-close"
                                                                             onClick={this.handleItemClose.bind(this, index)}
+                                                                            theme={new IconThemeData({size: 16})}
                                                                         />
                                                                     </UploadProViewItemClose>
                                                                 </UploadProViewItem>
@@ -370,21 +375,17 @@ export default class Upload extends Component<IUploadProps, IState> {
             }
             const formData = new FormData()
             formData.append(name || 'avatar', i.file)
-            let url = action
             if (isObject(data)) {
-                let params = ''
-                // tslint:disable-next-line: no-shadowed-variable
-                Object.keys(data).map((i: any) => {
-                    params = i + '=' + data[i] + '&'
+                Object.keys(data).forEach((i: any) => {
+                    formData.append(i, data[i])
                 })
-                url = url + '?' + params
             }
             if (!i.xhr && isFunction(onUploadStart) && onUploadStart()) {
                 i.xhr = axios({
                     baseURL: baserUrl,
                     method: 'POST',
                     headers,
-                    url,
+                    url: action,
                     data: formData,
                     withCredentials,
                     onUploadProgress: (progressEvent) => {
