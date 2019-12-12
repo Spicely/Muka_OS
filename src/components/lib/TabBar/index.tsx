@@ -102,7 +102,7 @@ interface IActiveBarProps {
 }
 
 const ActiveBar = styled.div<IActiveBarProps>`
-    ${transition(0.3, 'top,left')};
+    ${transition(0.3, ['top', 'left'])};
     ${({ type, activeNum, selectIndex }) => {
         if (type === 'horizontal') return css`height: ${getRatioUnit(2)};width: ${getRatioUnit(activeNum)};bottom: 0;left: ${getRatioUnit((selectIndex || 0) * activeNum)};`
         else return css`width: ${getRatioUnit(2)};height: ${getRatioUnit(activeNum)};left: 0;top: ${getRatioUnit((selectIndex || 0) * activeNum)};`

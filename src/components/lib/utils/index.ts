@@ -40,12 +40,11 @@ export interface IStyledProps {
 }
 
 
-export const transition = function (time: number, tag?: string): string {
+export const transition = function (time: number, tag?: string[]): string {
     if (tag) {
-        const arr = tag.split(',')
-        return `transition: ${arr.map((i) => `${i} ${time}s`).toString()}`
+        return `transition: ${tag.map((i) => `${i} ${time}s`).toString()}`
     }
-    return `transition: ${tag || 'all'} ${time}s`
+    return `transition: all ${time}s`
 }
 
 export const getRatioUnit = function (num: number) {
