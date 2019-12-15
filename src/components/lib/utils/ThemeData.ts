@@ -39,6 +39,7 @@ interface IThemeDataProps {
     colorsTheme?: ColorsThemeData
     uploadTheme?: UploadThemeData
     progressTheme?: ProgressThemeData
+    navBarTheme?: NavBarThemeData
 }
 
 export default class ThemeData {
@@ -60,6 +61,7 @@ export default class ThemeData {
             if (data.tabBarTheme) this.tabBarTheme = data.tabBarTheme
             if (data.alertTheme) this.alertTheme = data.alertTheme
             if (data.carouselTheme) this.carouselTheme = data.carouselTheme
+            if(data.navBarTheme) this.navBarTheme = data.navBarTheme
             if (data.successColor) this.successColor = data.successColor
             if (data.warningColor) this.warningColor = data.warningColor
             if (data.colorsTheme) this.colorsTheme = data.colorsTheme

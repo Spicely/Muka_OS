@@ -2,7 +2,7 @@ import React, { Component, CSSProperties } from 'react'
 import styled, { css } from 'styled-components'
 import { isArray, isNumber, isNull, isFunction, isString } from 'lodash'
 import { Consumer } from '../ThemeProvider'
-import { IStyledProps, NavBarThemeData, ThemeData, getUnit, getRatioUnit } from '../utils'
+import { IStyledProps, NavBarThemeData, ThemeData, getUnit, getRatioUnit, getClassName } from '../utils'
 import Icon, { iconType } from '../Icon'
 import Image from '../Image'
 
@@ -84,7 +84,7 @@ const NavRight = styled.div<IStyledProps>`
     }
 `
 
-const NavImg = styled(Image)<IStyledProps>`
+const NavImg = styled(Image) <IStyledProps>`
     width: ${() => getRatioUnit(22)};
     height: ${() => getRatioUnit(22)};
 `
@@ -160,14 +160,14 @@ export default class NavBar extends Component<INavBarProps, any> {
                                         )
                                     }
                                     <NavTitle
-                                        className={`flex_1 ${titleCenter ? 'flex_center' : 'flex_justify'} ${titleClassName}`}
+                                        className={getClassName(`flex_1 ${titleCenter ? 'flex_center' : 'flex_justify'}`, titleClassName)}
                                     >
                                         {title || children}
                                     </NavTitle>
                                     {
                                         !isNull(rightValue) && (
                                             <NavRight
-                                                className={`flex ${isString(rightValue) ? 'flex_justify' : ''} ${rightClassName || ''} `}
+                                                className={getClassName(`flex${isString(rightValue) ? ' flex_justify' : ''}`, rightClassName)}
                                                 onClick={onRightClick}
                                             >
                                                 {rightValue}
