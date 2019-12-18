@@ -3,7 +3,6 @@ import { message } from 'antd'
 import CryptoJS from 'crypto-js'
 import axois, { AxiosRequestConfig } from 'axios'
 import { store } from 'src/store'
-import { SET_LOGIN } from 'src/store/action'
 
 interface IValue {
     [name: string]: any
