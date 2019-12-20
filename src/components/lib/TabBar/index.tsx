@@ -1,6 +1,6 @@
 import React, { Component, Children, CSSProperties, cloneElement, createContext } from 'react'
 import styled, { css } from 'styled-components'
-import { isNil, isFunction } from 'lodash'
+import { isNil } from 'lodash'
 import { Consumer as ThemeConsumer } from '../ThemeProvider'
 import { TabBarThemeData, getUnit, transition, getClassName, getRatioUnit, Color } from '../utils'
 

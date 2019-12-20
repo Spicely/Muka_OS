@@ -2,7 +2,7 @@ import React, { Component, CSSProperties } from 'react'
 import styled, { css } from 'styled-components'
 import { isArray, isNumber, isNull, isFunction, isString } from 'lodash'
 import { Consumer } from '../ThemeProvider'
-import { IStyledProps, NavBarThemeData, ThemeData, getUnit, getRatioUnit, getClassName } from '../utils'
+import { IStyledProps, NavBarThemeData, getUnit, getRatioUnit, getClassName } from '../utils'
 import Icon, { iconType } from '../Icon'
 import Image from '../Image'
 

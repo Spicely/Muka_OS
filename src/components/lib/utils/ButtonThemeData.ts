@@ -1,10 +1,13 @@
 import { isNumber } from 'lodash'
 import Color from './Color'
 import IconThemeData from './IconThemeData'
+import Border from './Border'
 
 interface IButtonThemeDataProps {
     buttonColor?: Color
     disabledColor?: Color
+    color?: Color
+    border?: Border
     errorColor?: Color
     disabledFontColor?: Color
     disabledBorderColor?: Color
@@ -18,15 +21,19 @@ export default class ButtonThemeData {
     constructor(data?: IButtonThemeDataProps) {
         if (data) {
             if (data.buttonColor) this.buttonColor = data.buttonColor
+            if (data.color) this.color = data.color
             if (data.errorColor) this.errorColor = data.errorColor
             if (data.disabledColor) this.disabledColor = data.disabledColor
             if (data.disabledFontColor) this.disabledFontColor = data.disabledFontColor
             if (data.disabledBorderColor) this.disabledBorderColor = data.disabledBorderColor
             if (data.iconTheme) this.iconTheme = data.iconTheme
+            if (data.border) this.border = data.border
             if (isNumber(data.height)) this.height = data.height
             if (isNumber(data.borderRadius)) this.borderRadius = data.borderRadius
         }
     }
+
+    public color?: Color
 
     public buttonColor?: Color
 
@@ -41,6 +48,8 @@ export default class ButtonThemeData {
     public disabledBorderColor: Color = Color.fromRGB(223, 216, 216)
 
     public borderRadius?: number | string
+
+    public border?: Border
 
     public iconTheme: IconThemeData = new IconThemeData({
         size: 18,

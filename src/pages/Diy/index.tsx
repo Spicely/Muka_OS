@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { Button, Image } from 'components'
 import { GlobalView } from 'src/utils/node'
@@ -54,6 +55,12 @@ const DivLine = styled.div`
     margin: ${getRatioUnit(24)} ${getRatioUnit(20)} 0 ${getRatioUnit(20)};
 `
 
+const DivLabel = styled.div`
+    height: ${getRatioUnit(54)};
+    overflow: hidden;
+    text-overflow: ellipsis;
+`
+
 export default class DiyType extends PureComponent<any, any> {
 
     public render(): JSX.Element {
@@ -70,18 +77,20 @@ export default class DiyType extends PureComponent<any, any> {
                         </DivQrcode>
                         <DivLine />
                         <DivText >
-                            <div>分为商城首页与自定义页面两种，自定义页面可以做为文章或商城主题活动使用。</div>
-                            <DivBtn mold="primary">进入</DivBtn>
+                            <DivLabel>修改内部页面显示</DivLabel>
+                            <Link to="/diy/item">
+                                <DivBtn mold="primary">进入</DivBtn>
+                            </Link>
                         </DivText>
                     </DivList>
                     <DivList>
-                        <DivListName>小程序设置</DivListName>
+                        <DivListName>自定义页面</DivListName>
                         <DivQrcode>
                             <DivImg src={require('../../assets/app_setting.png')} />
                         </DivQrcode>
                         <DivLine />
                         <DivText >
-                            <div> 小程序发布前，AppID、AppSecret为必填配置，微信支付以为客服为可选功能。</div>
+                            <DivLabel>自定义页面可以做为文章或商城主题活动使用</DivLabel>
                             <DivBtn mold="primary">进入</DivBtn>
                         </DivText>
                     </DivList>
@@ -92,7 +101,7 @@ export default class DiyType extends PureComponent<any, any> {
                         </DivQrcode>
                         <DivLine />
                         <DivText >
-                            <div>首页广告为弹出式，进商城首页时强出，先设置好广告，在商城首页的配置中引用。</div>
+                            <DivLabel>首页广告为弹出式，进商城首页时强出，先设置好广告，在商城首页的配置中引用。</DivLabel>
                             <DivBtn mold="primary">进入</DivBtn>
                         </DivText>
                     </DivList>
@@ -103,7 +112,7 @@ export default class DiyType extends PureComponent<any, any> {
                         </DivQrcode>
                         <DivLine />
                         <DivText>
-                            <div>底部导航比较特别，改动后需重新提交微信审核，并且审核通过后才可生效。</div>
+                            <DivLabel>底部导航比较特别，改动后需重新提交微信审核，并且审核通过后才可生效。</DivLabel>
                             <DivBtn mold="primary">进入</DivBtn>
                         </DivText>
                     </DivList>

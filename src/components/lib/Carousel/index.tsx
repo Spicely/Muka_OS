@@ -3,7 +3,7 @@ import { isNumber, isFunction, isNil } from 'lodash'
 import styled, { css } from 'styled-components'
 import { Consumer } from '../ThemeProvider'
 import Image from '../Image'
-import { getClassName, prefix, CarouselThemeData, getUnit, transition, getRatioUnit, Color } from '../utils'
+import { getClassName, CarouselThemeData, getUnit, transition, getRatioUnit, Color } from '../utils'
 
 export interface ICarouselValueProps {
     url: string
