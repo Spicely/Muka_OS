@@ -17,7 +17,7 @@ class App extends React.Component {
                     <ThemeProvider>
                         <BrowserRouter>
                             <Switch>
-                                <Route path="/login" exact component={loadable(import('./pages/Login'))} />
+                                {/* <Route path="/login" exact component={loadable(import('./pages/Login'))} /> */}
                                 <PageLayout>
                                     <Switch>
                                         {

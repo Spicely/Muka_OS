@@ -12,7 +12,7 @@ import { connect, DispatchProp } from 'react-redux'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { ColorResult } from 'react-color'
 import { GlobalView } from 'src/utils/node'
-import { NavBarThemeData, Color, getRatioUnit, Border, BorderStyle, TabBarThemeData, CarouselThemeData, ButtonThemeData } from 'src/components/lib/utils'
+import { NavBarThemeData, Color, getRatioUnit, Border, BorderStyle, TabBarThemeData, CarouselThemeData, ButtonThemeData, IconThemeData } from 'src/components/lib/utils'
 import { IComponentData } from 'src/store/reducers/componentData'
 import styled, { css, createGlobalStyle } from 'styled-components'
 import EditComponent from './editComponent'
@@ -116,11 +116,18 @@ const TplScrollView = styled(Drag.Box)`
     overflow: auto;
 `
 
-const EditBtn = styled(Button)<any>`
+const EditBtn = styled(Button)`
     margin-right: ${getRatioUnit(5)};
     margin-top: ${getRatioUnit(6)};
     :nth-of-type(4n) {
         margin-right: 0
+    }
+`
+
+const EditLabel = styled.div`
+    margin-top: ${getRatioUnit(5)};
+    :first-child {
+        margin-top: 0
     }
 `
 
@@ -213,7 +220,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                                             ref={provided.innerRef}
                                             style={{ height: '100%' }}
                                         >
-                                            {componentData.pagePorps.map((item: IComponents, index: number) => (
+                                            {componentData.pageProps.map((item: IComponents, index: number) => (
                                                 <Draggable key={index} draggableId={index.toString()} index={index}>
                                                     {(provided) => (
                                                         <div
@@ -376,7 +383,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
 
     private handleSetLink = (id: string) => {
         const { componentData, dispatch } = this.props
-        const pageProps: any = [...componentData.pagePorps]
+        const pageProps: any = [...componentData.pageProps]
         pageProps[this.index].props[this.tagName][this.selectIndex][this.field] = `/pages/${id}`
         dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
         this.setState({
@@ -410,7 +417,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
 
     private addNavRight = () => {
         const { componentData, dispatch } = this.props
-        const pageProps: any = [...componentData.pagePorps]
+        const pageProps: any = [...componentData.pageProps]
         pageProps[this.index].props.right.push({
             type: 'icon',
             url: 'msg',
@@ -421,14 +428,14 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
 
     private handleNavBarRightDel = (index: number) => {
         const { componentData, dispatch } = this.props
-        const pageProps: any = [...componentData.pagePorps]
+        const pageProps: any = [...componentData.pageProps]
         pageProps[this.index].props.right.splice(index, 1)
         dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
     private handleNavBarRightColor(index: number, val: ColorResult) {
         const { componentData, dispatch } = this.props
-        const pageProps: any = [...componentData.pagePorps]
+        const pageProps: any = [...componentData.pageProps]
         pageProps[this.index].props.right[index].color = val.hex
         dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
@@ -485,8 +492,25 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
     }
 
     private getData = async () => {
-        const data = await Axios.get('http://192.168.1.6:3007/o/common/pic-host')
-        this.baseUrl = data.data.data
+        try {
+            const { match } = this.props
+            const { dispatch } = this.props
+            const data = await http(`diy-page?path=${match.params.page}`, {}, { method: 'GET' })
+            const content = data.data.content
+            content.pageProps = content.pageProps.map((i: any) => {
+                if (i.component === 'Carousel') {
+                    i.props.value = i.props.value.map((v: any) => {
+                        v.url = v.pic_link
+                        return v
+                    })
+                }
+                return i
+            })
+            dispatch({ type: SET_COMPONENT_DATA, data: data.data.content })
+        } catch (e) {
+            console.log(e)
+        }
+
     }
 
     private handleDragEnter = () => {
@@ -498,11 +522,11 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
     private handleFormChange = () => {
         const { componentData, dispatch } = this.props
         const { componentName } = this.state
-        const pageProps: any = [...componentData.pagePorps]
+        const pageProps: any = [...componentData.pageProps]
         const data: any = {}
         if (this.exFun) {
             const val: any = this.exFun.getFieldValue()
-            Object.keys(val).map((i) => {
+            Object.keys(val).forEach((i) => {
                 const key = i.split('.')
                 if (key.length > 1) {
                     if (val[i]) {
@@ -533,7 +557,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
             delete data['extendRadio']
         }
         pageProps[this.index].props = assign(pageProps[this.index].props, data)
-        componentData.pagePorps = pageProps
+        componentData.pageProps = pageProps
         dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
@@ -561,14 +585,14 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
 
     private handleFormIntChange(field: string, e: any) {
         const { componentData, dispatch } = this.props
-        const pageProps: any = [...componentData.pagePorps]
+        const pageProps: any = [...componentData.pageProps]
         pageProps[this.index].props[field] = e.target.value
         dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
     // private setComProps = (data: INavBarRightIcon | INavBarRightImage, dialogName: 'searchSelect') => {
     //     const { componentData, setComponentData }: any = this.props
-    //     const right = componentData.pagePorps[this.index].props.right
+    //     const right = componentData.pageProps[this.index].props.right
     //     right[this.listIndex] = data
     //     this.setState({
     //         [dialogName]: false
@@ -579,7 +603,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
 
     private setCarouselUrl = (url: string, field: string, dialogName: 'imagesDialog') => {
         const { componentData, setComponentData }: any = this.props
-        const right = componentData.pagePorps[this.index].props[field]
+        const right = componentData.pageProps[this.index].props[field]
         right[this.listIndex].url = url
         this.setState({
             [dialogName]: false
@@ -598,7 +622,46 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                     onEdit={this.handleEditStart.bind(this, data, index, 'LForm')}
                     onDelete={this.handleDelete.bind(this, index)}
                 >
-                    <NavBar {...data.props} theme={new NavBarThemeData({ width: '100%' })} />
+                    <NavBar
+                        {...data.props}
+                        left={(
+                            <div className="flex">
+                                <Icon
+                                    icon="md-pin"
+                                    theme={new IconThemeData({
+                                        color: Color.hex(data.props.iconColor || '#fff')
+                                    })}
+                                />
+                                <div className="flex_justify">定位</div>
+                            </div>
+                        )}
+                        title={
+                            data.props.titleType === 'img' ? (
+                                <Image
+                                    src={require('../../assets/title_logon.png')}
+                                    style={{
+                                        height: (data.props.height || 48) * 0.6
+                                    }}
+                                />
+                            ) : data.props.title
+                        }
+                        right={
+                            data.props.rightType === 'search' ?
+                                <Icon
+                                    icon="md-search"
+                                    theme={new IconThemeData({
+                                        color: Color.hex(data.props.iconColor || '#fff')
+                                    })}
+                                /> :
+                                <Icon
+                                    icon="md-cart"
+                                    theme={new IconThemeData({
+                                        color: Color.hex(data.props.iconColor || '#fff')
+                                    })}
+                                />
+                        }
+                        theme={new NavBarThemeData({ width: '100%' })}
+                    />
                 </EditComponent>
             )
             case 'SearchBar': return (
@@ -631,7 +694,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                     onEdit={this.handleEditStart.bind(this, data, index, 'Carousel')}
                     onDelete={this.handleDelete.bind(this, index)}
                 >
-                    <Carousel {...data.props} baseUrl={baseUrl} />
+                    <Carousel {...data.props} />
                 </EditComponent>
             )
             case 'TabBar': {
@@ -662,20 +725,20 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
 
     private handleDelete(index: number) {
         const { componentData, dispatch } = this.props
-        componentData.pagePorps.splice(index, 1)
+        componentData.pageProps.splice(index, 1)
         dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
     private handleListDel = (index: number, field: string) => {
         const { componentData, dispatch } = this.props
-        const pageProps: any = [...componentData.pagePorps]
+        const pageProps: any = [...componentData.pageProps]
         pageProps[this.index].props[field].splice(index, 1)
         dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
     private handleCarouselListAdd = (value: any) => {
         const { componentData, dispatch } = this.props
-        const pageProps: any = [...componentData.pagePorps]
+        const pageProps: any = [...componentData.pageProps]
         pageProps[this.index].props.value.push(value)
         dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
@@ -726,7 +789,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
 
     private handelSetType = (value: string) => {
         const { componentData, dispatch } = this.props
-        const pageProps: any = [...componentData.pagePorps]
+        const pageProps: any = [...componentData.pageProps]
         pageProps[this.index].props['getType'] = value
         if (value === 'read') {
             pageProps[this.index].props.value = [{ label: '内容将从数据库读取', link: '' }]
@@ -738,7 +801,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
 
     private handleSetIntValue = (index: number, tagName: string, val: string, event: any) => {
         const { componentData, dispatch } = this.props
-        const pageProps: any = [...componentData.pagePorps]
+        const pageProps: any = [...componentData.pageProps]
         pageProps[this.index].props[tagName][index][val] = event.target.value
         dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
@@ -871,9 +934,9 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
         const components: JSX.Element[] = []
         data.forEach((i, k) => {
             components.push(
-                <div key={k}>
-                    <Label color="#999">{i.label}</Label>
-                </div>
+                <EditLabel key={k}>
+                    <Label color="#999" >{i.label}</Label>
+                </EditLabel>
             )
             i.components.forEach((v, index) => {
                 components.push(
@@ -931,11 +994,11 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
         }
         const { componentData, dispatch } = this.props
         const items = reorder(
-            componentData.pagePorps[this.index].props[field],
+            componentData.pageProps[this.index].props[field],
             result.source.index,
             result.destination.index
         )
-        componentData.pagePorps[this.index].props[field] = items
+        componentData.pageProps[this.index].props[field] = items
         dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
@@ -945,11 +1008,11 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
         }
         const { componentData, dispatch } = this.props
         const items = reorder(
-            componentData.pagePorps,
+            componentData.pageProps,
             result.source.index,
             result.destination.index
         );
-        componentData.pagePorps = items
+        componentData.pageProps = items
         dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
@@ -989,7 +1052,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
 
     private handleDragSuccess = (data: any) => {
         const { dispatch, componentData } = this.props
-        componentData.pagePorps.push(data)
+        componentData.pageProps.push(data)
         dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 }

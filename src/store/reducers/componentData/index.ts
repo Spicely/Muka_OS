@@ -5,14 +5,14 @@ export interface IComponentData {
     name: string
     introduce: string
     pageColor: string
-    pagePorps: any[]
+    pageProps: any[]
 }
 
 const initData: IComponentData = {
     name: '',
     introduce: '',
     pageColor: '',
-    pagePorps: []
+    pageProps: []
 }
 
 

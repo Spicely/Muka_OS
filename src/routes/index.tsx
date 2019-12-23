@@ -26,7 +26,7 @@ export const routes: IRoutes[] = [{
 }, {
     component: import('../pages/Diy'),
     path: '/diy'
-}, {
+}, /*{
     component: import('../pages/Article'),
     path: '/article'
 }, {
@@ -44,7 +44,7 @@ export const routes: IRoutes[] = [{
 }, {
     component: import('../pages/Home'),
     path: '/'
-},]
+},*/]
 
 export const loadable = (component: Promise<React.ComponentClass<any> | React.StatelessComponent<any> | { default: React.ComponentType<any> }>) => {
     return Loadable({

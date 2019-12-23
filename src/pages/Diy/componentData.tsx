@@ -37,24 +37,97 @@ const CloseIcon = styled(Icon)`
 
 const componentData = function (self: any) {
     const { componentData } = self.props
-    let props = componentData.pagePorps[self.index].props || {}
+    let props = componentData.pageProps[self.index].props || {}
     return {
         'NavBar': [{
+            component: 'RadioGroup',
+            label: '标题类型',
+            props: {
+                value: props.titleType || 'text',
+                options: [{
+                    label: '文字',
+                    value: 'text'
+                }, {
+                    label: '图片',
+                    value: 'img'
+                }],
+                onChange: self.handleFormChange
+            },
+            field: 'titleType'
+        }, {
             component: 'Input',
+            visible: props.titleType === 'text',
             label: '标题',
             props: {
+                value: props.title,
                 type: 'text',
                 onChange: self.handleFormChange
             },
             field: 'title'
         }, {
-            component: 'Input',
+            component: 'Slider',
             label: '高度',
             props: {
+                value: props.height || 48,
                 type: 'number',
+                min: 40,
+                max: 60,
                 onChange: self.handleFormChange
             },
             field: 'style.height'
+        }, {
+            component: 'RadioGroup',
+            label: '标题显示',
+            props: {
+                value: props.centerTitle || false,
+                options: [{
+                    label: '默认',
+                    value: false
+                }, {
+                    label: '居中',
+                    value: true
+                }],
+                onChange: self.handleFormChange
+            },
+            field: 'titleCenter'
+        }, {
+            component: 'RadioGroup',
+            label: '分割线',
+            props: {
+                value: props.divider || true,
+                options: [{
+                    label: '不显示',
+                    value: false
+                }, {
+                    label: '显示',
+                    value: true
+                }],
+                onChange: self.handleFormChange
+            },
+            field: 'divider'
+        }, {
+            component: 'RadioGroup',
+            label: '右侧',
+            props: {
+                value: props.rightType || 'cart',
+                options: [{
+                    label: '购物车',
+                    value: 'cart'
+                }, {
+                    label: '搜索',
+                    value: 'search'
+                }],
+                onChange: self.handleFormChange
+            },
+            field: 'rightType'
+        }, {
+            component: 'Colors',
+            label: '图标颜色',
+            props: {
+                initColor: '#fff',
+                onChange: self.handleFormChange
+            },
+            field: 'iconColor'
         }, {
             component: 'Colors',
             label: '背景颜色',

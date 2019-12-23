@@ -63,6 +63,9 @@ const NavLeft = styled.div<IStyledProps>`
 
 const NavTitle = styled.div<IStyledProps>`
     font-size: ${() => getRatioUnit(14)};
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 `
 
 const NavRight = styled.div<IStyledProps>`

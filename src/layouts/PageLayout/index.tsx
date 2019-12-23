@@ -328,25 +328,25 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
     }
 
     public componentWillReceiveProps(nextProps: IPageLayout) {
-        const { history } = this.props
-        if (!nextProps.isLogin) {
-            history.replace('/login')
-            return
-        }
+        // const { history } = this.props
+        // if (!nextProps.isLogin) {
+        //     history.replace('/login')
+        //     return
+        // }
     }
 
     private getData = async () => {
-        const { dispatch, isLogin, history } = this.props
-        if (!isLogin) {
-            history.replace('/login')
-            return
-        }
-        const arr = history.location.pathname.split('/')
-        this.setState({
-            selected: arr.length === 2 ? history.location.pathname : `/${arr[1]}`,
-            extendSelected: history.location.pathname
-        })
-        dispatch({ type: GET_LAYOUT_DATA })
+        // const { dispatch, isLogin, history } = this.props
+        // if (!isLogin) {
+        //     history.replace('/login')
+        //     return
+        // }
+        // const arr = history.location.pathname.split('/')
+        // this.setState({
+        //     selected: arr.length === 2 ? history.location.pathname : `/${arr[1]}`,
+        //     extendSelected: history.location.pathname
+        // })
+        // dispatch({ type: GET_LAYOUT_DATA })
     }
 
     private getItems = (fn: IFormFun): IFormItem[] => {
