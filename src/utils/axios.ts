@@ -8,7 +8,7 @@ interface IValue {
     [name: string]: any
 }
 
-export const baseUrl = 'http://localhost:1337'
+export const baseUrl = 'http://localhost:1337/admin/'
 export const imgUrl = 'http://localhost:1337'
 
 export interface IRresItem<T = any> {
@@ -71,7 +71,7 @@ instance.interceptors.response.use(async function (res: any) {
 
 const http = function (url: string, params?: IValue, config?: AxiosRequestConfig): any {
     const headers = config ? config.headers : {}
-    return instance(`/admin/${url}`, {
+    return instance(`${url}`, {
         ...config,
         data: encrypt(params || {}),
         headers: {

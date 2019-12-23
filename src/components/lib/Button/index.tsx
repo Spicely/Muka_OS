@@ -42,7 +42,7 @@ const Btn = styled.button<IBtnStyleProps>`
     ${transition(0.5)};
     -webkit-tap-highlight-color: transparent;
     ${({ buttonTheme }) => {
-        if (buttonTheme.border) return css`${buttonTheme.border.toString()}`
+        if (buttonTheme.border) return css`${buttonTheme.border.toString()}`;
         else return css`border: none;`
     }}
     

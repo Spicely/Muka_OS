@@ -38,7 +38,7 @@ export default class EditItem extends PureComponent<any, any> {
                 >
                     <EditList>
                         <EditP>首页</EditP>
-                        <Link to="/diy/homeEdit">
+                        <Link to="/diy/edit/home">
                             <Button
                                 theme={new ButtonThemeData({
                                     border: Border.all({

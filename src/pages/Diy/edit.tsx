@@ -1,4 +1,5 @@
 import React, { Component, ChangeEvent } from 'react'
+import { RouteComponentProps } from 'react-router-dom'
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd'
 import { Modal } from 'antd'
 import { assign, cloneDeep } from 'lodash'
@@ -11,7 +12,7 @@ import { connect, DispatchProp } from 'react-redux'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { ColorResult } from 'react-color'
 import { GlobalView } from 'src/utils/node'
-import { NavBarThemeData, Color, getRatioUnit, Border, BorderStyle, TabBarThemeData, CarouselThemeData } from 'src/components/lib/utils'
+import { NavBarThemeData, Color, getRatioUnit, Border, BorderStyle, TabBarThemeData, CarouselThemeData, ButtonThemeData } from 'src/components/lib/utils'
 import { IComponentData } from 'src/store/reducers/componentData'
 import styled, { css, createGlobalStyle } from 'styled-components'
 import EditComponent from './editComponent'
@@ -19,6 +20,7 @@ import componentViewData from './componentData'
 import { SET_COMPONENT_DATA } from 'src/store/action'
 import { uploadModal } from 'src/utils'
 import Axios from 'axios'
+import comData from './data'
 
 const { confirm } = Modal
 
@@ -114,6 +116,14 @@ const TplScrollView = styled(Drag.Box)`
     overflow: auto;
 `
 
+const EditBtn = styled(Button)<any>`
+    margin-right: ${getRatioUnit(5)};
+    margin-top: ${getRatioUnit(6)};
+    :nth-of-type(4n) {
+        margin-right: 0
+    }
+`
+
 const reorder = (list: IComponents[], startIndex: number, endIndex: number) => {
     const result = Array.from(list)
     const [removed] = result.splice(startIndex, 1)
@@ -122,7 +132,11 @@ const reorder = (list: IComponents[], startIndex: number, endIndex: number) => {
     return result
 }
 
-class AppsDesign extends Component<IProps, any> {
+interface IParams {
+    page: 'home'
+}
+
+class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
 
     public state: any = {
         components: [],
@@ -739,21 +753,7 @@ class AppsDesign extends Component<IProps, any> {
                 itemBarClassName="tab_VE_line"
             >
                 <TabBar.Item icon={<Icon icon="ios-apps" />} tooltipTitle="页面组件" placement="left">
-                    <Drag data={{ component: 'NavBar', props: {}, edit: false }}>
-                        <NavBar />
-                    </Drag>
-                    <Label color="#999">轮播</Label>
-                    <Drag data={{ component: 'Carousel', props: { value: [{ url: `/images/banner-1.jpg` }, { url: `/images/banner-2.jpg` }], baseUrl }, edit: false }}>
-                        <Carousel baseUrl={baseUrl} value={[{ url: `/images/banner-1.jpg` }, { url: `/images/banner-2.jpg` }]}>
-                        </Carousel>
-                    </Drag>
-                    <Label color="#999">选项卡</Label>
-                    <Drag data={{ component: 'TabBar', props: { value: [{ label: '选项', content: '选项', data: '' }, { label: '选项', content: '选项', data: '' }] }, edit: false }}>
-                        <TabBar>
-                            <TabBar.Item title="选项" >选项</TabBar.Item>
-                            <TabBar.Item title="选项" >选项</TabBar.Item>
-                        </TabBar>
-                    </Drag>
+                    {this.getComponentDataView()}
                 </TabBar.Item>
                 <TabBar.Item icon={<Icon icon="ios-arrow-back" />} tooltipTitle="参数设置" placement="left" >
                     {
@@ -862,6 +862,37 @@ class AppsDesign extends Component<IProps, any> {
         this.setState({
             [field]: true
         })
+    }
+
+    // 获得定义好的页面组件
+    private getComponentDataView = () => {
+        const { match } = this.props
+        const data = comData[match.params.page]
+        const components: JSX.Element[] = []
+        data.forEach((i, k) => {
+            components.push(
+                <div key={k}>
+                    <Label color="#999">{i.label}</Label>
+                </div>
+            )
+            i.components.forEach((v, index) => {
+                components.push(
+                    <EditBtn
+                        theme={new ButtonThemeData({
+                            border: Border.all({
+                                width: 1,
+                                style: BorderStyle.dashed,
+                                color: Color.fromRGB(221, 221, 221)
+                            })
+                        })}
+                        key={`${k}_${index}`}
+                    >
+                        {v.label}
+                    </EditBtn>
+                )
+            })
+        })
+        return components
     }
 
     private getPageNode() {

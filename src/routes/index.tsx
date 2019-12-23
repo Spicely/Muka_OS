@@ -18,8 +18,8 @@ export interface IRoutes {
 }
 
 export const routes: IRoutes[] = [{
-    component: import('../pages/Diy/homeEdit'),
-    path: '/diy/homeEdit'
+    component: import('../pages/Diy/edit'),
+    path: '/diy/edit/:page'
 }, {
     component: import('../pages/Diy/editItem'),
     path: '/diy/item'

@@ -1,7 +1,7 @@
 import { isNumber } from 'lodash'
 import Color from './Color'
 import IconThemeData from './IconThemeData'
-import Border from './Border'
+import Border, { BorderStyle } from './Border'
 
 interface IButtonThemeDataProps {
     buttonColor?: Color
@@ -49,7 +49,11 @@ export default class ButtonThemeData {
 
     public borderRadius?: number | string
 
-    public border?: Border
+    public border: Border = Border.all({
+        width: 1,
+        style: BorderStyle.solid,
+        color: Color.fromRGB(221, 221, 221)
+    })
 
     public iconTheme: IconThemeData = new IconThemeData({
         size: 18,
