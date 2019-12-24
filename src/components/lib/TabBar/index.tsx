@@ -1,6 +1,6 @@
 import React, { Component, Children, CSSProperties, cloneElement, createContext } from 'react'
 import styled, { css } from 'styled-components'
-import { isNil } from 'lodash'
+import { isNil, isFunction } from 'lodash'
 import { Consumer as ThemeConsumer } from '../ThemeProvider'
 import { TabBarThemeData, getUnit, transition, getClassName, getRatioUnit, Color } from '../utils'
 
@@ -18,6 +18,7 @@ export interface ITabBarProps {
     tabViewBarClassName?: string
     itemBarClassName?: string
     itemClassName?: string
+    onChange?: (field: number | string) => void
 }
 
 interface IDefaultValue {
@@ -314,6 +315,7 @@ export default class TabBar extends Component<ITabBarProps, ITabBarState> {
     }
 
     private handleTabItemChange = (field?: number) => {
+        const { onChange } = this.props
         const { selected } = this.state
         if (selected === field) return
         if (!isNil(field)) {
@@ -325,6 +327,9 @@ export default class TabBar extends Component<ITabBarProps, ITabBarState> {
                 height: info.height,
                 activeNum: itemInfo
             })
+            if (isFunction(onChange)) {
+                onChange(field)
+            }
         }
     }
 }

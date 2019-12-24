@@ -41,9 +41,9 @@ export default class ButtonThemeData {
 
     public height: number = 32
 
-    public disabledColor: Color = Color.fromRGB(223, 216, 216)
+    public disabledColor: Color = Color.fromRGB(241, 241, 241)
 
-    public disabledFontColor: Color = Color.fromRGBO(0, 0, 0, 0.25)
+    public disabledFontColor: Color = Color.fromRGBO(0, 0, 0, 0.45)
 
     public disabledBorderColor: Color = Color.fromRGB(223, 216, 216)
 

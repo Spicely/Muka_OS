@@ -1,7 +1,7 @@
 import React, { Component, ChangeEvent } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd'
-import { Modal } from 'antd'
+import { Modal, Spin, message } from 'antd'
 import { assign, cloneDeep } from 'lodash'
 import { LayoutNavBar, LayoutActions } from 'src/layouts/PageLayout'
 import { omit, isArray, isString } from 'muka'
@@ -19,7 +19,6 @@ import EditComponent from './editComponent'
 import componentViewData from './componentData'
 import { SET_COMPONENT_DATA } from 'src/store/action'
 import { uploadModal } from 'src/utils'
-import Axios from 'axios'
 import comData from './data'
 
 const { confirm } = Modal
@@ -152,6 +151,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
         images: [],
         total: 0,
         componentName: '',
+        spinning: false,
         selected: 0,
         type: 'LForm',
         searchSelect: false,
@@ -183,7 +183,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
 
     public render(): JSX.Element {
         const { componentData } = this.props
-        const { searchSelect, icons, uploadDialog, images, pageCurrent, total, linkDialog, links, imagesDialog } = this.state
+        const { spinning } = this.state
         return (
             <GlobalView>
                 <GlobalDiyStyle />
@@ -192,8 +192,11 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                     theme={new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255) })}
                     title={<LabelHeader title={this.title} line="vertical" />}
                 />
+
                 <LayoutActions>
-                    {this.getActionsView()}
+                    <Spin spinning={spinning}>
+                        {this.getActionsView()}
+                    </Spin>
                 </LayoutActions>
                 <Alert
                     inheritColor
@@ -749,7 +752,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
         this.setState({
             type: field,
             componentName: data.component,
-            selected: 1
+            selected: 2
         })
     }
 
@@ -807,84 +810,32 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
     }
 
     private getActionsView(): JSX.Element {
-        const { selected, componentName } = this.state
+        const { selected } = this.state
         return (
             <TabBar
                 selected={selected}
                 type="vertical"
-                theme={new TabBarThemeData({ height: '100%', width: 400 })}
+                theme={new TabBarThemeData({ height: 'calc(100vh - 98px)', width: 400 })}
                 itemBarClassName="tab_VE_line"
+                onChange={this.handleTabChange}
             >
+                <TabBar.Item icon={<Icon icon="ios-settings" />} tooltipTitle="页面信息" placement="left">
+                    {this.getPageNode()}
+                </TabBar.Item>
                 <TabBar.Item icon={<Icon icon="ios-apps" />} tooltipTitle="页面组件" placement="left">
                     {this.getComponentDataView()}
                 </TabBar.Item>
                 <TabBar.Item icon={<Icon icon="ios-arrow-back" />} tooltipTitle="参数设置" placement="left" >
-                    {
-                        componentName === 'Page' && this.getPageNode()
-                    }
-                    {
-                        componentName !== 'Page' && <Form getItems={this.getItem} />
-                    }
-                    {/*{this.componentType === 'TabBar' ?
-                        (
-                            <DragDropContext onDragEnd={this.onDragTabBar}>
-                                <Droppable droppableId="tab_bar" >
-                                    {(provided) => (
-                                        <div
-                                            {...provided.droppableProps}
-                                            ref={provided.innerRef}
-                                            className={label_view}
-                                        >
-                                            {components[this.index].props.value.map((i: ITabBarValue, index: number) => (
-                                                <Draggable key={index} draggableId={'tab_bar' + index.toString()} index={index}>
-                                                    {(provided) => (
-                                                        <div
-                                                            className={`flex ${label_view_list}`}
-                                                            ref={provided.innerRef}
-                                                            {...provided.draggableProps}
-                                                            {...provided.dragHandleProps}
-
-                                                        >
-                                                            <div className="flex_1">
-                                                                <div className="flex">
-                                                                    <div className={`flex_justify ${label_list}`}>选项卡文字</div>
-                                                                    <Input
-                                                                        className={`flex_1 ${label_list_int}`}
-                                                                        value={i.label}
-                                                                        onChange={this.handleTabBarInt.bind(this, index)}
-                                                                        closeIconShow={false}
-                                                                        maxLength={5}
-                                                                        showMaxLength
-                                                                    />
-                                                                </div>
-                                                                <div className="flex" style={{ marginTop: 10 }}>
-                                                                    <Input className={`flex_1 ${label_list_int}`} value={i.data} placeholder="请选择数据" disabled closeIconShow={false} style={{ borderRight: 0 }} />
-                                                                    <Button className={`flex_justify ${label_list_btn}`} mold="primary">选择数据</Button>
-                                                                </div>
-                                                            </div>
-                                                            <div className={`${label_list_icon} flex_justify`}>
-                                                                <Icon
-                                                                    icon="md-close-circle"
-                                                                    color="rgba(0, 0, 0, 0.3)"
-                                                                    style={{ cursor: 'pointer' }}
-                                                                    onClick={this.handleTabBarDel.bind(this, index)}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </Draggable>
-                                            ))}
-                                            {provided.placeholder}
-                                        </div>
-                                    )}
-                                </Droppable>
-                            </DragDropContext>
-
-                        ) : null
-                    } */}
+                    <Form getItems={this.getItem} />
                 </TabBar.Item>
             </TabBar>
         )
+    }
+
+    private handleTabChange = (field: string | number) => {
+        this.setState({
+            selected: field
+        })
     }
 
     private getPageComponentItem = (fn: IFormFun): IFormItem[] => {
@@ -896,6 +847,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                 placeholder: '请输入名称',
                 value: componentData.name,
                 maxLength: 16,
+                onChange: this.updateComGlobalData.bind(this, 'name')
             },
             additional: <Label color="#1890ff" style={{ paddingLeft: 0 }}>注意：页面名称是便于后台查找。</Label>,
             field: 'name'
@@ -907,6 +859,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                 value: componentData.introduce,
                 maxLength: 50,
                 showMaxLength: true,
+                onChange: this.updateComGlobalData.bind(this, 'introduce')
             },
             field: 'introduce'
         }, {
@@ -917,7 +870,45 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                 onChange: this.updateComColorData.bind(this, 'pageColor'),
             },
             field: 'pageColor'
+        }, {
+            component: 'Button',
+            props: {
+                children: '保存',
+                mold: 'primary',
+                onClick: this.handleUpdateComInfo
+            },
         }]
+    }
+
+    private updateComGlobalData = (field: string, e: ChangeEvent<HTMLInputElement>) => {
+        const { componentData, dispatch }: any = this.props
+        componentData[field] = e.target.value
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
+    }
+
+    private handleUpdateComInfo = async () => {
+        try {
+            const { componentData, match } = this.props
+            this.setState({
+                spinning: true
+            })
+            await http(`diy-page`, {
+                path: match.params.page,
+                title: componentData.name,
+                type: 0,
+                content: JSON.stringify(componentData)
+            })
+            this.setState({
+                spinning: false
+            })
+            message.success('保存成功')
+        } catch (e) {
+            this.setState({
+                spinning: false
+            })
+            message.error('保存失败')
+        }
+
     }
 
     private handleSelectView = (index: number, field: any) => {
@@ -929,7 +920,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
 
     // 获得定义好的页面组件
     private getComponentDataView = () => {
-        const { match } = this.props
+        const { match , componentData} = this.props
         const data = comData[match.params.page]
         const components: JSX.Element[] = []
         data.forEach((i, k) => {
@@ -939,6 +930,10 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                 </EditLabel>
             )
             i.components.forEach((v, index) => {
+                let disabled = false
+                if(v.data.component === 'NavBar') {
+                    disabled = componentData.pageProps.some((i) => i.component === 'NavBar')
+                }
                 components.push(
                     <EditBtn
                         theme={new ButtonThemeData({
@@ -948,7 +943,9 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                                 color: Color.fromRGB(221, 221, 221)
                             })
                         })}
+                        disabled={disabled}
                         key={`${k}_${index}`}
+                        onClick={this.handleComAdd.bind(this, v.data)}
                     >
                         {v.label}
                     </EditBtn>
@@ -956,6 +953,12 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
             })
         })
         return components
+    }
+
+    private handleComAdd = (data: any) => {
+        const { componentData, dispatch } = this.props
+        componentData.pageProps.push(data)
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
     private getPageNode() {
@@ -966,9 +969,9 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
         )
     }
     private updateComColorData = (field: string, value: any) => {
-        const { componentData, setComponentData }: any = this.props
+        const { componentData, dispatch }: any = this.props
         componentData[field] = value.hex
-        setComponentData(cloneDeep(componentData))
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
     private onDragTabBar = (result: DropResult) => {
@@ -1019,7 +1022,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
     private handleTabComponent = (name: string) => {
         this.setState({
             componentName: name,
-            selected: 1
+            selected: 2
         })
     }
 

@@ -278,7 +278,7 @@ const componentData = function (self: any) {
                 onChange: self.handleFormChange,
                 min: 100,
                 max: 170,
-                defaultValue: 170
+                defaultValue: props.style.height || 170
             },
             field: 'style.height'
         }, {
@@ -286,7 +286,8 @@ const componentData = function (self: any) {
             label: '左侧间距',
             props: {
                 onChange: self.handleFormChange,
-                max: 20
+                max: 20,
+                defaultValue: props.style.marginLeft || 0
             },
             field: 'style.marginLeft'
         }, {
@@ -294,7 +295,8 @@ const componentData = function (self: any) {
             label: '右侧间距',
             props: {
                 onChange: self.handleFormChange,
-                max: 20
+                max: 20,
+                defaultValue: props.style.marginRight || 0
             },
             field: 'style.marginRight'
         }, {
@@ -302,7 +304,8 @@ const componentData = function (self: any) {
             label: '顶部间距',
             props: {
                 onChange: self.handleFormChange,
-                max: 20
+                max: 20,
+                defaultValue: props.style.marginTop || 0
             },
             field: 'style.marginTop'
         }, {
@@ -310,7 +313,8 @@ const componentData = function (self: any) {
             label: '底部间距',
             props: {
                 onChange: self.handleFormChange,
-                max: 20
+                max: 20,
+                defaultValue: props.style.marginBottom || 0
             },
             field: 'style.marginBottom'
         }, {
@@ -334,7 +338,7 @@ const componentData = function (self: any) {
                 }, {
                     label: '顶部', value: 'top',
                 }],
-                value: 'bottom'
+                value: props.dotPosition || 'bottom'
             },
             field: 'dotPosition'
         }, {
@@ -347,7 +351,7 @@ const componentData = function (self: any) {
                 }, {
                     label: '圆形', value: 'circular',
                 }],
-                value: 'rectangle'
+                value: props.dotType || 'rectangle'
             },
             field: 'dotType'
         }, {
@@ -355,7 +359,7 @@ const componentData = function (self: any) {
             label: '指示颜色',
             props: {
                 onChange: self.handleFormChange,
-                initColor: '#fff'
+                initColor: props.dotColor || '#fff'
             },
             field: 'dotColor'
         }, {
@@ -368,7 +372,7 @@ const componentData = function (self: any) {
                 }, {
                     label: '否', value: false,
                 }],
-                value: false
+                value: props.autoplay || false
             },
             field: 'autoplay'
         }, {
@@ -383,79 +387,93 @@ const componentData = function (self: any) {
                 }, {
                     label: '淡入', value: 'fade',
                 }],
-                value: 'scrollx'
+                value: props.effect || 'scrollx'
             },
             field: 'effect'
         }, {
-            component: 'Label',
+            component: 'RadioGroup',
             label: '图片设置',
-            field: 'image',
-            additional: (
-                <div>
-                    <DragDropContext onDragEnd={self.onDragPropsEnd.bind(self, 'value')}>
-                        <Droppable droppableId="droppable_label" >
-                            {(provided, snapshot) => {
-                                return (
-                                    <div
-                                        {...provided.droppableProps}
-                                        ref={provided.innerRef}
-                                    >
-                                        {
-                                            (props.value || []).map((item: any, index: number) => {
-                                                return (
-                                                    <Draggable key={index} draggableId={index.toString()} index={index}>
-                                                        {(provided) => (
-                                                            <LabelView
-                                                                className="flex"
-                                                                ref={provided.innerRef}
-                                                                {...provided.draggableProps}
-                                                                {...provided.dragHandleProps}
-                                                            >
-                                                                <LabelListView className="flex_center">
-                                                                    <ImageView src={baseUrl + item.url} key={item.url + index} />
-                                                                </LabelListView>
-                                                                <div className="flex_1">
-                                                                    <div className="flex_1">
-                                                                        <div className="flex">
-                                                                            <Input className={`flex_1`} value={item.url} placeholder="请选择图片地址" disabled closeIconShow={false} style={{ borderRight: 0 }} />
-                                                                            <Button className={`flex_justify`} onClick={self.handleUploadView.bind(self, index)} mold="primary">上传图片</Button>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="flex_1" style={{ marginTop: '7px' }}>
-                                                                        <div className="flex">
-                                                                            <Input className={`flex_1`} value={item.link} placeholder="请选择链接地址" disabled closeIconShow={false} style={{ borderRight: 0 }} />
-                                                                            <Button className={`flex_justify`} onClick={self.showLinkDialog.bind(self, index, 'value', 'link')} mold="primary">选择链接</Button>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <CloseIcon
-                                                                    icon="md-close-circle"
-                                                                    color="rgba(0, 0, 0, 0.3)"
-                                                                    theme={new IconThemeData({ size: 18 })}
-                                                                    style={{ cursor: 'pointer' }}
-                                                                    onClick={self.handleListDel.bind(self, index, 'value')}
-                                                                />
-                                                            </LabelView>
-                                                        )}
-                                                    </Draggable>
-                                                )
-                                            })
-                                        }
-                                        <Button style={{ width: '100%', marginTop: snapshot.isDraggingOver ? '100px' : '' }} onClick={self.handleCarouselListAdd.bind(self, { url: '/images/banner-1.jpg', link: '' })}>
-                                            <div className="flex">
-                                                <Icon icon="ios-add" />
-                                                <div className="flex_center">添加一个</div>
-                                            </div>
-                                        </Button>
-                                    </div>
-                                )
-                            }}
+            props: {
+                onChange: self.handleFormChange,
+                options: [{
+                    label: '2个', value: 2,
+                }, {
+                    label: '3个', value: 3,
+                }, {
+                    label: '4个', value: 4,
+                }, {
+                    label: '5个', value: 5,
+                }],
+                value: props.countNum || 3
+            },
+            field: 'countNum',
+            
+            // additional: (
+            //     <div>
+            //         <DragDropContext onDragEnd={self.onDragPropsEnd.bind(self, 'value')}>
+            //             <Droppable droppableId="droppable_label" >
+            //                 {(provided, snapshot) => {
+            //                     return (
+            //                         <div
+            //                             {...provided.droppableProps}
+            //                             ref={provided.innerRef}
+            //                         >
+            //                             {
+            //                                 (props.value || []).map((item: any, index: number) => {
+            //                                     return (
+            //                                         <Draggable key={index} draggableId={index.toString()} index={index}>
+            //                                             {(provided) => (
+            //                                                 <LabelView
+            //                                                     className="flex"
+            //                                                     ref={provided.innerRef}
+            //                                                     {...provided.draggableProps}
+            //                                                     {...provided.dragHandleProps}
+            //                                                 >
+            //                                                     <LabelListView className="flex_center">
+            //                                                         <ImageView src={baseUrl + item.url} key={item.url + index} />
+            //                                                     </LabelListView>
+            //                                                     <div className="flex_1">
+            //                                                         <div className="flex_1">
+            //                                                             <div className="flex">
+            //                                                                 <Input className={`flex_1`} value={item.url} placeholder="请选择图片地址" disabled closeIconShow={false} style={{ borderRight: 0 }} />
+            //                                                                 <Button className={`flex_justify`} onClick={self.handleUploadView.bind(self, index)} mold="primary">上传图片</Button>
+            //                                                             </div>
+            //                                                         </div>
+            //                                                         <div className="flex_1" style={{ marginTop: '7px' }}>
+            //                                                             <div className="flex">
+            //                                                                 <Input className={`flex_1`} value={item.link} placeholder="请选择链接地址" disabled closeIconShow={false} style={{ borderRight: 0 }} />
+            //                                                                 <Button className={`flex_justify`} onClick={self.showLinkDialog.bind(self, index, 'value', 'link')} mold="primary">选择链接</Button>
+            //                                                             </div>
+            //                                                         </div>
+            //                                                     </div>
+            //                                                     <CloseIcon
+            //                                                         icon="md-close-circle"
+            //                                                         color="rgba(0, 0, 0, 0.3)"
+            //                                                         theme={new IconThemeData({ size: 18 })}
+            //                                                         style={{ cursor: 'pointer' }}
+            //                                                         onClick={self.handleListDel.bind(self, index, 'value')}
+            //                                                     />
+            //                                                 </LabelView>
+            //                                             )}
+            //                                         </Draggable>
+            //                                     )
+            //                                 })
+            //                             }
+            //                             <Button style={{ width: '100%', marginTop: snapshot.isDraggingOver ? '100px' : '' }} onClick={self.handleCarouselListAdd.bind(self, { url: '/images/banner-1.jpg', link: '' })}>
+            //                                 <div className="flex">
+            //                                     <Icon icon="ios-add" />
+            //                                     <div className="flex_center">添加一个</div>
+            //                                 </div>
+            //                             </Button>
+            //                         </div>
+            //                     )
+            //                 }}
 
-                        </Droppable>
-                    </DragDropContext>
+            //             </Droppable>
+            //         </DragDropContext>
 
-                </div>
-            )
+            //     </div>
+            // )
         }],
         'TabBar': [{
             component: 'Slider',

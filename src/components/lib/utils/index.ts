@@ -18,6 +18,7 @@ export { default as NavBarThemeData } from './NavBarThemeData'
 export { default as DialogThemeData } from './DialogThemeData'
 export { default as TagThemeData } from './TagThemeData'
 export { default as UploadThemeData } from './UploadThemeData'
+export { default as TextareaThemeData } from './TextareaThemeData'
 
 export const prefix: string = 'mk_'
 
@@ -42,9 +43,9 @@ export interface IStyledProps {
 
 export const transition = function (time: number, tag?: string[]): string {
     if (tag) {
-        return `transition: ${tag.map((i) => `${i} ${time}s`).toString()}`
+        return `transition: ${tag.map((i) => `${i} ${time}s`).toString()};`
     }
-    return `transition: all ${time}s`
+    return `transition: all ${time}s;`
 }
 
 export const getRatioUnit = function (num: number) {
