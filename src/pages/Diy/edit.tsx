@@ -6,7 +6,7 @@ import { assign, cloneDeep } from 'lodash'
 import { LayoutNavBar, LayoutActions } from 'src/layouts/PageLayout'
 import { omit, isArray, isString } from 'muka'
 import { IInitState } from 'src/store/state'
-import { Alert, BoxLine, Button, Carousel, Dialog, Drag, Icon, Image, Label, LabelHeader, NavBar, TabBar, Form, Pagination, ScrollView, SearchBar, Upload, Notice } from 'components'
+import { Alert, ShopList, Button, Carousel, Dialog, Drag, Icon, Image, Label, LabelHeader, NavBar, TabBar, Form, Pagination, ScrollView, SearchBar, Upload, Notice } from 'components'
 import http, { IRresItems, IRresItem, baseUrl, httpUtils, getTitle } from 'src/utils/axios'
 import { connect, DispatchProp } from 'react-redux'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
@@ -39,7 +39,7 @@ interface IComponents {
     edit: boolean
 }
 
-type IComponentType = 'TabBar' | 'NavBar' | 'Carousel' | 'SearchBar' | 'Notice' | ''
+type IComponentType = 'TabBar' | 'NavBar' | 'Carousel' | 'SearchBar' | 'Notice' | 'ShopList' | ''
 
 type typeList = 'LForm' | 'Carousel'
 
@@ -676,6 +676,17 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                     onDelete={this.handleDelete.bind(this, index)}
                 >
                     <SearchBar {...data.props} />
+                </EditComponent>
+            )
+            case 'ShopList': return (
+                <EditComponent
+                    edit={data.edit}
+                    key={index}
+                    onClick={this.handleEdit.bind(this, data, index)}
+                    onEdit={this.handleEditStart.bind(this, data, index, 'LForm')}
+                    onDelete={this.handleDelete.bind(this, index)}
+                >
+                    <ShopList {...data.props} />
                 </EditComponent>
             )
             case 'Notice': return (

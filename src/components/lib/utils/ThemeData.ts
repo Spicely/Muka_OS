@@ -15,6 +15,7 @@ import ColorsThemeData from './ColorsThemeData'
 import UploadThemeData from './UploadThemeData'
 import ProgressThemeData from './ProgressThemeData'
 import TextareaThemeData from './TextareaThemeData'
+import CardThemeData from './CardThemeData'
 
 export type IUnit = 'px' | 'rem'
 
@@ -32,6 +33,7 @@ interface IThemeDataProps {
     fontSize?: number
     menuGroupHeight?: number
     inputTheme?: InputThemeData
+    cardTheme?: CardThemeData
     menuTheme?: MenuThemeData
     radioTheme?: RadioThemeData
     tabBarTheme?: TabBarThemeData
@@ -70,6 +72,7 @@ export default class ThemeData {
             if (data.warningColor) this.warningColor = data.warningColor
             if (data.colorsTheme) this.colorsTheme = data.colorsTheme
             if (data.uploadTheme) this.uploadTheme = data.uploadTheme
+            if (data.cardTheme) this.cardTheme = data.cardTheme
             if (data.progressTheme) this.progressTheme = data.progressTheme
             if (data.disabledBorderColor) this.disabledBorderColor = data.disabledBorderColor
         }
@@ -124,6 +127,8 @@ export default class ThemeData {
     public progressTheme: ProgressThemeData = new ProgressThemeData()
 
     public textareaTheme: TextareaThemeData = new TextareaThemeData()
+
+    public cardTheme: CardThemeData = new CardThemeData()
 
     public menuGroupHeight: number = 45
 

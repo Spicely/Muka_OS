@@ -1,3 +1,4 @@
+const defaultImg = require('../../assets/banner-1.jpg')
 const comData = {
     home: [{
         label: '基础组件',
@@ -30,10 +31,17 @@ const comData = {
         }, {
             label: '商品组',
             data: {
-                component: 'Carousel',
+                component: 'ShopList',
                 props: {
-                    autoPlay: true,
-                    countNum: 3
+                    data: [{
+                        imgUrl: defaultImg
+                    }, {
+                        imgUrl: defaultImg
+                    }, {
+                        imgUrl: defaultImg
+                    }, {
+                        imgUrl: defaultImg
+                    }]
                 }
             }
         }, {
