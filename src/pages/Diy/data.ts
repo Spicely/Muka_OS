@@ -34,13 +34,25 @@ const comData = {
                 component: 'ShopList',
                 props: {
                     data: [{
-                        imgUrl: defaultImg
+                        imgUrl: defaultImg,
+                        title: '这里显示商品描述，最多显示1行',
+                        describe: '这里显示商品描述，最多显示1行',
+                        price: 99
                     }, {
-                        imgUrl: defaultImg
+                        imgUrl: defaultImg,
+                        title: '这里显示商品描述，最多显示1行',
+                        describe: '这里显示商品描述，最多显示1行',
+                        price: 99
                     }, {
-                        imgUrl: defaultImg
+                        imgUrl: defaultImg,
+                        title: '这里显示商品描述，最多显示1行',
+                        describe: '这里显示商品描述，最多显示1行',
+                        price: 99
                     }, {
-                        imgUrl: defaultImg
+                        imgUrl: defaultImg,
+                        title: '这里显示商品描述，最多显示1行',
+                        describe: '这里显示商品描述，最多显示1行',
+                        price: 99
                     }]
                 }
             }

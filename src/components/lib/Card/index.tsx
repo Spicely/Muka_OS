@@ -16,15 +16,15 @@ interface ICardViewProps {
 }
 
 const CardView = styled.div<ICardViewProps>`
-    height: ${({ cardTheme }) => getUnit(cardTheme.height)};
+    min-height: ${({ cardTheme }) => getUnit(cardTheme.height)};
     background: ${({ cardTheme }) => cardTheme.cardColor.toString()};
     width: 100%;
     ${({ cardTheme }) => cardTheme.borderRadius.toString()}
     overflow: hidden;
 `
 
-const CardImg = styled.div`
-    height: 70%;
+const CardImg = styled.div<ICardViewProps>`
+    height: ${({ cardTheme }) => getUnit(cardTheme.height * 0.7)};
     display: block;
     margin: 0 auto;
     overflow: hidden;
@@ -47,8 +47,10 @@ export default class Card extends Component<ICardProps, any> {
                             cardTheme={theme || init.theme.cardTheme}
                         >
                             {source ? (
-                                <CardImg>
-                                    <Image src={source} style={{height: '100%', width: '100%'}} />
+                                <CardImg
+                                    cardTheme={theme || init.theme.cardTheme}
+                                >
+                                    <Image src={source} style={{ height: '100%', width: '100%' }} />
                                 </CardImg>
                             ) : null}
                             <CardInfo>

@@ -4,7 +4,7 @@ import BorderRadius from './BorderRadius'
 
 interface ICardThemeDataProps {
     cardColor?: Color
-    height?: number | string
+    height?: number
     borderRadius?: BorderRadius
 }
 
@@ -20,7 +20,7 @@ export default class CardThemeData {
 
     public cardColor: Color = Color.fromRGB(255, 255, 255)
 
-    public height: number | string = 180
+    public height: number = 180
 
     public borderRadius: BorderRadius = BorderRadius.all(0)
 }
