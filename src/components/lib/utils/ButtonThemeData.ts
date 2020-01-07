@@ -1,7 +1,8 @@
-import { isNumber } from 'lodash'
+import { isNil } from 'lodash'
 import Color from './Color'
 import IconThemeData from './IconThemeData'
 import Border, { BorderStyle } from './Border'
+import BorderRadius from './BorderRadius'
 
 interface IButtonThemeDataProps {
     buttonColor?: Color
@@ -11,9 +12,10 @@ interface IButtonThemeDataProps {
     errorColor?: Color
     disabledFontColor?: Color
     disabledBorderColor?: Color
-    borderRadius?: number | string
-    height?: number
+    borderRadius?: BorderRadius
+    height?: number | string
     iconTheme?: IconThemeData
+    fontSize?: number | string
 }
 
 export default class ButtonThemeData {
@@ -28,8 +30,9 @@ export default class ButtonThemeData {
             if (data.disabledBorderColor) this.disabledBorderColor = data.disabledBorderColor
             if (data.iconTheme) this.iconTheme = data.iconTheme
             if (data.border) this.border = data.border
-            if (isNumber(data.height)) this.height = data.height
-            if (isNumber(data.borderRadius)) this.borderRadius = data.borderRadius
+            if (!isNil(data.height)) this.height = data.height
+            if (data.borderRadius) this.borderRadius = data.borderRadius
+            if (!isNil(data.fontSize)) this.fontSize = data.fontSize
         }
     }
 
@@ -39,15 +42,17 @@ export default class ButtonThemeData {
 
     public errorColor?: Color
 
-    public height: number = 32
+    public height: number | string = 32
 
-    public disabledColor: Color = Color.fromRGB(223, 216, 216)
+    public fontSize?: number | string
 
-    public disabledFontColor: Color = Color.fromRGBO(0, 0, 0, 0.25)
+    public disabledColor: Color = Color.fromRGB(241, 241, 241)
+
+    public disabledFontColor: Color = Color.fromRGBO(0, 0, 0, 0.45)
 
     public disabledBorderColor: Color = Color.fromRGB(223, 216, 216)
 
-    public borderRadius?: number | string
+    public borderRadius?: BorderRadius
 
     public border: Border = Border.all({
         width: 1,

@@ -2,11 +2,11 @@ import React, { Component, ChangeEvent, CSSProperties } from 'react'
 import Loadable from 'react-loadable'
 import moment from 'moment'
 import { omit, isFunction, isUndefined, hash, isBool, isNil, isArray } from 'muka'
-import { getClassName, getRatioUnit } from '../utils'
+import { getClassName, getRatioUnit, InputThemeData, Border, getUnit } from '../utils'
 import { IButtonProps } from '../Button'
 import { RadioGroupProps } from 'antd/lib/radio'
 import { TimePickerProps } from 'antd/lib/time-picker'
-import { IInputProps } from '../Input'
+import Input, { IInputProps } from '../Input'
 import { ILUpload, ILUploadChangeParam } from '../LUpload'
 import { ILDatePicker } from '../DatePicker'
 import { IImagePickerProps } from '../ImagePicker'
@@ -18,15 +18,21 @@ import { ISelectProps } from '../Select'
 import { ICheckBoxProps } from '../CheckBox'
 import { IUploadProps } from '../Upload'
 import { IEditorProps } from '../Editor'
+import { IItemProps } from '../Item'
 import { ColorResult } from 'react-color'
 import styled from 'styled-components'
+
+const inputThemeData = new InputThemeData({
+    border: Border.all({ width: 0 }),
+    width: '100%'
+})
 
 interface IFormUpload extends ILUpload {
     label?: string | JSX.Element
 }
 
-type component = 'Colors' | 'Input' | 'Button' | 'Radio' | 'DatePicker' | 'LUpload' | 'RangePicker' | 'NULL' | 'Label' | 'RadioGroup' | 'Select' | 'ImagePicker' | 'Map' | 'Textarea' | 'Carousel' | 'Slider' | 'CheckBox' | 'Editor' | 'TimePicker' | 'Upload'
-type props = RadioGroupProps | IInputProps | IButtonProps | ILDatePicker | IFormUpload | IImagePickerProps | IMapProps | ICarouselProps | ITextareaProps | IColorsProps | ISelectProps | ICheckBoxProps | IEditorProps | TimePickerProps | IUploadProps | undefined
+type component = 'Colors' | 'Input' | 'Button' | 'Radio' | 'DatePicker' | 'LUpload' | 'RangePicker' | 'NULL' | 'Label' | 'RadioGroup' | 'Select' | 'ImagePicker' | 'Map' | 'Textarea' | 'Carousel' | 'Slider' | 'CheckBox' | 'Editor' | 'TimePicker' | 'Upload' | 'Item' | 'ItemInput'
+type props = RadioGroupProps | IInputProps | IButtonProps | ILDatePicker | IFormUpload | IImagePickerProps | IMapProps | ICarouselProps | ITextareaProps | IColorsProps | ISelectProps | ICheckBoxProps | IEditorProps | TimePickerProps | IUploadProps | IItemProps | undefined
 
 export interface IFormItem {
     component: component
@@ -113,6 +119,9 @@ const FormItemLabel = styled.div`
     margin-right: ${getRatioUnit(8)};
 `
 
+const ItemExtend = styled.div`
+    padding: 0 ${getUnit(10)};
+`
 export default class Form extends Component<IFormProps, IState> {
 
     public static defaultProps: IFormProps = {
@@ -147,45 +156,19 @@ export default class Form extends Component<IFormProps, IState> {
             const field = item.field || `${item.component}_${index}`
             const _porps: any = item.props || {}
             switch (item.component) {
-                case 'Radio': {
-                    vals[field] = _porps.value
-                    // tslint:disable-next-line: align
-                } break
-                case 'Slider': {
-                    vals[field] = _porps.value || _porps.defaultValue || 0
-                    // tslint:disable-next-line: align
-                } break
-                case 'Colors': {
-                    vals[field] = _porps.initColor || ''
-                    // tslint:disable-next-line: align
-                } break
-                case 'CheckBox': {
-                    vals[field] = _porps.value || []
-                    // tslint:disable-next-line: align
-                } break
-                case 'LUpload': {
-                    vals[field] = _porps.fileList || (_porps.maxLength > 1 ? [] : '')
-                    // tslint:disable-next-line: align
-                } break
-                case 'RadioGroup': {
-                    vals[field] = isUndefined(_porps.value) ? '' : _porps.value
-                    // tslint:disable-next-line: align
-                } break
-                case 'ImagePicker': {
-                    vals[field] = _porps.value || []
-                    // tslint:disable-next-line: align
-                } break
-                case 'Carousel': {
-                    vals[field] = _porps.value || []
-                    // tslint:disable-next-line: align
-                } break
-                case 'Map': {
-                    vals[field] = _porps.value || {}
-                    // tslint:disable-next-line: align
-                } break
-                default: {
-                    vals[field] = _porps.value || ''
-                }
+                // eslint-disable-next-line no-lone-blocks
+                case 'Radio': vals[field] = _porps.value; break
+                case 'Slider':
+                    vals[field] = _porps.value || _porps.defaultValue || 0; break
+                case 'Colors':
+                    vals[field] = _porps.initColor || ''; break
+                case 'CheckBox': vals[field] = _porps.value || []; break
+                case 'LUpload': vals[field] = _porps.fileList || (_porps.maxLength > 1 ? [] : ''); break
+                case 'RadioGroup': vals[field] = isUndefined(_porps.value) ? '' : _porps.value; break
+                case 'ImagePicker': vals[field] = _porps.value || []; break
+                case 'Carousel': vals[field] = _porps.value || []; break
+                case 'Map': vals[field] = _porps.value || {}; break
+                default: vals[field] = _porps.value || ''
             }
 
             childs.push({
@@ -231,49 +214,17 @@ export default class Form extends Component<IFormProps, IState> {
                     extend: item.extend
                 }
                 switch (item.component) {
-                    case 'Radio': {
-                        vals[field] = _porps.value
-                        // tslint:disable-next-line: align
-                    } break
-                    case 'Slider': {
-                        vals[field] = _porps.value || _porps.defaultValue || 0
-                        // tslint:disable-next-line: align
-                    } break
-                    case 'Colors': {
-                        vals[field] = _porps.initColor || ''
-                        // tslint:disable-next-line: align
-                    } break
-                    case 'LUpload': {
-                        vals[field] = _porps.fileList || (_porps.maxLength > 1 ? [] : '')
-                        // tslint:disable-next-line: align
-                    } break
-                    case 'ImagePicker': {
-                        vals[field] = _porps.value || []
-                        // tslint:disable-next-line: align
-                    } break
-                    case 'Carousel': {
-                        vals[field] = _porps.value || []
-                        // tslint:disable-next-line: align
-                    } break
-                    case 'RadioGroup': {
-                        vals[field] = isUndefined(_porps.value) ? '' : _porps.value
-                        // tslint:disable-next-line: align
-                    } break
-                    case 'CheckBox': {
-                        vals[field] = _porps.value || []
-                        // tslint:disable-next-line: align
-                    } break
-                    case 'RangePicker': {
-                        vals[field] = _porps.value || []
-                        // tslint:disable-next-line: align
-                    } break
-                    case 'Map': {
-                        vals[field] = _porps.value || {}
-                        // tslint:disable-next-line: align
-                    } break
-                    default: {
-                        vals[field] = _porps.value || ''
-                    }
+                    case 'Radio': vals[field] = _porps.value; break
+                    case 'Slider': vals[field] = _porps.value || _porps.defaultValue || 0; break
+                    case 'Colors': vals[field] = _porps.initColor || ''; break
+                    case 'LUpload': vals[field] = _porps.fileList || (_porps.maxLength > 1 ? [] : ''); break
+                    case 'ImagePicker': vals[field] = _porps.value || []; break
+                    case 'Carousel': vals[field] = _porps.value || []; break
+                    case 'RadioGroup': vals[field] = isUndefined(_porps.value) ? '' : _porps.value; break
+                    case 'CheckBox': vals[field] = _porps.value || []; break
+                    case 'RangePicker': vals[field] = _porps.value || []; break
+                    case 'Map': vals[field] = _porps.value || {}; break
+                    default: vals[field] = _porps.value || ''
                 }
                 return
             }
@@ -371,6 +322,8 @@ export default class Form extends Component<IFormProps, IState> {
             case 'CheckBox': return loadableComponent(import('../CheckBox'))
             case 'Slider': return loadableComponent(import('antd/lib/slider'))
             case 'TimePicker': return loadableComponent(import('antd/lib/time-picker'))
+            case 'Item': return loadableComponent(import('../Item'))
+            case 'ItemInput': return loadableComponent(import('../Item'))
             default: return null
         }
     }
@@ -475,7 +428,7 @@ export default class Form extends Component<IFormProps, IState> {
                     <div className={getClassName(`${prefixClass}__list flex_justify`, className)} key={field}>
                         <div className="flex">
                             {label && <FormItemLabel className="flex_justify">{label}</FormItemLabel>}
-                            <div className="flex_1">
+                            <div className="flex_1 flex_justify">
                                 <View
                                     {...vProps}
                                     key={field}
@@ -540,6 +493,48 @@ export default class Form extends Component<IFormProps, IState> {
                         </div>
                         {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
                     </FormItem>
+                )
+            }
+            case 'Item': {
+                const vProps = omit(props, ['onChange', 'value'])
+                const _porps: any = props
+                const onChange: any = _porps.onChange
+                return (
+                    <View
+                        {...vProps}
+                        key={field}
+                        value={vals[field]}
+                        onChange={this.setRVal.bind(this, field, onChange)}
+                    />
+                )
+            }
+            case 'ItemInput': {
+                const vProps = omit(props, ['onChange', 'value'])
+                const _porps: any = props
+                const onChange: any = _porps.onChange
+                const onClose: any = _porps.onClose || function (val: string) { }
+                return (
+                    <div className="flex mk_divider" key={field}>
+                        <div className="flex_1">
+                            <View
+                                {...vProps}
+                                key={field}
+                                value={
+                                    <Input
+                                        theme={inputThemeData}
+                                        placeholder={vProps.placeholder}
+                                        type={vProps.type}
+                                        value={vals[field]}
+                                        maxLength={vProps.maxLength}
+                                        onChange={this.setVal.bind(this, field, onChange)}
+                                        onClose={this.cleanInputVal.bind(this, field, onClose)}
+                                    />
+                                }
+                                onChange={this.setRVal.bind(this, field, onChange)}
+                            />
+                        </div>
+                        <ItemExtend className="flex_justify">{extend}</ItemExtend>
+                    </div>
                 )
             }
             case 'Radio': {
@@ -666,15 +661,17 @@ export default class Form extends Component<IFormProps, IState> {
                 const onChange: any = _porps.onChange
                 return (
                     <FormItem className={`flex_justify ${className || ''}`} key={field}>
-                        {label && <FormItemLabel style={{ paddingTop: getRatioUnit(16) }}>{label}</FormItemLabel>}
-                        <div className="flex_1">
-                            {isFunction(render) ? render(vals[field]) : (
-                                <View
-                                    {...vProps}
-                                    fileList={vals[field]}
-                                    onChange={this.setUploadVal.bind(this, field, onChange)}
-                                />
-                            )}
+                        <div className="flex">
+                            {label && <FormItemLabel style={{ paddingTop: getRatioUnit(16) }}>{label}</FormItemLabel>}
+                            <div className="flex_1">
+                                {isFunction(render) ? render(vals[field]) : (
+                                    <View
+                                        {...vProps}
+                                        fileList={vals[field]}
+                                        onChange={this.setUploadVal.bind(this, field, onChange)}
+                                    />
+                                )}
+                            </div>
                         </div>
                     </FormItem>
                 )
@@ -906,7 +903,7 @@ export default class Form extends Component<IFormProps, IState> {
     private getFieldValue(params?: string[]): IValue {
         const { childs } = this.state
         const val: IValue = {}
-        childs.map((item: IFormChild, index: number) => {
+        childs.forEach((item: IFormChild, index: number) => {
             if (params) {
                 params.map((i: string) => {
                     if (item.field === i) {
@@ -927,33 +924,13 @@ export default class Form extends Component<IFormProps, IState> {
             // tslint:disable-next-line: no-shadowed-variable
             const props: any = item.props || {}
             switch (item.component) {
-                case 'Radio': {
-                    vals[field] = props.value
-                    // tslint:disable-next-line: align
-                } break
-                case 'LUpload': {
-                    vals[field] = []
-                    // tslint:disable-next-line: align
-                } break
-                case 'CheckBox': {
-                    vals[field] = []
-                    // tslint:disable-next-line: align
-                } break
-                case 'RangePicker': {
-                    vals[field] = []
-                    // tslint:disable-next-line: align
-                } break
-                case 'Carousel': {
-                    vals[field] = []
-                    // tslint:disable-next-line: align
-                } break
-                case 'ImagePicker': {
-                    vals[field] = props.value ? props.value : []
-                    // tslint:disable-next-line: align
-                } break
-                default: {
-                    vals[field] = props.value ? props.value : ''
-                }
+                case 'Radio': vals[field] = props.value; break
+                case 'LUpload': vals[field] = []; break
+                case 'CheckBox': vals[field] = []; break
+                case 'RangePicker': vals[field] = []; break
+                case 'Carousel': vals[field] = []; break
+                case 'ImagePicker': vals[field] = props.value ? props.value : []; break
+                default: vals[field] = props.value ? props.value : ''
             }
         })
         this.setState({

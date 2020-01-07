@@ -17,15 +17,33 @@ export interface IActionsProps {
 
 export function* layoutAsync() {
     try {
-        let data = yield all([
-            call(http, 'user/get'),
-            call(http, 'routers/get'),
-            call(http, 'jurisdiction/get')
+        const data = yield all([
+            call(http, 'get-menu', {}, { method: 'GET' }),
+            // call(http, 'user/get'),
+            // call(http, 'routers/get'),
+            // call(http, 'jurisdiction/get')
         ])
+
+        const router = data[0].map((i: any) => {
+            return {
+                item: {
+                    field: i.module.split('-').join('/'),
+                    label: i.display_name
+                },
+                extend: i.children.map((v: any) => {
+                    return {
+                        field: v.module.split('-').join('/'),
+                        id: v.id,
+                        label: v.display_name
+                    }
+                })
+            }
+        })
         yield all([
-            put({ type: SET_USERINFO_DATA, data: data[0].data }),
-            put({ type: SET_ROUTER_DATA, data: data[1].data }),
-            put({ type: SET_JURISD_DATA, data: data[2].data }),
+            put({ type: SET_ROUTER_DATA, data: router }),
+            // put({ type: SET_USERINFO_DATA, data: data[0].data }),
+            // put({ type: SET_ROUTER_DATA, data: data[1].data }),
+            // put({ type: SET_JURISD_DATA, data: data[2].data }),
         ])
     } catch (data) {
         yield put({ type: SET_LOGIN, data: false })

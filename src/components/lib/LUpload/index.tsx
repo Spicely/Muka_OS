@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
 import { UploadChangeParam, UploadProps } from 'antd/lib/upload'
 import { message, Upload } from 'antd'
+import styled from 'styled-components'
+import { omit, isFunction, hash } from 'muka'
 import { getClassName } from '../utils'
 import Icon from '../Icon'
-import { omit, isFunction, hash } from 'muka'
+
 
 export interface ILUploadResponse {
     data: string
@@ -12,6 +14,15 @@ export interface ILUploadResponse {
 
 // tslint:disable-next-line: no-empty-interface
 export interface ILUploadChangeParam extends UploadChangeParam { }
+
+const UploadBox = styled(Upload)`
+    .ant-upload {
+        ${({ theme }) => theme.borderRadius}
+    }
+    .ant-upload-list-item {
+        ${({ theme }) => theme.borderRadius}
+    }
+`
 
 export interface ILUpload extends UploadProps {
     fileTypes?: string[]
@@ -46,15 +57,15 @@ export default class LUpload extends Component<ILUpload, any> {
         )
         const props = omit(this.props, ['className', 'onChange', 'onDone', 'fileTypes', 'fileSize', 'maxLength', 'action', 'baseUrl'])
         return (
-            <Upload
+            <UploadBox
                 {...props}
                 action={`${baseUrl}${action || ''}`}
-                className={getClassName('upload', className)}
+                className={className}
                 beforeUpload={this.beforeUpload}
                 onChange={this.handleChange}
             >
                 {(fileList && fileList.length >= (maxLength || 3)) ? null : uploadButton}
-            </Upload>
+            </UploadBox>
         )
     }
 

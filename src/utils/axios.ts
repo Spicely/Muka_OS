@@ -8,7 +8,7 @@ interface IValue {
     [name: string]: any
 }
 
-export const baseUrl = 'http://localhost:1337/admin/'
+export const baseUrl = 'http://192.168.1.6/admin/'
 export const imgUrl = 'http://localhost:1337'
 
 export interface IRresItem<T = any> {
@@ -62,20 +62,22 @@ export const deviaDecrypt = (data: string) => {
 instance.interceptors.response.use(async function (res: any) {
     // const devia = deviaDecrypt(res.data.devia)
     // res.data = JSON.parse(decrypt(res.data.value, res.data.secret, devia))
-    if (res.status === 200 && res.data.status === 200) {
-        return res.data
+    if (res.status === 200 && res.data.code === 0) {
+        return res.data.data
     } else {
         return Promise.reject(res.data)
     }
 })
 
 const http = function (url: string, params?: IValue, config?: AxiosRequestConfig): any {
+    
     const headers = config ? config.headers : {}
     return instance(`${url}`, {
         ...config,
         data: encrypt(params || {}),
         headers: {
             ...headers,
+            'Authorization': localStorage.getItem('token')
         }
     })
 }
@@ -100,7 +102,7 @@ export class httpUtils {
 export const getTitle = (field: string) => {
     const data = store.getState()
     let title = ''
-    data.router.map((i: any) => {
+    data.router.forEach((i: any) => {
         if (i.item.field === field) {
             title = i.item.label
         }

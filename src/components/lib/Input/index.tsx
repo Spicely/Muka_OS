@@ -2,7 +2,7 @@ import React, { InputHTMLAttributes, Component, ChangeEvent, FocusEvent, CSSProp
 import styled, { css } from 'styled-components'
 import { omit, isFunction, isEmpty, isNil, isNumber } from 'lodash'
 import InputSearch from './search'
-import { getClassName, prefix, IStyledProps, transition, InputThemeData, Color, getRatioUnit } from '../utils'
+import { getClassName, prefix, IStyledProps, transition, InputThemeData, Color, getUnit } from '../utils'
 import { Consumer } from '../ThemeProvider'
 import Icon from '../Icon'
 
@@ -38,14 +38,14 @@ interface IStyleProps extends IStyledProps {
 }
 
 const Int = styled.input<IStyleProps>`
-    padding: 0 ${() => getRatioUnit(10)};
+    padding: 0 ${() => getUnit(10)};
     outline: none;
     height: 100%;
     background: inherit;
     width: 100% ;
     color: inherit;
     position: relative;
-    font-size: ${({ inputTheme }) => getRatioUnit(inputTheme.fontSize)};
+    font-size: ${({ inputTheme }) => getUnit(inputTheme.fontSize)};
     ${transition(0.5)};
     -moz-appearance: textfield;
     border: none;
@@ -58,19 +58,19 @@ const Int = styled.input<IStyleProps>`
     }
 
     &::-webkit-input-placeholder {
-        font-size: ${({ inputTheme }) => getRatioUnit(inputTheme.fontSize)};
+        font-size: ${({ inputTheme }) => getUnit(inputTheme.fontSize)};
     }
 
     &:-moz-placeholder {
-        font-size: ${({ inputTheme }) => getRatioUnit(inputTheme.fontSize)};
+        font-size: ${({ inputTheme }) => getUnit(inputTheme.fontSize)};
     }
 
     &::-moz-placeholder {
-        font-size: ${({ inputTheme }) => getRatioUnit(inputTheme.fontSize)};
+        font-size: ${({ inputTheme }) => getUnit(inputTheme.fontSize)};
     }
 
     &:-ms-input-placeholder {
-        font-size: ${({ inputTheme }) => getRatioUnit(inputTheme.fontSize)};
+        font-size: ${({ inputTheme }) => getUnit(inputTheme.fontSize)};
     }
 
     &:disabled {
@@ -88,12 +88,12 @@ interface IInitProps {
 }
 
 const IntBox = styled.div<IInitProps>`
-    height: ${({ inputTheme }) => getRatioUnit(inputTheme.height)};
+    height: ${({ inputTheme }) => getUnit(inputTheme.height)};
     ${({ inputTheme }) => {
-        if (isNumber(inputTheme.width)) return css` width: ${getRatioUnit(inputTheme.width)};`
+        if (!isNil(inputTheme.width)) return css`width: ${getUnit(inputTheme.width)};`
     }}
     color: ${({ inputTheme }) => inputTheme.color.toString()};
-    font-size: ${({ inputTheme }) => getRatioUnit(inputTheme.fontSize)};
+    font-size: ${({ inputTheme }) => getUnit(inputTheme.fontSize)};
     position: relative;
     ${transition(0.5)};
     overflow: hidden;
@@ -122,16 +122,16 @@ const IntView = styled.div<IIntViewProps>`
 `
 
 const PreIcon = styled.div`
-    width: ${() => getRatioUnit(35)};
+    width: ${() => getUnit(35)};
 `
 
 const IntLabel = styled.div`
-     width: ${() => getRatioUnit(60)};
+     width: ${() => getUnit(60)};
 `
 const CloseIcon = styled(Icon)`
     ${transition(0.5)};
     position: absolute;
-    right: ${() => getRatioUnit(5)};
+    right: ${() => getUnit(5)};
     top: 50%;
     transform: translate(0, -50%);
     background: ${({ theme }) => Color.setOpacity(theme.color, 0.25).toString()};
@@ -162,6 +162,7 @@ export default class Input extends Component<IInputProps, IState> {
         const { className, placeholder, placeAnimate, value, closeIconShow, disabled, label, labelClassName, labelStyle, showMaxLength, maxLength, extend, extendClassName, extendStyle, preIcon, style, theme } = this.props
         const { moveToTop, val, focus } = this.state
         const otherProps = omit(this.props, ['className', 'placeholder', 'placeAnimate', 'onFocus', 'onBlur', 'preIcon', 'onClose', 'value', 'closeIconShow', 'labelStyle', 'label', 'labelClassName', 'showMaxLength', 'extend', 'extendStyle', 'extendClassName', 'style'])
+        const status = val.length > 0 || (value || '').toString().length > 0
         return (
             <Consumer>
                 {(data) => (
@@ -207,7 +208,7 @@ export default class Input extends Component<IInputProps, IState> {
                             {(showMaxLength && maxLength) ? <div className={getClassName(`${prefixClass}_max_length flex_justify`)} style={{
                                 right: closeIconShow ? 26 : 5
                             }}>{val.length || (value || '').toString().length}/{maxLength}</div> : null}
-                            {(isNil(value) ? val : true) && closeIconShow && !disabled && (
+                            {status && closeIconShow && !disabled && (
                                 <CloseIcon
                                     onClick={this.handleClose}
                                     icon="ios-close"
@@ -254,7 +255,7 @@ export default class Input extends Component<IInputProps, IState> {
     }
 
     private handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const { onChange, value } = this.props
+        const { onChange } = this.props
         const val = event.target.value
         if (isFunction(onChange)) {
             onChange(event)

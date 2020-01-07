@@ -33,6 +33,11 @@ const GlobalStyle = createGlobalStyle<IStyledProps>`
         margin: 0;
         list-style: none;
     }
+    
+    a {
+        text-decoration: none;
+        color: initial;
+    }
 
     * {
         box-sizing: border-box;

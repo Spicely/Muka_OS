@@ -52,7 +52,7 @@ const Nav = styled.div<IStyleProps>`
     box-sizing: border-box;
     z-index: 8;
     ${({ fixed }) => {
-        if (fixed) return css`top: 0;`
+        if (fixed) return css`position: sticky; top: 0;`
     }}
 `
 
@@ -63,6 +63,9 @@ const NavLeft = styled.div<IStyledProps>`
 
 const NavTitle = styled.div<IStyledProps>`
     font-size: ${() => getRatioUnit(14)};
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 `
 
 const NavRight = styled.div<IStyledProps>`

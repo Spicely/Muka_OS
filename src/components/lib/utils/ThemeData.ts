@@ -14,6 +14,11 @@ import AlertThemeData from './AlertThemeData'
 import ColorsThemeData from './ColorsThemeData'
 import UploadThemeData from './UploadThemeData'
 import ProgressThemeData from './ProgressThemeData'
+import TextareaThemeData from './TextareaThemeData'
+import CardThemeData from './CardThemeData'
+import ItemThemeData from './ItemThemeData'
+import BorderRadius from './BorderRadius'
+import ToastThemeData from './ToastThemeData'
 
 export type IUnit = 'px' | 'rem'
 
@@ -26,11 +31,12 @@ interface IThemeDataProps {
     fontColor?: Color
     buttonTheme?: ButtonThemeData
     iconTheme?: IconThemeData
-    borderRadius?: number
+    borderRadius?: BorderRadius
     dialogColor?: number
     fontSize?: number
     menuGroupHeight?: number
     inputTheme?: InputThemeData
+    cardTheme?: CardThemeData
     menuTheme?: MenuThemeData
     radioTheme?: RadioThemeData
     tabBarTheme?: TabBarThemeData
@@ -40,6 +46,10 @@ interface IThemeDataProps {
     uploadTheme?: UploadThemeData
     progressTheme?: ProgressThemeData
     navBarTheme?: NavBarThemeData
+    textareaTheme?: TextareaThemeData
+    disabledBorderColor?: Color
+    itemTheme?: ItemThemeData
+    toastTheme?: ToastThemeData
 }
 
 export default class ThemeData {
@@ -49,7 +59,7 @@ export default class ThemeData {
             if (data.primarySwatch) this.primarySwatch = data.primarySwatch
             if (data.buttonTheme) this.buttonTheme = data.buttonTheme
             if (data.iconTheme) this.iconTheme = data.iconTheme
-            if (!isNil(data.borderRadius)) this.borderRadius = data.borderRadius
+            if (data.borderRadius) this.borderRadius = data.borderRadius
             if (!isNil(data.fontSize)) this.fontSize = data.fontSize
             if (data.errorColor) this.errorColor = data.errorColor
             if (data.dividerColor) this.dividerColor = data.dividerColor
@@ -59,14 +69,19 @@ export default class ThemeData {
             if (data.menuTheme) this.menuTheme = data.menuTheme
             if (data.radioTheme) this.radioTheme = data.radioTheme
             if (data.tabBarTheme) this.tabBarTheme = data.tabBarTheme
+            if (data.textareaTheme) this.textareaTheme = data.textareaTheme
             if (data.alertTheme) this.alertTheme = data.alertTheme
             if (data.carouselTheme) this.carouselTheme = data.carouselTheme
-            if(data.navBarTheme) this.navBarTheme = data.navBarTheme
+            if (data.navBarTheme) this.navBarTheme = data.navBarTheme
             if (data.successColor) this.successColor = data.successColor
             if (data.warningColor) this.warningColor = data.warningColor
             if (data.colorsTheme) this.colorsTheme = data.colorsTheme
             if (data.uploadTheme) this.uploadTheme = data.uploadTheme
+            if (data.cardTheme) this.cardTheme = data.cardTheme
             if (data.progressTheme) this.progressTheme = data.progressTheme
+            if (data.itemTheme) this.itemTheme = data.itemTheme
+            if (data.disabledBorderColor) this.disabledBorderColor = data.disabledBorderColor
+            if (data.toastTheme) this.toastTheme = data.toastTheme
         }
     }
 
@@ -85,6 +100,8 @@ export default class ThemeData {
     public dividerColor: Color = Color.fromRGB(230, 230, 230)
 
     public fontColor: Color = Color.fromRGB(0, 0, 0)
+
+    public disabledBorderColor: Color = Color.fromRGB(231, 231, 231)
 
     public fontSize: number = 12
 
@@ -116,11 +133,19 @@ export default class ThemeData {
 
     public progressTheme: ProgressThemeData = new ProgressThemeData()
 
+    public textareaTheme: TextareaThemeData = new TextareaThemeData()
+
+    public cardTheme: CardThemeData = new CardThemeData()
+
+    public itemTheme: ItemThemeData = new ItemThemeData()
+
+    public toastTheme: ToastThemeData = new ToastThemeData()
+
     public menuGroupHeight: number = 45
 
     public unit: IUnit = 'rem'
 
     public ratio: number = 0.05
 
-    public borderRadius: number = 0
+    public borderRadius: BorderRadius = BorderRadius.all(0)
 }

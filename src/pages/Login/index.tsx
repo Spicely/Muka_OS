@@ -107,7 +107,7 @@ class Login extends Component<IProps & DispatchProp, IState> {
                 },
                 theme: inputTheme,
             },
-            field: 'userName'
+            field: 'username'
         }, {
             component: 'Input',
             props: {
@@ -122,7 +122,7 @@ class Login extends Component<IProps & DispatchProp, IState> {
                     })
                 }
             },
-            field: 'passWord'
+            field: 'password'
         }, {
             component: 'CheckBox',
             props: {
@@ -153,9 +153,10 @@ class Login extends Component<IProps & DispatchProp, IState> {
         try {
             if (this.fn) {
                 const data = this.fn.getFieldValue()
-                await http('user/login', { ...data, keep: data.keep[0] || false })
+                const res = await http('login', { ...data, keep: data.keep[0] || false })
                 const { history, dispatch } = this.props
                 dispatch({ type: SET_LOGIN, data: true })
+                localStorage.setItem('token', res.token)
                 setTimeout(() => {
                     history.replace('/')
                 }, 10)
