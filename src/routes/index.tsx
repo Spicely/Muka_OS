@@ -21,6 +21,12 @@ export const routes: IRoutes[] = [{
     component: import('../pages/Merchant'),
     path: '/merchant'
 }, {
+    component: import('../pages/Jurisdiction'),
+    path: '/system/role'
+},{
+    component: import('../pages/Setting'),
+    path: '/system'
+}, {
     component: import('../pages/Home'),
     path: '/'
 },]

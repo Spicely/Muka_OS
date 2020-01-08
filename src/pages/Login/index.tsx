@@ -3,10 +3,11 @@ import styled from 'styled-components'
 import { Form, Icon } from 'components'
 import { IFormItem, IFormFun } from 'src/components/lib/Form'
 import { InputThemeData, Color, IconThemeData, ThemeData, RadioThemeData } from 'src/components/lib/utils'
-import http, { httpUtils } from 'src/utils/axios'
+import http from 'src/utils/axios'
 import { connect, DispatchProp } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router'
 import { SET_LOGIN } from 'src/store/action'
+import { message } from 'antd'
 
 const LoginView = styled.div`
     width: 100vw;
@@ -161,8 +162,8 @@ class Login extends Component<IProps & DispatchProp, IState> {
                     history.replace('/')
                 }, 10)
             }
-        } catch (data) {
-            httpUtils.verify(data)
+        } catch (e) {
+            message.error('网络不稳定,请稍后再试')
         }
     }
 }

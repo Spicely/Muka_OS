@@ -40,7 +40,7 @@ class AdminList extends Component<IProps, IState> {
 
     private title = getTitle('/admin')
 
-    private columns: ITableColumns[] = [{
+    private columns: ITableColumns<any>[] = [{
         title: '用户名',
         dataIndex: 'userName',
         key: 'userName',

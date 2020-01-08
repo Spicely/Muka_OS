@@ -3,7 +3,6 @@ import { UploadChangeParam, UploadProps } from 'antd/lib/upload'
 import { message, Upload } from 'antd'
 import styled from 'styled-components'
 import { omit, isFunction, hash } from 'muka'
-import { getClassName } from '../utils'
 import Icon from '../Icon'
 
 

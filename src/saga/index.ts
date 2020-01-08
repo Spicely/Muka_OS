@@ -25,14 +25,18 @@ export function* layoutAsync() {
         ])
 
         const router = data[0].map((i: any) => {
+            const field = i.module.split('-')
+            field.unshift('')
             return {
                 item: {
-                    field: i.module.split('-').join('/'),
+                    field: field.join('/'),
                     label: i.display_name
                 },
                 extend: i.children.map((v: any) => {
+                    const field = v.module === 'system-ali' ? 'system'.split('-') : v.module.split('-')
+                    field.unshift('')
                     return {
-                        field: v.module.split('-').join('/'),
+                        field: field.join('/'),
                         id: v.id,
                         label: v.display_name
                     }

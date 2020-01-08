@@ -44,7 +44,7 @@ class Routers extends Component<IProps, IState> {
 
     private title = getTitle('/routers')
 
-    private columns: ITableColumns[] = [{
+    private columns: ITableColumns<any>[] = [{
         title: '路由名称',
         dataIndex: 'name',
         key: 'name',

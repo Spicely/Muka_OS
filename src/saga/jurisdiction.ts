@@ -6,14 +6,16 @@ import { SET_JURISDICTION_DATA, SET_JURISDICTION_OPTIONS_DATA, SET_ROUTERS_DATA 
 export default function* jurisdictionAsync(actions: IActionsProps) {
     try {
         const data = yield all([
-            call(http, 'jurisdiction/find'),
-            call(http, 'jurisdiction/classifyFind'),
-            call(http, 'routers/find')
+            call(http, 'system-role', {}, { method: 'GET' })
+            // call(http, 'jurisdiction/find'),
+            // call(http, 'jurisdiction/classifyFind'),
+            // call(http, 'routers/find')
         ])
         yield all([
-            put({ type: SET_JURISDICTION_OPTIONS_DATA, data: data[0].data }),
-            put({ type: SET_JURISDICTION_DATA, data: data[1].data }),
-            put({ type: SET_ROUTERS_DATA, data: data[2].data }),
+            put({ type: SET_JURISDICTION_DATA, data: data[0] }),
+            // put({ type: SET_JURISDICTION_OPTIONS_DATA, data: data[0].data }),
+            // put({ type: SET_JURISDICTION_DATA, data: data[1].data }),
+            // put({ type: SET_ROUTERS_DATA, data: data[2].data }),
         ])
     } catch (data) {
         httpUtils.verify(data)

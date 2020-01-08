@@ -3,7 +3,7 @@ import { AnyAction } from 'redux'
 
 export interface IJurisdictionOptions {
     label: string
-     value: string
+    value: string
 }
 
 const initData: IJurisdictionOptions[] = []

@@ -89,7 +89,7 @@ class Article extends Component<IProps, IState> {
 
     private index: number = 0
 
-    private columns: ITableColumns[] = [{
+    private columns: ITableColumns<any>[] = [{
         title: '标题',
         dataIndex: 'title',
         key: 'title',

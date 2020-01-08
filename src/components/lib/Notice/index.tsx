@@ -70,7 +70,7 @@ export default class Notice extends Component<INoticeProps, IState> {
     private itemNode: Element | null = null
 
     public render(): JSX.Element {
-        const { className, logo, value, style, icon, iconColor, labelColor, effect, titleColor, loop, speed, timingFunction, mode } = this.props
+        const { className, logo, value, style, icon, labelColor, effect, titleColor, loop, speed, timingFunction, mode } = this.props
         const { selectIndex, animate, valueAnimate, valueIndex } = this.state
         const itemStyle: CSSProperties = {}
         const loopStyle: CSSProperties = {}
