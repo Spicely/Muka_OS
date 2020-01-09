@@ -57,7 +57,7 @@ class Jurisdiction extends Component<IProps, IState> {
 
     private userId = ''
 
-    private title = getTitle('/jurisdiction')
+    private title = getTitle('/system/role')
 
     private columns: ITableColumns<any>[] = [{
         title: '权限名',

@@ -75,7 +75,7 @@ class Login extends Component<IProps & DispatchProp, IState> {
                     <LoginBoxView
                         className="flex_1"
                         style={{
-                            backgroundImage: 'url(https://i.muka.site/pixiv/pixiv_2019_04_23/74300605_p0.png)'
+                            backgroundImage: 'url(https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1576417866084&di=b5b8c2cc6808515b4952df4959392a25&imgtype=0&src=http%3A%2F%2Fimg.mp.itc.cn%2Fupload%2F20170527%2F55aceb6746ff4473acb89e40b6562ae5_th.jpg)'
                         }}
                     />
                     <LoginBoxView className="flex_1">

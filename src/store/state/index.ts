@@ -24,7 +24,7 @@ export interface IInitState {
     jurisd: IJurisd[]
     jurisdiction: IJurisdiction[]
     router: IRouter[]
-    userList: IUserList[]
+    userList: IUserList
     userInfo: IUserInfo
     shopList: IShopList
     article: IArticle[]

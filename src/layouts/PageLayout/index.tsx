@@ -13,7 +13,7 @@ import http, { baseUrl, imgUrl, httpUtils } from 'src/utils/axios'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import Color from 'src/components/lib/utils/Color'
 import { IconThemeData, MenuThemeData, ThemeData, transition, InputThemeData, NavBarThemeData } from 'src/components/lib/utils'
-import { GET_LAYOUT_DATA, SET_COLLAPSED, SET_SOLO } from 'src/store/action'
+import { GET_LAYOUT_DATA, SET_COLLAPSED, SET_SOLO, SET_LOGIN } from 'src/store/action'
 
 interface IPageLayout extends DispatchProp {
     solo: boolean
@@ -230,7 +230,7 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                             </span>
                         </LayoutNavList>
                         <Tooltip title="退出登录" placement="left">
-                            <LayoutNavList className="flex_center">
+                            <LayoutNavList className="flex_center" onClick={this.handleExit}>
                                 <Icon icon="md-exit" color="#696363" />
                             </LayoutNavList>
                         </Tooltip>
@@ -378,6 +378,17 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
         }]
 
         return items
+    }
+
+    private handleExit = async () => {
+        try {
+            const { dispatch } = this.props
+            await http('logout')
+            dispatch({ type: SET_LOGIN, data: false })
+            localStorage.setItem('token', '')
+        } catch (e) {
+            message.error('网络不稳定,请稍后再试')
+        }
     }
 
     private handleOk = async () => {

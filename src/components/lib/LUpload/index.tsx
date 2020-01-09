@@ -46,7 +46,7 @@ export default class LUpload extends Component<ILUpload, any> {
     }
 
     public render(): JSX.Element {
-        const { className, fileList, maxLength, baseUrl, action } = this.props
+        const { className, fileList, maxLength, action } = this.props
         const { loading } = this.state
         const uploadButton = (
             <div>
@@ -58,7 +58,7 @@ export default class LUpload extends Component<ILUpload, any> {
         return (
             <UploadBox
                 {...props}
-                action={`${baseUrl}${action || ''}`}
+                action={action}
                 className={className}
                 beforeUpload={this.beforeUpload}
                 onChange={this.handleChange}

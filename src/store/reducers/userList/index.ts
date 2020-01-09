@@ -1,13 +1,17 @@
 import { SET_USERLIST_DATA } from '../../action'
 import { AnyAction } from 'redux'
 
+interface IUserProps {
+    id: number
+    username: string
+    users: string
+    mobile: string
+}
+
 export interface IUserList {
-    id: string
-    userName: string
-    history: any[]
-    jurisdiction: { name: string, id: string }
-    userLogo: string
-    createdAt: number
+    total: number
+    data: IUserProps[]
+    current_page: number
 }
 
 const initData: IUserList[] = []

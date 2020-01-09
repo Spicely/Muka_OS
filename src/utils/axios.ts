@@ -8,7 +8,7 @@ interface IValue {
     [name: string]: any
 }
 
-export const baseUrl = 'http://192.168.1.6/admin/'
+export const baseUrl = 'http://mistep-fund.maixiaobu.cn/admin/'
 export const imgUrl = 'http://localhost:1337'
 
 export interface IRresItem<T = any> {
@@ -70,11 +70,14 @@ instance.interceptors.response.use(async function (res: any) {
 })
 
 const http = function (url: string, params?: IValue, config?: AxiosRequestConfig): any {
-    
     const headers = config ? config.headers : {}
+    let param: any = { data: encrypt(params || {}) }
+    if (config && config.method === 'GET') {
+        param = { params }
+    }
     return instance(`${url}`, {
         ...config,
-        data: encrypt(params || {}),
+        ...param,
         headers: {
             ...headers,
             'Authorization': localStorage.getItem('token')
@@ -105,6 +108,13 @@ export const getTitle = (field: string) => {
     data.router.forEach((i: any) => {
         if (i.item.field === field) {
             title = i.item.label
+        }
+        if (title === '' && i.extend) {
+            i.extend.forEach((v: any) => {
+                if (v.field === field) {
+                    title = v.label
+                }
+            })
         }
     })
     return title

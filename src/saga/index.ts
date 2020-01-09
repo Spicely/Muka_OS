@@ -19,6 +19,7 @@ export function* layoutAsync() {
     try {
         const data = yield all([
             call(http, 'get-menu', {}, { method: 'GET' }),
+            call(http, 'common/pic-host', {}, { method: 'GET', baseURL: 'http://mistep-fund.maixiaobu.cn' }),
             // call(http, 'user/get'),
             // call(http, 'routers/get'),
             // call(http, 'jurisdiction/get')
@@ -33,7 +34,15 @@ export function* layoutAsync() {
                     label: i.display_name
                 },
                 extend: i.children.map((v: any) => {
-                    const field = v.module === 'system-ali' ? 'system'.split('-') : v.module.split('-')
+                    let field
+                    if (v.module === 'system-ali') {
+                        field = 'system'.split('-')
+                    } else if (v.module === 'merchant-manage') {
+                        field = 'merchant'.split('-')
+                    } else {
+                        field = v.module.split('-')
+                    }
+                    // const field = v.module === 'system-ali' ? 'system'.split('-') : v.module.split('-')
                     field.unshift('')
                     return {
                         field: field.join('/'),
@@ -43,6 +52,7 @@ export function* layoutAsync() {
                 })
             }
         })
+        localStorage.setItem('imgUrl', data[1])
         yield all([
             put({ type: SET_ROUTER_DATA, data: router }),
             // put({ type: SET_USERINFO_DATA, data: data[0].data }),

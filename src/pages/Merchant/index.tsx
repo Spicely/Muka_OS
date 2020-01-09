@@ -1,10 +1,9 @@
 import React, { Component, Fragment } from 'react'
-import { Tooltip, message } from 'antd'
-import styled, { css } from 'styled-components'
+import { message } from 'antd'
+import styled from 'styled-components'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
-import { LabelHeader, NavBar, Icon, Button, Dialog, Form, Table, Label } from 'components'
+import { LabelHeader, Button, Dialog, Form, Table, Label, Image } from 'components'
 import http, { getTitle } from 'src/utils/axios'
-import echarts, { ECharts } from 'echarts'
 import { connect } from 'react-redux'
 import { IRouter } from 'src/store/reducers/router'
 import { IJurisd } from 'src/store/reducers/jurisd'
@@ -68,7 +67,8 @@ class Index extends Component<IProps, IState> {
         dataIndex: 'business',
         render: (val: string) => {
             if (val) {
-                return val
+                const imgUrl = localStorage.getItem('imgUrl')
+                return <Image src={imgUrl + '/' + val}  style={{height: getUnit(60)}}/>
             } else {
                 return ''
             }
@@ -248,6 +248,8 @@ class Index extends Component<IProps, IState> {
             visible: false,
             childVisible: false,
         })
+        this.fn && this.fn.cleanFieldValue()
+        this.childFn && this.childFn.cleanFieldValue()
     }
 
     private getChildItems = (fn: IFormFun) => {
@@ -353,8 +355,10 @@ class Index extends Component<IProps, IState> {
             component: 'LUpload',
             label: <FormLabel>营业执照</FormLabel>,
             props: {
+                // localStorage.getItem('imgUrl') http://mistep-fund.maixiaobu.cn/common/upload
                 maxLength: 1,
-                baseUrl: 'http://192.168.1.6/common/upload',
+                baseUrl: localStorage.getItem('imgUrl') + '/',
+                action: 'http://mistep-fund.maixiaobu.cn/common/upload',
                 method: 'POST',
                 name: 'file'
             },
@@ -501,6 +505,7 @@ class Index extends Component<IProps, IState> {
                 this.setState({
                     visible: false
                 })
+                this.getData()
             }
         } catch (e) {
             message.error('网络不稳定,请稍后再试')
@@ -557,6 +562,7 @@ class Index extends Component<IProps, IState> {
                 this.setState({
                     childVisible: false
                 })
+                this.getData()
             }
         } catch (e) {
             message.error('网络不稳定,请稍后再试')
@@ -579,7 +585,7 @@ class Index extends Component<IProps, IState> {
         })
     }
 
-    private handleChildEdit  = (data: any) => {
+    private handleChildEdit = (data: any) => {
         this.setState({
             childVisible: true
         }, () => {
