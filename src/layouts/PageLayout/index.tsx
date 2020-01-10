@@ -9,7 +9,7 @@ import { IInitState } from 'src/store/state'
 import { IRouter } from 'src/store/reducers/router'
 import { IUserInfo } from 'src/store/reducers/userInfo'
 import { IJurisd } from 'src/store/reducers/jurisd'
-import http, { baseUrl, imgUrl, httpUtils } from 'src/utils/axios'
+import http, { imgUrl, httpUtils } from 'src/utils/axios'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import Color from 'src/components/lib/utils/Color'
 import { IconThemeData, MenuThemeData, ThemeData, transition, InputThemeData, NavBarThemeData } from 'src/components/lib/utils'
@@ -217,7 +217,7 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                         <LayoutNavList className="flex_center" userBox hasAfter hasBefore>
                             <span className="flex">
                                 <Image
-                                    src={baseUrl + userInfo.userLogo}
+                                    src={imgUrl + userInfo.avatar}
                                     style={{ width: '1.5rem', height: '1.5rem', borderRadius: '50%', verticalAlign: 'middle' }}
                                 />
                                 <span className="flex_center" style={{ paddingLeft: '0.5rem' }}>{userInfo.userName}</span>

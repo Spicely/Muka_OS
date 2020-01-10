@@ -18,43 +18,12 @@ export interface IActionsProps {
 export function* layoutAsync() {
     try {
         const data = yield all([
-            call(http, 'get-menu', {}, { method: 'GET' }),
-            call(http, 'common/pic-host', {}, { method: 'GET', baseURL: 'http://mistep-fund.maixiaobu.cn' }),
+          
             // call(http, 'user/get'),
             // call(http, 'routers/get'),
             // call(http, 'jurisdiction/get')
         ])
-
-        const router = data[0].map((i: any) => {
-            const field = i.module.split('-')
-            field.unshift('')
-            return {
-                item: {
-                    field: field.join('/'),
-                    label: i.display_name
-                },
-                extend: i.children.map((v: any) => {
-                    let field
-                    if (v.module === 'system-ali') {
-                        field = 'system'.split('-')
-                    } else if (v.module === 'merchant-manage') {
-                        field = 'merchant'.split('-')
-                    } else {
-                        field = v.module.split('-')
-                    }
-                    // const field = v.module === 'system-ali' ? 'system'.split('-') : v.module.split('-')
-                    field.unshift('')
-                    return {
-                        field: field.join('/'),
-                        id: v.id,
-                        label: v.display_name
-                    }
-                })
-            }
-        })
-        localStorage.setItem('imgUrl', data[1])
         yield all([
-            put({ type: SET_ROUTER_DATA, data: router }),
             // put({ type: SET_USERINFO_DATA, data: data[0].data }),
             // put({ type: SET_ROUTER_DATA, data: data[1].data }),
             // put({ type: SET_JURISD_DATA, data: data[2].data }),

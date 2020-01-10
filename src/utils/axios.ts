@@ -8,8 +8,8 @@ interface IValue {
     [name: string]: any
 }
 
-export const baseUrl = 'http://mistep-fund.maixiaobu.cn/admin/'
-export const imgUrl = 'http://localhost:1337'
+export const baseUrl = 'http://localhost:7001/admin/'
+export const imgUrl = 'http://i.muka.site'
 
 export interface IRresItem<T = any> {
     msg: string
@@ -62,7 +62,7 @@ export const deviaDecrypt = (data: string) => {
 instance.interceptors.response.use(async function (res: any) {
     // const devia = deviaDecrypt(res.data.devia)
     // res.data = JSON.parse(decrypt(res.data.value, res.data.secret, devia))
-    if (res.status === 200 && res.data.code === 0) {
+    if (res.status === 200 && res.data.status === 200) {
         return res.data.data
     } else {
         return Promise.reject(res.data)

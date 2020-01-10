@@ -6,7 +6,7 @@ import { InputThemeData, Color, IconThemeData, ThemeData, RadioThemeData } from 
 import http from 'src/utils/axios'
 import { connect, DispatchProp } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router'
-import { SET_LOGIN } from 'src/store/action'
+import { SET_LOGIN, SET_USERINFO_DATA } from 'src/store/action'
 import { message } from 'antd'
 
 const LoginView = styled.div`
@@ -108,7 +108,7 @@ class Login extends Component<IProps & DispatchProp, IState> {
                 },
                 theme: inputTheme,
             },
-            field: 'username'
+            field: 'userName'
         }, {
             component: 'Input',
             props: {
@@ -157,7 +157,7 @@ class Login extends Component<IProps & DispatchProp, IState> {
                 const res = await http('login', { ...data, keep: data.keep[0] || false })
                 const { history, dispatch } = this.props
                 dispatch({ type: SET_LOGIN, data: true })
-                localStorage.setItem('token', res.token)
+                dispatch({ type: SET_USERINFO_DATA, data: res })
                 setTimeout(() => {
                     history.replace('/')
                 }, 10)

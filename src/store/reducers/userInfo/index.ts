@@ -5,7 +5,7 @@ export interface IUserInfo {
     id: string
     userName: string
     jurisdiction: string | null
-    userLogo: string
+    avatar: string
     createdAt: number
     status: boolean
 }
@@ -18,7 +18,7 @@ const initData: IUserInfo = {
     id: '',
     userName: '',
     jurisdiction: null,
-    userLogo: '',
+    avatar: '',
     createdAt: 0,
     status: true
 }
