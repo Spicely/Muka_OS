@@ -12,7 +12,7 @@ import { IJurisd } from 'src/store/reducers/jurisd'
 import http, { imgUrl, httpUtils } from 'src/utils/axios'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import Color from 'src/components/lib/utils/Color'
-import { IconThemeData, MenuThemeData, ThemeData, transition, InputThemeData, NavBarThemeData } from 'src/components/lib/utils'
+import { IconThemeData, MenuThemeData, ThemeData, transition, InputThemeData, NavBarThemeData, getUnit } from 'src/components/lib/utils'
 import { GET_LAYOUT_DATA, SET_COLLAPSED, SET_SOLO, SET_LOGIN } from 'src/store/action'
 
 interface IPageLayout extends DispatchProp {
@@ -50,8 +50,7 @@ const LayoutCollapsed = styled.div`
 `
 
 const LayoutPass = styled.div`
-    width: ${() => 80 * ThemeData.ratio + ThemeData.unit};
-    text-align: right;
+    width: ${() => getUnit(70)};
 `
 
 const LayoutMenu = styled.div`
@@ -307,7 +306,7 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                     onOk={this.handleOk}
                     async={true}
                 >
-                    <Form getItems={this.getItems} style={{ marginTop: '3rem' }} />
+                    <Form getItems={this.getItems} />
                 </Dialog>
             </Layout>
         )

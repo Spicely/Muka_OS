@@ -110,8 +110,9 @@ const DialogContent = styled.div<IDialogContentProps>`
     }
 `
 
-const DialogBox = styled.div<IStyledProps>`
+const DialogBox = styled.div<IDialogContentProps>`
     min-height: ${() => getRatioUnit(300)};
+    ${({ dialogTheme }) => dialogTheme.padding.toString()};
     position: relative;
     margin: 0;
     overflow: auto;
@@ -216,6 +217,7 @@ export default class Dialog extends Component<IDialogProps, IState> {
                                         right={<Icon icon="ios-close" style={{ cursor: 'pointer' }} onClick={this.handleClose} />}
                                     />
                                     <DialogBox
+                                        dialogTheme={theme || value.theme.dialogTheme}
                                         className="flex_1"
                                     >
                                         {children}

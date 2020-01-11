@@ -18,8 +18,11 @@ export interface IRoutes {
 }
 
 export const routes: IRoutes[] = [{
-    component: import('../pages/Merchant'),
-    path: '/merchant'
+    component: import('../pages/Routers'),
+    path: '/router'
+},{
+    component: import('../pages/Icon'),
+    path: '/icon'
 }, {
     component: import('../pages/Jurisdiction'),
     path: '/system/role'

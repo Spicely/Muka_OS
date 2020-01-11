@@ -63,7 +63,7 @@ instance.interceptors.response.use(async function (res: any) {
     // const devia = deviaDecrypt(res.data.devia)
     // res.data = JSON.parse(decrypt(res.data.value, res.data.secret, devia))
     if (res.status === 200 && res.data.status === 200) {
-        return res.data.data
+        return res.data
     } else {
         return Promise.reject(res.data)
     }

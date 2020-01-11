@@ -11,7 +11,7 @@ import { GlobalView } from 'src/utils/node'
 import { IInitState } from 'src/store/state'
 import { IJurisd } from 'src/store/reducers/jurisd'
 import { IIcons } from 'src/store/reducers/icons'
-import { NavBarThemeData, Color } from 'src/components/lib/utils'
+import { NavBarThemeData, Color, getUnit } from 'src/components/lib/utils'
 import { SET_ROUTERS_DATA, GET_ROUTER } from 'src/store/action'
 import { IRouters } from 'src/store/reducers/routers'
 
@@ -108,7 +108,7 @@ class Routers extends Component<IProps, IState> {
                     left={null}
                     theme={new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255) })}
                     title={<LabelHeader title={this.title} line="vertical" />}
-                    right={jurisd.find((i) => i.type === 3) ? <Button mold="primary" onClick={this.setClassifyVisble}>添加路由</Button> : null}
+                    right={<Button mold="primary" onClick={this.setClassifyVisble}>添加路由</Button>}
                 />
                 <Table
                     columns={this.columns}
@@ -122,7 +122,7 @@ class Routers extends Component<IProps, IState> {
                     async
                     onClose={this.handleClassifyClose}
                 >
-                    <Form getItems={this.getItems} />
+                    <Form getItems={this.getItems} style={{padding: getUnit(10)}}/>
                 </Dialog>
             </GlobalView>
         )
@@ -207,9 +207,9 @@ class Routers extends Component<IProps, IState> {
                     message.error('请输入路由地址')
                     return
                 }
-                let url = 'routers/create'
+                let url = 'router/create'
                 if (router.id) {
-                    url = 'routers/update'
+                    url = 'router/update'
                 }
                 const data = await http(url, {
                     ...router
