@@ -18,14 +18,13 @@ export interface IActionsProps {
 export function* layoutAsync() {
     try {
         const data = yield all([
-          
-            // call(http, 'user/get'),
+            call(http, 'router/get', {}, {method: 'GET'}),
             // call(http, 'routers/get'),
             // call(http, 'jurisdiction/get')
         ])
         yield all([
             // put({ type: SET_USERINFO_DATA, data: data[0].data }),
-            // put({ type: SET_ROUTER_DATA, data: data[1].data }),
+            put({ type: SET_ROUTER_DATA, data: data[0].data }),
             // put({ type: SET_JURISD_DATA, data: data[2].data }),
         ])
     } catch (data) {

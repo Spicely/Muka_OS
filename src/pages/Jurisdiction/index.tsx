@@ -14,7 +14,7 @@ import { IInitState } from 'src/store/state'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { ITableColumns } from 'src/components/lib/Table'
 import { GlobalView } from 'src/utils/node'
-import { Color, NavBarThemeData, getUnit, DialogThemeData } from 'src/components/lib/utils'
+import { Color, NavBarThemeData, getUnit } from 'src/components/lib/utils'
 import { SET_JURISDICTION_DATA, GET_JURISDICTION } from 'src/store/action'
 import { IJurisdictionOptions } from 'src/store/reducers/jurisdictionOptions'
 
@@ -30,30 +30,25 @@ interface IProps extends DispatchProp {
     jurisdiction: any[]
     jurisdictionOptions: IJurisdictionOptions[]
     jurisd: IJurisd[]
+    routers: IRouters[]
 }
 
 interface IState {
-    classifyVisible: boolean
+    visible: boolean
     dialogName: string
     treeVal: string[]
     parentVal: string[]
-    jurisdVisible: boolean
-    routers: any[]
 }
 
 class Jurisdiction extends Component<IProps, IState> {
     public state: IState = {
-        routers: [],
-        classifyVisible: false,
-        jurisdVisible: false,
+        visible: false,
         dialogName: '',
         treeVal: [],
         parentVal: []
     }
 
     private fn: IFormFun | null = null
-
-    private jurisdFn: IFormFun | null = null
 
     private userId = ''
 
@@ -63,16 +58,16 @@ class Jurisdiction extends Component<IProps, IState> {
         title: '权限名',
         dataIndex: 'name',
         key: 'name',
-    },/* {
+    }, {
         title: '拥有权限',
-        dataIndex: 'jurisdiction',
-        key: 'jurisdiction',
+        dataIndex: 'jurisd',
+        key: 'jurisd',
         render: (data: { name: string, id: string }[]) => {
             return data.map((i) => {
-                return <Tag key={i.id} style={{ marginBottom: getRatioUnit(8) }} color="#7edc55" >{i.name}</Tag>
+                return <Tag key={i.id} style={{ marginBottom: getUnit(8) }} color="#7edc55" >{i.name}</Tag>
             })
         }
-    }, */{
+    }, {
         title: '操作',
         width: '5rem',
         dataIndex: 'actions',
@@ -88,14 +83,14 @@ class Jurisdiction extends Component<IProps, IState> {
 
     public render(): JSX.Element {
         const { jurisdiction } = this.props
-        const { classifyVisible, dialogName, jurisdVisible } = this.state
+        const { visible, dialogName } = this.state
         return (
             <GlobalView>
                 <LayoutNavBar
                     left={null}
                     theme={new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255) })}
                     title={<LabelHeader title={this.title} line="vertical" />}
-                    right={<Button mold="primary" onClick={this.setClassifyVisble}>添加角色</Button>}
+                    right={<Button mold="primary" onClick={this.setClassifyVisble}>添加权限</Button>}
                 />
                 <Table
                     columns={this.columns}
@@ -103,7 +98,7 @@ class Jurisdiction extends Component<IProps, IState> {
                     rowKey={(data: any) => data.id}
                 />
                 <Dialog
-                    visible={classifyVisible}
+                    visible={visible}
                     title={dialogName}
                     async
                     onOk={this.handleUpdateOrCreate}
@@ -112,21 +107,6 @@ class Jurisdiction extends Component<IProps, IState> {
                 >
                     <div style={{ padding: getUnit(20) }}>
                         <Form getItems={this.getItems} />
-                    </div>
-                </Dialog>
-                <Dialog
-                    visible={jurisdVisible}
-                    title="角色修改"
-                    async
-                    onOk={this.handleUpdate}
-                    onClose={this.handleClassifyClose}
-                    theme={new DialogThemeData({
-                        width: '30rem',
-                        height: '70%'
-                    })}
-                >
-                    <div style={{ padding: getUnit(20) }}>
-                        <Form getItems={this.getJurisdItems} />
                     </div>
                 </Dialog>
             </GlobalView>
@@ -142,6 +122,8 @@ class Jurisdiction extends Component<IProps, IState> {
     }
 
     private getItems = (fn: IFormFun) => {
+        const { jurisdictionOptions, routers } = this.props
+        const { treeVal } = this.state
         this.fn = fn
         const items: IFormItem[] = [{
             component: 'NULL',
@@ -154,36 +136,12 @@ class Jurisdiction extends Component<IProps, IState> {
             },
             field: 'name'
         }, {
-            component: 'Textarea',
-            label: <FromLabel>描述</FromLabel>,
+            component: 'CheckBox',
+            label: <FromLabel>权限</FromLabel>,
             props: {
-                placeholder: '添加描述信息'
+                options: jurisdictionOptions
             },
-            field: 'description'
-        }]
-        return items
-    }
-
-    private getJurisdItems = (fn: IFormFun) => {
-        const { treeVal, routers } = this.state
-        this.jurisdFn = fn
-        const items: IFormItem[] = [{
-            component: 'NULL',
-            field: 'id'
-        }, {
-            component: 'Input',
-            label: <FromLabel>角色名</FromLabel>,
-            props: {
-                placeholder: '请输入角色名'
-            },
-            field: 'name'
-        }, {
-            component: 'Textarea',
-            label: <FromLabel>描述</FromLabel>,
-            props: {
-                placeholder: '添加描述信息'
-            },
-            field: 'description'
+            field: 'jurisd'
         }, {
             component: 'Label',
             label: <FromLabel>路由设置</FromLabel>,
@@ -198,15 +156,15 @@ class Jurisdiction extends Component<IProps, IState> {
                         {
                             routers.map((i: any) => {
                                 return (
-                                    <TreeNode key={i.id} title={i.display_name} >
+                                    <TreeNode key={i.id} title={i.name} >
                                         {
                                             i.children && i.children.map((z: any) => {
                                                 return (
-                                                    <TreeNode key={z.id} title={z.display_name} >
+                                                    <TreeNode key={z.id} title={z.name} >
                                                         {
                                                             z.children && z.children.map((v: any) => {
                                                                 return (
-                                                                    <TreeNode key={v.id} title={v.display_name} />
+                                                                    <TreeNode key={v.id} title={v.name} />
                                                                 )
                                                             })
                                                         }
@@ -221,7 +179,7 @@ class Jurisdiction extends Component<IProps, IState> {
                     </Tree>
                 </div>
             ),
-            field: 'router'
+            field: 'routers'
         }]
         return items
     }
@@ -238,22 +196,22 @@ class Jurisdiction extends Component<IProps, IState> {
     private handleUpdateOrCreate = async () => {
         try {
             if (this.fn) {
-                // const { treeVal, parentVal } = this.state
+                const { treeVal, parentVal } = this.state
                 const jurisd = this.fn.getFieldValue()
-                let url = 'system-role/create'
-                // if (jurisd.id) {
-                //     url = 'jurisdiction/classifyUpdate'
-                // }
+                let url = 'jurisdClassify/create'
+                if (jurisd.id) {
+                    url = 'jurisdiction/classifyUpdate'
+                }
                 await http(url, {
                     ...jurisd,
-                    // routers: union(treeVal, parentVal)
+                    routers: union(treeVal, parentVal)
                 })
                 const { dispatch, jurisdiction } = this.props
                 jurisdiction.unshift(jurisd)
                 dispatch({ type: SET_JURISDICTION_DATA, data: [...jurisdiction] })
                 message.success('添加角色成功')
                 this.setState({
-                    classifyVisible: false
+                    visible: false
                 })
                 this.fn.cleanFieldValue()
             }
@@ -263,80 +221,52 @@ class Jurisdiction extends Component<IProps, IState> {
         }
     }
 
-    private handleUpdate = async () => {
-        try {
-            if (this.jurisdFn) {
-                const { treeVal, parentVal } = this.state
-                const jurisd = this.jurisdFn.getFieldValue()
-                await http(`system-role/${this.userId}`, {
-                    ...jurisd,
-                    permission_ids: union(treeVal, parentVal).join(',')
-                }, { method: 'PUT' })
-                message.success('修改角色成功')
-                this.setState({
-                    jurisdVisible: false
-                })
-                this.jurisdFn.cleanFieldValue()
-            }
-
-        } catch (data) {
-            message.error('网络不稳定,请稍后再试')
-        }
-    }
-
     private handleEdit = async (data: IJurisdiction, index: number) => {
-        try {
-            this.userId = data.id
-            const res = await http(`system-role/${data.id}`, {}, { method: 'GET' })
-            const treeVal: any[] = []
-            res.forEach((i: any) => {
-                // if (i.is_selected) {
-                //     treeVal.push(i.id)
-                // }
-                if (i.children) {
-                    i.children.forEach((v: any) => {
-                        if (v.is_selected) {
-                            treeVal.push(v.id)
-                        }
-                    })
-                }
-            })
-            this.setState({
-                jurisdVisible: true,
-                routers: res,
-                treeVal
-            }, () => {
-                setTimeout(() => {
-                    this.jurisdFn && this.jurisdFn.setFieldValue(data)
-                }, 10)
-            })
-        } catch (e) {
-            message.error('网络不稳定,请稍后再试')
-        }
+        const parentVal: string[] = []
+        data.routers.forEach((i: any) => {
+            if (i.children) {
+                parentVal.push(i.id)
+                i.children.forEach((v: any) => {
+                    if (v.children) { parentVal.push(v.id) }
+                })
+            }
+        })
+        const treeVal = pullAll(data.routers, parentVal)
+        this.setState({
+            visible: true,
+            treeVal,
+            parentVal
+        }, () => {
+            setTimeout(() => {
+                this.fn && this.fn.setFieldValue({
+                    ...data,
+                    jurisd: data.jurisd.map(i => i.id)
+                })
+            }, 10)
+        })
     }
 
     private handleClassifyClose = () => {
         this.setState({
-            classifyVisible: false,
-            jurisdVisible: false,
+            visible: false,
             treeVal: []
         })
         this.fn && this.fn.cleanFieldValue()
-        this.jurisdFn && this.jurisdFn.cleanFieldValue()
     }
 
     private setClassifyVisble = () => {
         this.setState({
-            classifyVisible: true,
+            visible: true,
             dialogName: '添加角色'
         })
     }
 }
 
 export default connect(
-    ({ jurisd, jurisdiction, jurisdictionOptions }: IInitState) => ({
+    ({ jurisd, jurisdiction, jurisdictionOptions, routers }: IInitState) => ({
         jurisd,
         jurisdictionOptions,
-        jurisdiction
+        jurisdiction,
+        routers,
     })
 )(Jurisdiction)

@@ -157,7 +157,7 @@ class Login extends Component<IProps & DispatchProp, IState> {
                 const res = await http('login', { ...data, keep: data.keep[0] || false })
                 const { history, dispatch } = this.props
                 dispatch({ type: SET_LOGIN, data: true })
-                dispatch({ type: SET_USERINFO_DATA, data: res })
+                dispatch({ type: SET_USERINFO_DATA, data: res.data })
                 setTimeout(() => {
                     history.replace('/')
                 }, 10)

@@ -2,7 +2,6 @@ import { SET_ROUTER_DATA } from '../../action'
 import { AnyAction } from 'redux'
 
 export interface IRouter {
-    id: string
     item: {
         field: string
         icon?: { createdAt: number, updatedAt: number, id: string, name: string, type: 'icon' | 'img' }

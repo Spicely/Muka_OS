@@ -4,7 +4,7 @@ import { AnyAction } from 'redux'
 
 export interface IJurisdiction {
     id: string
-    jurisdiction: IJurisd[]
+    jurisd: IJurisd[]
     name: string
     routers: string[]
 }
