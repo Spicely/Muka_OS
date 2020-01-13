@@ -100,7 +100,7 @@ class Routers extends Component<IProps, IState> {
     }
 
     public render(): JSX.Element {
-        const { jurisd, routers } = this.props
+        const { routers } = this.props
         const { classifyVisible, dialogName } = this.state
         return (
             <GlobalView>
@@ -310,7 +310,7 @@ class Routers extends Component<IProps, IState> {
         const { routers } = this.props
         const lastIds: string[] = []
         const parents: { label: string, value: string }[] = []
-        routers.map((i: any) => {
+        routers.forEach((i: any) => {
             if (i.id !== id) {
                 parents.push({
                     label: i.name,
@@ -318,7 +318,7 @@ class Routers extends Component<IProps, IState> {
                 })
             }
             if (i.children) {
-                i.children.map((z: any) => {
+                i.children.forEach((z: any) => {
                     if (z.id !== id) {
                         parents.push({
                             label: z.name,
@@ -326,7 +326,7 @@ class Routers extends Component<IProps, IState> {
                         })
                     }
                     if (z.children) {
-                        z.children.map((v: any) => {
+                        z.children.forEach((v: any) => {
                             lastIds.push(v.id)
                         })
                     }

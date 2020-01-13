@@ -200,16 +200,15 @@ class Jurisdiction extends Component<IProps, IState> {
                 const jurisd = this.fn.getFieldValue()
                 let url = 'jurisdClassify/create'
                 if (jurisd.id) {
-                    url = 'jurisdiction/classifyUpdate'
+                    url = 'jurisdClassify/update'
                 }
-                await http(url, {
+                const data = await http(url, {
                     ...jurisd,
                     routers: union(treeVal, parentVal)
                 })
-                const { dispatch, jurisdiction } = this.props
-                jurisdiction.unshift(jurisd)
-                dispatch({ type: SET_JURISDICTION_DATA, data: [...jurisdiction] })
-                message.success('添加角色成功')
+                const { dispatch } = this.props
+                dispatch({ type: SET_JURISDICTION_DATA, data: data.data })
+                message.success(data.msg)
                 this.setState({
                     visible: false
                 })

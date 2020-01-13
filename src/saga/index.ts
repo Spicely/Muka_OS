@@ -18,7 +18,7 @@ export interface IActionsProps {
 export function* layoutAsync() {
     try {
         const data = yield all([
-            call(http, 'router/get', {}, {method: 'GET'}),
+            call(http, 'router/get', {}),
             // call(http, 'routers/get'),
             // call(http, 'jurisdiction/get')
         ])

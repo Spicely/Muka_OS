@@ -163,7 +163,7 @@ class Login extends Component<IProps & DispatchProp, IState> {
                 }, 10)
             }
         } catch (e) {
-            message.error('网络不稳定,请稍后再试')
+            message.error(e.msg || '网络不稳定,请稍后再试')
         }
     }
 }
