@@ -72,7 +72,7 @@ class Index extends Component<IProps, IState> {
 
     private getData = async () => {
         try {
-            const data = await http('system-ali', {}, { method: 'GET' })
+            const data = await http('config/get')
             this.fn && this.fn.setFieldValue(data)
         } catch (e) {
             message.error('网络不稳定,请稍后再试')

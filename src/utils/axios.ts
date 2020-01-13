@@ -117,5 +117,6 @@ export const getTitle = (field: string) => {
             })
         }
     })
+    document.title = title
     return title
 }

@@ -52,7 +52,7 @@ class Jurisdiction extends Component<IProps, IState> {
 
     private userId = ''
 
-    private title = getTitle('/system/role')
+    private title = getTitle('/system/jurisd')
 
     private columns: ITableColumns<any>[] = [{
         title: '权限名',
@@ -221,20 +221,21 @@ class Jurisdiction extends Component<IProps, IState> {
     }
 
     private handleEdit = async (data: IJurisdiction, index: number) => {
-        const parentVal: string[] = []
-        data.routers.forEach((i: any) => {
+        const { routers } = this.props
+        const treeVal: string[] = []
+        routers.forEach((i: any) => {
             if (i.children) {
-                parentVal.push(i.id)
                 i.children.forEach((v: any) => {
-                    if (v.children) { parentVal.push(v.id) }
+                    if (data.routers.includes(v.id)) {
+                        treeVal.push(v.id)
+                    }
+                    if (v.children) { treeVal.push(v.id) }
                 })
             }
         })
-        const treeVal = pullAll(data.routers, parentVal)
         this.setState({
             visible: true,
-            treeVal,
-            parentVal
+            treeVal
         }, () => {
             setTimeout(() => {
                 this.fn && this.fn.setFieldValue({

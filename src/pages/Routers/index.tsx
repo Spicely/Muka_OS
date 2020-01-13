@@ -42,7 +42,7 @@ class Routers extends Component<IProps, IState> {
 
     private fn: IFormFun | null = null
 
-    private title = getTitle('/routers')
+    private title = getTitle('/system/router')
 
     private columns: ITableColumns<any>[] = [{
         title: '路由名称',

@@ -44,7 +44,7 @@ class RouterIcons extends Component<IProps, IState> {
 
     private fn: IFormFun | null = null
 
-    private title = getTitle('/routers/icons')
+    private title = getTitle('/system/icon')
 
     public render(): JSX.Element {
         const { icons, jurisd } = this.props

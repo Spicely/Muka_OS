@@ -17,7 +17,7 @@ export interface IRouters {
 
 const initData: IRouters[] = []
 
-export default function shopList(state = initData, action: AnyAction) {
+export default function routers(state = initData, action: AnyAction) {
     switch (action.type) {
         case SET_ROUTERS_DATA:
             return action.data || initData

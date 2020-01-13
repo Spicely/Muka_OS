@@ -19,16 +19,16 @@ export interface IRoutes {
 
 export const routes: IRoutes[] = [{
     component: import('../pages/Routers'),
-    path: '/router'
+    path: '/system/router'
 },{
     component: import('../pages/Icon'),
-    path: '/icon'
+    path: '/system/icon'
 }, {
     component: import('../pages/Jurisdiction'),
-    path: '/system/role'
+    path: '/system/jurisd'
 }, {
-    component: import('../pages/Admin'),
-    path: '/system/user'
+    component: import('../pages/Setting'),
+    path: '/system/config'
 }, {
     component: import('../pages/Setting'),
     path: '/system'
