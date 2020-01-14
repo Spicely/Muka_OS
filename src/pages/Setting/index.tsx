@@ -4,20 +4,13 @@ import styled from 'styled-components'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
 import { LabelHeader, Button, Form } from 'components'
 import http, { getTitle } from 'src/utils/axios'
-import { connect } from 'react-redux'
-import { IRouter } from 'src/store/reducers/router'
-import { IJurisd } from 'src/store/reducers/jurisd'
-import { IIcons } from 'src/store/reducers/icons'
-import { IInitState } from 'src/store/state'
 import { NavBarThemeData, Color, getUnit } from 'src/components/lib/utils'
 import { GlobalView } from 'src/utils/node'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
+import { IConfig } from 'src/store/reducers'
 
 interface IProps {
-    lastIds: string[]
-    router: IRouter[]
-    jurisd: IJurisd[]
-    icons: IIcons[]
+    config: IConfig
 }
 
 interface IState {
@@ -34,11 +27,11 @@ const FormLabel = styled.div`
     width: ${getUnit(90)};
 `
 
-class Index extends Component<IProps, IState> {
+export default class Index extends Component<IProps, IState> {
 
     private fn?: IFormFun
 
-    private title = getTitle('/system')
+    private title = getTitle('/system/config')
 
     public state: IState = {
         data: {
@@ -61,7 +54,7 @@ class Index extends Component<IProps, IState> {
                         <Button mold="primary" async onClick={this.handleOk}>更新</Button>
                     }
                 />
-                <Form getItems={this.getItems} style={{width: getUnit(560)}}/>
+                <Form getItems={this.getItems} style={{ width: getUnit(560) }} />
             </GlobalView>
         )
     }
@@ -121,12 +114,3 @@ class Index extends Component<IProps, IState> {
     }
 
 }
-
-export default connect(
-    ({ routers, router, jurisd, icons }: IInitState) => ({
-        routers,
-        router,
-        jurisd,
-        icons
-    })
-)(Index)

@@ -22,6 +22,10 @@ import isLogin from './isLogin'
 import solo from './solo'
 import imageModalVisible from './imageModal/index'
 
+export interface IConfig {
+    amapKey: string
+}
+
 export default combineReducers({
     router,
     routers,
@@ -44,5 +48,5 @@ export default combineReducers({
     settingsShopSpecs,
     isLogin,
     solo,
-    imageModalVisible
+    imageModalVisible,
 })
