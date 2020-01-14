@@ -73,7 +73,7 @@ class Index extends Component<IProps, IState> {
     private getData = async () => {
         try {
             const data = await http('config/get')
-            this.fn && this.fn.setFieldValue(data)
+            this.fn && this.fn.setFieldValue(data.data)
         } catch (e) {
             message.error('网络不稳定,请稍后再试')
         }
@@ -83,32 +83,11 @@ class Index extends Component<IProps, IState> {
         this.fn = fn
         const items: IFormItem[] = [{
             component: 'Input',
-            label: <FormLabel>支付宝名称</FormLabel>,
+            label: <FormLabel>高德地图秘钥</FormLabel>,
             props: {
-                placeholder: '请输入支付宝名称'
+                placeholder: '请输入高德地图秘钥'
             },
-            field: 'name'
-        }, {
-            component: 'Input',
-            label: <FormLabel>应用id</FormLabel>,
-            props: {
-                placeholder: '请输入应用id'
-            },
-            field: 'pid'
-        }, {
-            component: 'Input',
-            label: <FormLabel>商户私钥</FormLabel>,
-            props: {
-                placeholder: '请输入商户私钥',
-            },
-            field: 'private_key'
-        }, {
-            component: 'Input',
-            label: <FormLabel>支付宝公钥</FormLabel>,
-            props: {
-                placeholder: '请输入支付宝公钥',
-            },
-            field: 'public_key'
+            field: 'amapKey'
         }]
         return items
     }
