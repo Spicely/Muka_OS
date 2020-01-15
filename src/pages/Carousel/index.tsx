@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { message, Spin } from 'antd'
 import styled from 'styled-components'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
-import { Button, Dialog, LabelHeader, Form, Tag,  Table, Label, Image, Icon } from 'components'
+import { Button, Dialog, LabelHeader, Form, Tag, Table, Label, Image, Icon } from 'components'
 import http, { baseUrl, httpUtils, getTitle, getJurisd } from 'src/utils/axios'
 import { IArticle } from 'src/store/reducers/article'
 import { IJurisd } from 'src/store/reducers/jurisd'
@@ -24,7 +24,7 @@ interface IProps extends DispatchProp {
 }
 
 interface IState {
-    classifyVisible: boolean
+    visible: boolean
     uploadDialog: boolean
     imagesDialog: boolean
     dialogName: string
@@ -72,7 +72,7 @@ class Carousel extends Component<IProps, IState> {
     public state: IState = {
         imagesDialog: false,
         uploadDialog: false,
-        classifyVisible: false,
+        visible: false,
         dialogName: '',
         fileList: [],
         spinning: false
@@ -142,7 +142,7 @@ class Carousel extends Component<IProps, IState> {
 
     public render(): JSX.Element {
         const { article } = this.props
-        const { classifyVisible, dialogName, spinning } = this.state
+        const { visible, dialogName, spinning } = this.state
         return (
             <GlobalView>
                 <LayoutNavBar
@@ -150,7 +150,7 @@ class Carousel extends Component<IProps, IState> {
                     theme={new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255) })}
                     title={<LabelHeader title={this.title} line="vertical" />}
                     right={
-                        getJurisd(5) ? <Button mold="primary" onClick={this.setClassifyVisble}>新增轮播</Button>: null
+                        getJurisd(5) ? <Button mold="primary" onClick={this.setVisble}>新增轮播</Button> : null
                     }
                 />
                 <Spin tip="Loading..." spinning={spinning}>
@@ -161,7 +161,7 @@ class Carousel extends Component<IProps, IState> {
                     />
                 </Spin>
                 <Dialog
-                    visible={classifyVisible}
+                    visible={visible}
                     title={dialogName}
                     onOk={this.handleUpdateOrCreate}
                     async
@@ -180,11 +180,6 @@ class Carousel extends Component<IProps, IState> {
         })
     }
 
-    private handleImageVisble = (status: boolean) => {
-        this.setState({
-            imagesDialog: status
-        })
-    }
     private getItems = (fn: IFormFun) => {
         this.fn = fn
         const items: IFormItem[] = [{
@@ -198,58 +193,38 @@ class Carousel extends Component<IProps, IState> {
             },
             field: 'title'
         }, {
-            component: 'Label',
-            label: <FormLable><FormRequire color="red">*</FormRequire>LOGO</FormLable>,
-            render: (val: string) => {
-                if (!val) {
-                    return (
-                        <ArticleLogo className="flex_center" onClick={this.handleLogo}>
-                            {/* <Icon icon="ios-add" fontSize="40px" color="#e6e6e6" /> */}
-                            <Icon icon="ios-add" />
-                        </ArticleLogo>
-                    )
-                } else {
-                    return (
-                        <ArticleLogo className="flex_center" onClick={this.handleLogo}>
-                            <Image src={baseUrl + val} style={{ height: '8rem' }} />
-                        </ArticleLogo>
-                    )
-                }
-            },
-            field: 'logo'
+            component: 'Upload',
+            label: <FormLable><FormRequire color="red">*</FormRequire>图片</FormLable>,
+            field: 'img',
+            props: {
+                maxLength: 1,
+                crop: true,
+                name: 'file',
+                action: 'http://robin-animate.oss-cn-chengdu.aliyuncs.com',
+                onBeforeUpload: this.handleBeforeUpload,
+                withCredentials: true
+            }
         }, {
             component: 'Input',
-            label: <FormLable><FormRequire color="red">  </FormRequire>简介</FormLable>,
+            label: <FormLable><FormRequire color="red">*</FormRequire>跳转地址</FormLable>,
             props: {
-                placeholder: '请输入简介'
+                placeholder: '请输入简介',
             },
-            field: 'synopsis'
-        }, {
-            component: 'Editor',
-            label: <FormLable><FormRequire color="red">*</FormRequire>内容</FormLable>,
-            props: {
-                placeholder: '请输入内容',
-                // className: editor,
-                onImageChange: this.handleImgUpload
-            },
-            field: 'content'
-        },]
+            field: 'url'
+        }]
         return items
     }
 
-    private handleImgUpload = (imageHandler: any) => {
-        this.type = 'editor'
-        this.imageHandler = imageHandler
-        this.setState({
-            imagesDialog: true
-        })
-    }
-
-    private handleLogo = () => {
-        this.type = 'logo'
-        this.setState({
-            imagesDialog: true
-        })
+    private handleBeforeUpload = async (file: File) => {
+        try {
+            const data = await http('ossSign')
+            return {
+                ...data.data,
+                key: `${data.data.key}.${file.name.split('.')[1]}`,
+            }
+        } catch (e) {
+            httpUtils.verify(e)
+        }
     }
 
     public componentDidMount() {
@@ -268,17 +243,6 @@ class Carousel extends Component<IProps, IState> {
         } catch (data) {
             httpUtils.verify(data)
         }
-    }
-
-    private setSelectUrl = (url: string) => {
-        if (this.type === 'editor') {
-            this.imageHandler(baseUrl + url)
-        } else {
-            this.fn && this.fn.setFieldValue({ logo: url })
-        }
-        this.setState({
-            imagesDialog: false
-        })
     }
 
     private handleUpdate = async (id: string, status: boolean, index: number) => {
@@ -336,7 +300,7 @@ class Carousel extends Component<IProps, IState> {
                 dispatch({ type: SET_ARTICLE_DATA, data: article })
                 message.success(userList.msg)
                 this.setState({
-                    classifyVisible: false
+                    visible: false
                 })
                 this.fn.cleanFieldValue()
             }
@@ -348,7 +312,7 @@ class Carousel extends Component<IProps, IState> {
     private handleEdit = (data: IArticle, index: number) => {
         this.index = index
         this.setState({
-            classifyVisible: true,
+            visible: true,
             dialogName: '修改文章'
         }, () => {
             setTimeout(() => {
@@ -359,12 +323,15 @@ class Carousel extends Component<IProps, IState> {
 
     private handleClassifyClose = () => {
         this.setState({
-            classifyVisible: false,
+            visible: false,
         })
         this.fn && this.fn.cleanFieldValue()
     }
-    private setClassifyVisble = () => {
-        imageModal()
+    private setVisble = () => {
+        this.setState({
+            visible: true,
+            dialogName: '添加轮播'
+        })
     }
 }
 
