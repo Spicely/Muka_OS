@@ -215,27 +215,37 @@ class Jurisdiction extends Component<IProps, IState> {
                 this.fn.cleanFieldValue()
             }
 
-        } catch (data) {
-            message.error('网络不稳定,请稍后再试')
+        } catch (e) {
+            message.error(e.msg || '网络不稳定,请稍后再试')
         }
     }
 
     private handleEdit = async (data: IJurisdiction, index: number) => {
         const { routers } = this.props
         const treeVal: string[] = []
+        const parentVal: string[] = []
         routers.forEach((i: any) => {
+            parentVal.push(i.id)
             if (i.children) {
                 i.children.forEach((v: any) => {
                     if (data.routers.includes(v.id)) {
                         treeVal.push(v.id)
                     }
-                    if (v.children) { treeVal.push(v.id) }
+                    if (v.children) {
+                        parentVal.push(v.id)
+                        v.children.forEach((e: any) => {
+                            if (data.routers.includes(e.id)) {
+                                treeVal.push(e.id)
+                            }
+                        })
+                    }
                 })
             }
         })
         this.setState({
             visible: true,
-            treeVal
+            treeVal,
+            parentVal
         }, () => {
             setTimeout(() => {
                 this.fn && this.fn.setFieldValue({

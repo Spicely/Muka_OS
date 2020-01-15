@@ -163,6 +163,7 @@ export default class Form extends Component<IFormProps, IState> {
                 case 'Colors':
                     vals[field] = _porps.initColor || ''; break
                 case 'CheckBox': vals[field] = _porps.value || []; break
+                case 'Input': vals[field] = isNil(_porps.value) ? '' : _porps.value; break
                 case 'LUpload': vals[field] = _porps.fileList || (_porps.maxLength > 1 ? [] : ''); break
                 case 'RadioGroup': vals[field] = isUndefined(_porps.value) ? '' : _porps.value; break
                 case 'ImagePicker': vals[field] = _porps.value || []; break

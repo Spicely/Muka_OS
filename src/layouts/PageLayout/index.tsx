@@ -248,7 +248,10 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                 <div className="flex_column" style={{ height: '100%' }}>
                     <div id="navBar_item"></div>
                     {navBar}
-                    <div className={`flex flex_1`} style={{ overflow: 'hidden' }}>
+                    <div
+                        className="flex flex_1"
+                        style={{ overflow: 'hidden' }}
+                    >
                         {
                             extendRoute.length ? (
                                 <LayoutMenu>
@@ -271,24 +274,47 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                                                 extendRoute.map((i: any, index: number) => {
                                                     if (i.children) {
                                                         return (
-                                                            <Menu.Group title={i.label} field={i.field || index} key={i.field || index}>
+                                                            <Menu.Group
+                                                                title={i.label}
+                                                                field={i.field || index}
+                                                                key={i.field || index}
+                                                            >
                                                                 {
                                                                     i.children.map((i: any, index: number) => {
-                                                                        return <Menu.Item key={i.field || index} field={i.field || index}>{i.label}</Menu.Item>
+                                                                        return (
+                                                                            <Menu.Item
+                                                                                key={i.field || index}
+                                                                                field={i.field || index}
+                                                                            >
+                                                                                {i.label}
+                                                                            </Menu.Item>
+                                                                        )
                                                                     })
                                                                 }
                                                             </Menu.Group>
                                                         )
                                                     }
                                                     return (
-                                                        <Menu.Item field={i.field || index} key={i.field || index}>{i.label}</Menu.Item>
+                                                        <Menu.Item
+                                                            field={i.field || index}
+                                                            key={i.field || index}
+                                                        >
+                                                            {i.label}
+                                                        </Menu.Item>
                                                     )
                                                 })
                                             }
                                         </Menu>
                                     </LayoutAniMenu>
-                                    <LayoutSolo className="flex_center" show={solo} onClick={this.tabMenu}>
-                                        <Icon icon={solo ? 'double-arrow-right' : 'double-arrow-left'} theme={new IconThemeData({ size: 14 })} />
+                                    <LayoutSolo
+                                        className="flex_center"
+                                        show={solo}
+                                        onClick={this.tabMenu}
+                                    >
+                                        <Icon
+                                            icon={solo ? 'double-arrow-right' : 'double-arrow-left'}
+                                            theme={new IconThemeData({ size: 14 })}
+                                        />
                                     </LayoutSolo>
                                 </LayoutMenu>
                             ) : null

@@ -14,6 +14,7 @@ import { IIcons } from 'src/store/reducers/icons'
 import { NavBarThemeData, Color, getUnit } from 'src/components/lib/utils'
 import { SET_ROUTERS_DATA, GET_ROUTER } from 'src/store/action'
 import { IRouters } from 'src/store/reducers/routers'
+import styled from 'styled-components'
 
 const { confirm } = Modal
 
@@ -30,6 +31,12 @@ interface IState {
     lastIds: string[]
     parents: { label: string, value: string }[]
 }
+
+const FromLabel = styled.div`
+    width: ${getUnit(60)};
+    text-align: justify;
+    text-align-last: justify;
+`
 
 class Routers extends Component<IProps, IState> {
 
@@ -122,7 +129,7 @@ class Routers extends Component<IProps, IState> {
                     async
                     onClose={this.handleClassifyClose}
                 >
-                    <Form getItems={this.getItems} style={{padding: getUnit(10)}}/>
+                    <Form getItems={this.getItems} style={{ padding: getUnit(10) }} />
                 </Dialog>
             </GlobalView>
         )
@@ -150,28 +157,37 @@ class Routers extends Component<IProps, IState> {
             field: 'id'
         }, {
             component: 'Input',
-            label: <div><Label color="red">*</Label>路由名称</div>,
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>路由名称</FromLabel>,
             props: {
                 placeholder: '请输入路由名称(输入已经存在的路由会导致创建失败)'
             },
             field: 'name'
         }, {
             component: 'Input',
-            label: <div><Label color="red">*</Label>路由地址</div>,
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>路由地址</FromLabel>,
             props: {
-                placeholder: '请输入路由地址(以/开头)'
+                placeholder: '请输入路由地址(以/开头)',
             },
             field: 'path'
         }, {
+            component: 'Input',
+            label: <FromLabel>权重</FromLabel>,
+            props: {
+                placeholder: '数值越高显示越前',
+                value: 0,
+                type: 'number'
+            },
+            field: 'sort'
+        }, {
             component: 'Select',
-            label: <div>父级路由</div>,
+            label: <FromLabel>父级路由</FromLabel>,
             props: {
                 options: parents
             },
             field: 'parent'
         }, {
             component: 'Select',
-            label: <div>路由图标</div>,
+            label: <FromLabel>路由图标</FromLabel>,
             props: {
                 options: icons.map((i) => {
                     const name: any = i.name
@@ -300,7 +316,8 @@ class Routers extends Component<IProps, IState> {
                     path: data.path,
                     id: data.id,
                     parent: data.parent,
-                    icon: data.icon ? data.icon.id : null
+                    icon: data.icon ? data.icon.id : null,
+                    sort: data.sort
                 })
             }, 10)
         })

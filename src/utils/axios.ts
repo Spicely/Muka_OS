@@ -109,7 +109,7 @@ export const getTitle = (field: string) => {
         if (i.item.field === field) {
             title = i.item.label
         }
-        if (title === '' && i.extend) {
+        if (i.extend) {
             i.extend.forEach((v: any) => {
                 if (v.field === field) {
                     title = v.label
@@ -119,4 +119,9 @@ export const getTitle = (field: string) => {
     })
     document.title = title
     return title
+}
+
+export const getJurisd = (type: number): boolean => {
+    const data = store.getState()
+    return data.jurisd.some((i: any) => i.type === type)
 }

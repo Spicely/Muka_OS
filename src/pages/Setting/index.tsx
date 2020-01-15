@@ -24,14 +24,14 @@ interface IState {
 }
 
 const FormLabel = styled.div`
-    width: ${getUnit(90)};
+    width: ${getUnit(150)};
 `
 
 export default class Index extends Component<IProps, IState> {
 
     private fn?: IFormFun
 
-    private title = getTitle('/system/config')
+    private title = getTitle('/system')
 
     public state: IState = {
         data: {
@@ -81,6 +81,27 @@ export default class Index extends Component<IProps, IState> {
                 placeholder: '请输入高德地图秘钥'
             },
             field: 'amapKey'
+        }, {
+            component: 'Input',
+            label: <FormLabel>阿里云oss AccessKeyID</FormLabel>,
+            props: {
+                placeholder: '请输入阿里云oss AccessKeyID'
+            },
+            field: 'ossAccessKeyID'
+        }, {
+            component: 'Input',
+            label: <FormLabel>阿里云oss AccessKeySecret</FormLabel>,
+            props: {
+                placeholder: '请输入阿里云oss AccessKeySecret'
+            },
+            field: 'ossAccessKeySecret'
+        }, {
+            component: 'Input',
+            label: <FormLabel>阿里云oss Bucket</FormLabel>,
+            props: {
+                placeholder: '请输入阿里云oss Bucket'
+            },
+            field: 'ossBucket'
         }]
         return items
     }

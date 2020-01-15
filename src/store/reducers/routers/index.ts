@@ -8,6 +8,7 @@ export interface IRouters {
     status: boolean
     parent: string | null
     children?: any[]
+    sort: number
     icon: {
         id: string
         type: 'icon' | 'image'

@@ -34,7 +34,6 @@ interface IThemeDataProps {
     borderRadius?: BorderRadius
     dialogColor?: number
     fontSize?: number
-    menuGroupHeight?: number
     inputTheme?: InputThemeData
     cardTheme?: CardThemeData
     menuTheme?: MenuThemeData
@@ -63,7 +62,6 @@ export default class ThemeData {
             if (!isNil(data.fontSize)) this.fontSize = data.fontSize
             if (data.errorColor) this.errorColor = data.errorColor
             if (data.dividerColor) this.dividerColor = data.dividerColor
-            if (data.menuGroupHeight) this.menuGroupHeight = data.menuGroupHeight
             if (data.fontColor) this.fontColor = data.fontColor
             if (data.inputTheme) this.inputTheme = data.inputTheme
             if (data.menuTheme) this.menuTheme = data.menuTheme
@@ -140,8 +138,6 @@ export default class ThemeData {
     public itemTheme: ItemThemeData = new ItemThemeData()
 
     public toastTheme: ToastThemeData = new ToastThemeData()
-
-    public menuGroupHeight: number = 45
 
     public unit: IUnit = 'rem'
 

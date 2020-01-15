@@ -20,7 +20,7 @@ export interface IRoutes {
 export const routes: IRoutes[] = [{
     component: import('../pages/Routers'),
     path: '/system/router'
-},{
+}, {
     component: import('../pages/Icon'),
     path: '/system/icon'
 }, {
@@ -32,10 +32,10 @@ export const routes: IRoutes[] = [{
 }, {
     component: import('../pages/Setting'),
     path: '/system'
-},/* {
-    component: import('../pages/Home'),
-    path: '/'
-},*/]
+}, {
+    component: import('../pages/Carousel'),
+    path: '/platform/carousel'
+},]
 
 export const loadable = (component: Promise<React.ComponentClass<any> | React.StatelessComponent<any> | { default: React.ComponentType<any> }>) => {
     return Loadable({
