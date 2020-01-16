@@ -8,7 +8,7 @@ interface IValue {
     [name: string]: any
 }
 
-export const baseUrl = 'http://localhost:7001/admin/'
+export const baseUrl = 'https://api.muka.site/admin/'
 export const imgUrl = 'http://i.muka.site'
 
 export interface IRresItem<T = any> {
