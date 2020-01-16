@@ -200,9 +200,9 @@ class Carousel extends Component<IProps, IState> {
                 maxLength: 1,
                 crop: true,
                 name: 'file',
-                action: 'http://robin-animate.oss-cn-chengdu.aliyuncs.com',
+                action: 'https://robin-animate.oss-cn-chengdu.aliyuncs.com',
                 onBeforeUpload: this.handleBeforeUpload,
-                withCredentials: true
+                // withCredentials: true
             }
         }, {
             component: 'Input',
