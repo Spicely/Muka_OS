@@ -68,7 +68,7 @@ class Index extends Component<IProps, IState> {
         render: (val: string) => {
             if (val) {
                 const imgUrl = localStorage.getItem('imgUrl')
-                return <Image src={imgUrl + '/' + val}  style={{height: getUnit(60)}}/>
+                return <Image src={imgUrl + '/' + val} style={{ height: getUnit(60) }} />
             } else {
                 return ''
             }
@@ -320,8 +320,8 @@ class Index extends Component<IProps, IState> {
             component: 'Input',
             label: <FormLabel>最小随机数</FormLabel>,
             props: {
-                placeholder: '请输入最小随机数0~99',
-                max: 99,
+                placeholder: '请输入最小随机数0~0.99',
+                max: 1,
                 min: 0,
                 type: 'number'
             },
@@ -427,8 +427,8 @@ class Index extends Component<IProps, IState> {
             component: 'Input',
             label: <FormLabel>最小随机数</FormLabel>,
             props: {
-                placeholder: '请输入最小随机数0~99',
-                max: 99,
+                placeholder: '请输入最小随机数0~0.99',
+                max: 1,
                 min: 0,
                 type: 'number'
             },
@@ -437,9 +437,9 @@ class Index extends Component<IProps, IState> {
             component: 'Input',
             label: <FormLabel>最大随机数</FormLabel>,
             props: {
-                placeholder: '请输入最大随机数0~99',
+                placeholder: '请输入最大随机数0~0.99',
                 type: 'number',
-                max: 99,
+                max: 1,
                 min: 0,
             },
             field: 'random_max_num'
@@ -495,11 +495,27 @@ class Index extends Component<IProps, IState> {
                     message.error('请输入最大随机数')
                     return
                 }
+                if (!(value.random_min_num < 1)) {
+                    message.error('请输入0~0.99之间的值')
+                    return
+                }
+                if (!(value.random_max_num < 1)) {
+                    message.error('请输入0~0.99之间的值')
+                    return
+                }
                 if (value.id) {
-                    await http(`merchant-manage/${value.id}`, { ...value }, { method: 'PUT' })
+                    await http(`merchant-manage/${value.id}`, {
+                        ...value,
+                        random_min_num: Number(value.random_min_num) * 100,
+                        random_max_num: Number(value.random_max_num) * 100,
+                    }, { method: 'PUT' })
                     message.success('修改商户成功')
                 } else {
-                    await http('merchant-manage/create', { ...value })
+                    await http('merchant-manage/create', {
+                        ...value, 
+                        random_min_num: Number(value.random_min_num) * 100,
+                        random_max_num: Number(value.random_max_num) * 100,
+                    })
                     message.success('添加商户成功')
                 }
                 this.setState({
