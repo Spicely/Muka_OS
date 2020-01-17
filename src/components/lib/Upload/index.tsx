@@ -1,12 +1,14 @@
 import React, { Component, ChangeEvent } from 'react'
 import Cropper from 'react-easy-crop'
 import { isFunction, isString } from 'muka'
+import styled, { css } from 'styled-components'
 import CropImage from './cropImage'
 import Dragger from './dragger'
+import { Consumer } from '../ThemeProvider'
 import Icon, { iconType } from '../Icon'
 import Dialog from '../Dialog'
 import Image from '../Image'
-import { getClassName } from '../utils'
+import { UploadThemeData, getUnit, transition } from '../utils'
 
 export interface ICroppedArea {
     height: number
@@ -14,6 +16,74 @@ export interface ICroppedArea {
     x: number
     y: number
 }
+
+interface IStyledProps {
+    uploadTheme: UploadThemeData
+}
+
+const UploadView = styled.div<IStyledProps>`
+    font-size: ${({ uploadTheme }) => getUnit(uploadTheme.fontSize)};
+    background:${({ uploadTheme }) => uploadTheme.background.toString()};
+`
+
+const UploadIcon = styled(Icon)``
+
+const UploadCloseIcon = styled(Icon)<IStyledProps>`
+    position: absolute;
+    right: ${getUnit(5)};
+    top: ${getUnit(5)};
+`
+
+const UploadImage = styled(Image)`
+    width: 100%;
+`
+
+interface IUloadItemProps extends IStyledProps {
+    disabled: boolean
+}
+
+const UploadItem = styled.div<IUloadItemProps>`
+    height: ${({ uploadTheme }) => getUnit(uploadTheme.itemHeight)};
+    width: ${({ uploadTheme }) => getUnit(uploadTheme.itemWidth)};
+    ${({ uploadTheme }) => uploadTheme.border.toString()};
+    ${({ uploadTheme, theme }) => uploadTheme.borderRadius || theme.borderRadius};
+    cursor: pointer;
+    margin-right: ${getUnit(10)};
+    margin-bottom: ${getUnit(5)};
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    ${transition(0.5)};
+    :first-of-type {
+        margin-left: 0;
+    }
+    
+    :hover {
+        ${({ disabled, uploadTheme, theme }) => {
+        if (disabled) {
+            return css`cursor: no-drop;`
+        } else {
+            return css`border-color: ${uploadTheme.uploadColor || theme.primarySwatch};
+                        ${UploadIcon} {
+                            fill: ${uploadTheme.uploadColor || theme.primarySwatch};
+                        }
+                    `
+            }
+        }}
+    }
+`
+
+const UploadItemBox = styled.div`
+    height: 100%;
+
+    &.mk_picker_img {
+        height: ${() => `calc(100% - ${getUnit(10)})`} ;
+        width: ${() => `calc(100% - ${getUnit(10)})`} ;
+        margin: ${getUnit(5)};
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+`
 
 interface IIconStyle {
     color?: string,
@@ -51,6 +121,7 @@ export interface IUploadProps {
     cropProps?: ICropProps
     maxLength?: number
     value?: IFile[]
+    theme?: UploadThemeData
 }
 
 interface IState {
@@ -61,8 +132,6 @@ interface IState {
     zoom: number
     visible: boolean
 }
-
-const prefixClass = 'image_picker'
 
 export default class Upload extends Component<IUploadProps, IState> {
 
@@ -119,65 +188,98 @@ export default class Upload extends Component<IUploadProps, IState> {
     private fileNode: HTMLInputElement | null = null
 
     public render(): JSX.Element {
-        const { className, multiple, crop, cropProps, disabled } = this.props
+        const { className, multiple, crop, cropProps, disabled, theme } = this.props
         const { files, image, cropXY, aspect, zoom, visible } = this.state
         return (
-            <div className={getClassName(`${prefixClass}`, className)}>
-                <input type="file" style={{ display: 'none' }} ref={(e) => this.fileNode = e} multiple={crop ? false : multiple} onChange={this.handleFileChange} />
+            <Consumer>
                 {
-                    files.map((i: IFile, index: number) => {
-                        return (
-                            <div className={getClassName(`${prefixClass}__add`)} key={`$picker_${index}`}>
-                                <div className={getClassName(`${prefixClass}__add_box flex_center picker_img`)}>
-                                    <Image className={getClassName(`${prefixClass}__add_box_img`)} src={i.url} />
-                                </div>
-                                {
-                                    !disabled && <Icon icon="md-close-circle" className={getClassName(`${prefixClass}__add_close`)} onClick={this.handleFileRemove.bind(this, index)} />
-                                }
-                            </div>
-                        )
-                    })
-                }
-                {this.getAddBox()}
-                {(crop && !disabled) && <Dialog
-                    visible={visible}
-                    onClose={this.handleCropClose}
-                    onOk={this.handleOk}
-                >
-                    <Cropper
-                        {...cropProps}
-                        image={image}
-                        crop={cropXY}
-                        aspect={aspect}
-                        zoom={zoom}
-                        classes={{
-                            containerClassName: getClassName(`${prefixClass}_crop__container`)
-                        }}
-                        style={{
-                            containerStyle: {
-                                position: 'relative',
-                                height: '500px'
+                    (val) => (
+                        <UploadView
+                            className={className}
+                            uploadTheme={theme || val.theme.uploadTheme}
+                        >
+                            <input type="file" style={{ display: 'none' }} ref={(e) => this.fileNode = e} multiple={crop ? false : multiple} onChange={this.handleFileChange} />
+                            {
+                                files.map((i: IFile, index: number) => {
+                                    const iconTheme = theme ? theme.closeIconTheme : val.theme.uploadTheme.closeIconTheme
+                                    if (!iconTheme.hoverColor) {
+                                        iconTheme.hoverColor = theme ? theme.uploadColor ? theme.uploadColor : val.theme.primarySwatch : val.theme.primarySwatch
+                                    }
+                                    return (
+                                        <UploadItem
+                                            uploadTheme={theme || val.theme.uploadTheme}
+                                            disabled={disabled || false}
+                                            key={`$picker_${index}`}
+                                        >
+                                            <UploadItemBox
+                                                className="flex_center mk_picker_img"
+                                            >
+                                                <UploadImage src={i.url} />
+                                            </UploadItemBox>
+                                            {
+                                                !disabled && (
+                                                    <UploadCloseIcon
+                                                        uploadTheme={theme || val.theme.uploadTheme}
+                                                        icon="md-close-circle"
+                                                        onClick={this.handleFileRemove.bind(this, index)}
+                                                        theme={iconTheme}
+                                                    />
+                                                )
+                                            }
+                                        </UploadItem>
+                                    )
+                                })
                             }
-                        }}
-                        onCropComplete={this.onCropComplete}
-                        onCropChange={this.onCropChange}
-                        onZoomChange={this.onZoomChange}
-                    />
-                </Dialog>}
-            </div>
+                            {this.getAddBox(theme || val.theme.uploadTheme)}
+                            {(crop && !disabled) && (
+                                <Dialog
+                                    visible={visible}
+                                    onClose={this.handleCropClose}
+                                    onOk={this.handleOk}
+                                    theme={theme ? theme.cropDialogTheme : val.theme.uploadTheme.cropDialogTheme}
+                                >
+                                    <Cropper
+                                        {...cropProps}
+                                        image={image}
+                                        crop={cropXY}
+                                        aspect={aspect}
+                                        zoom={zoom}
+                                        classes={{
+                                            containerClassName: 'mk_upload_crop__container'
+                                        }}
+                                        style={{
+                                            containerStyle: {
+                                                position: 'relative',
+                                                height: '500px'
+                                            }
+                                        }}
+                                        onCropComplete={this.onCropComplete}
+                                        onCropChange={this.onCropChange}
+                                        onZoomChange={this.onZoomChange}
+                                    />
+                                </Dialog>
+                            )}
+                        </UploadView>
+                    )
+                }
+            </Consumer>
         )
     }
 
-    private getAddBox(): JSX.Element | undefined {
-        const { icon, iconStyle, maxLength } = this.props
+    private getAddBox(theme: UploadThemeData): JSX.Element | undefined {
+        const { icon, maxLength, disabled } = this.props
         const { files } = this.state
         if (!maxLength || maxLength > files.length) {
             return (
-                <div className={getClassName(`${prefixClass}__add `)} onClick={this.handleClick}>
-                    <div className={getClassName(`${prefixClass}__add_box flex_center`)}>
-                        {isString(icon) ? <Icon icon={icon} /> : icon}
-                    </div>
-                </div>
+                <UploadItem
+                    onClick={this.handleClick}
+                    uploadTheme={theme}
+                    disabled={disabled || false}
+                >
+                    <UploadItemBox className="flex_center">
+                        {isString(icon) ? <UploadIcon icon={icon} theme={theme.iconTheme} /> : icon}
+                    </UploadItemBox>
+                </UploadItem>
             )
         }
         return undefined
@@ -204,7 +306,8 @@ export default class Upload extends Component<IUploadProps, IState> {
     }
 
     private handleClick = () => {
-        if (this.fileNode) {
+        const { disabled } = this.props
+        if (this.fileNode && !disabled) {
             this.fileNode.click()
         }
     }

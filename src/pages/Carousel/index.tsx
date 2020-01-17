@@ -13,9 +13,17 @@ import { IImages } from 'src/store/reducers/images'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { ITableColumns } from 'src/components/lib/Table'
 import { GlobalView, FormLable, FormRequire } from 'src/utils/node'
-import { NavBarThemeData, Color, getRatioUnit } from 'src/components/lib/utils'
+import { NavBarThemeData, Color, UploadThemeData, IconThemeData } from 'src/components/lib/utils'
 import { SET_ARTICLE_DATA } from 'src/store/action'
-import { imageModal } from 'src/utils'
+
+const uploadTheme = new UploadThemeData({
+    itemWidth: 375,
+    itemHeight: 200,
+    iconTheme: new IconThemeData({
+        size: 30,
+        color: Color.fromRGB(217, 217, 217),
+    })
+})
 
 interface IProps extends DispatchProp {
     article: IArticle[]
@@ -47,28 +55,7 @@ const ArticleForm = styled(Form)`
     height: 100%;
 `
 
-const ArticleLogo = styled.div`
-     width: ${getRatioUnit(240)};
-    height:  ${getRatioUnit(160)};
-    cursor: pointer;
-    border:  ${getRatioUnit(1)} solid #e6e6e6;
-    overflow: hidden;
-`
-
 class Carousel extends Component<IProps, IState> {
-    // public static async getInitialProps(ctx: IinitProps) {
-    //     try {
-    //         const headers = await initOSInfo(ctx)
-    //         const data = await http('article/find', {}, headers)
-    //         ctx.store.dispatch({ type: SET_ARTICLE_DATA, data: data.data })
-    //         const images = await http('image/find', {}, headers)
-    //         ctx.store.dispatch({ type: SET_IMAGES_DATA, data: images.data })
-    //         return {}
-    //     } catch (data) {
-    //         httpUtils.resTest(data, ctx)
-    //     }
-    // }
-
     public state: IState = {
         imagesDialog: false,
         uploadDialog: false,
@@ -186,29 +173,20 @@ class Carousel extends Component<IProps, IState> {
             component: 'NULL',
             field: 'id'
         }, {
-            component: 'Input',
-            label: <FormLable><FormRequire color="red">*</FormRequire>标题</FormLable>,
-            props: {
-                placeholder: '请输入标题'
-            },
-            field: 'title'
-        }, {
             component: 'Upload',
             label: <FormLable><FormRequire color="red">*</FormRequire>图片</FormLable>,
             field: 'img',
             props: {
                 maxLength: 1,
                 crop: true,
-                name: 'file',
-                action: 'https://robin-animate.oss-cn-chengdu.aliyuncs.com',
-                onBeforeUpload: this.handleBeforeUpload,
-                // withCredentials: true
+                value: 'https://i.muka.site/pixiv/pixiv_2019_04_27/74350218_p0.png',
+                theme: uploadTheme,
             }
         }, {
             component: 'Input',
             label: <FormLable><FormRequire color="red">*</FormRequire>跳转地址</FormLable>,
             props: {
-                placeholder: '请输入简介',
+                placeholder: '请输入跳转地址',
             },
             field: 'url'
         }]
@@ -271,28 +249,25 @@ class Carousel extends Component<IProps, IState> {
     private handleUpdateOrCreate = async () => {
         try {
             if (this.fn) {
-                const user = this.fn.getFieldValue()
-                if (!user.title) {
-                    message.error('请输入标题')
+                const carousel = this.fn.getFieldValue()
+                console.log(carousel)
+                if (!carousel.logo) {
+                    message.error('请上传图片')
                     return
                 }
-                if (!user.logo) {
-                    message.error('请设置LOGO')
-                    return
-                }
-                if (!user.content) {
-                    message.error('请输入内容')
+                if (!carousel.url) {
+                    message.error('请输跳转地址')
                     return
                 }
                 let url = 'article/create'
-                if (user.id) {
+                if (carousel.id) {
                     url = 'article/update'
                 }
                 const { dispatch, article } = this.props
                 const userList = await http(url, {
-                    ...user
+                    ...carousel
                 })
-                if (user.id) {
+                if (carousel.id) {
                     article[this.index] = userList.data
                 } else {
                     article.unshift(userList.data)
@@ -305,6 +280,7 @@ class Carousel extends Component<IProps, IState> {
                 this.fn.cleanFieldValue()
             }
         } catch (data) {
+            console.log(data)
             httpUtils.verify(data)
         }
     }

@@ -117,7 +117,7 @@ class RouterIcons extends Component<IProps, IState> {
             },
             field: 'type'
         }, {
-            component: 'ImagePicker',
+            component: 'Upload',
             label: '图片上传',
             props: {
                 action: '/os/file/upload',

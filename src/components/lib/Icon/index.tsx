@@ -1,8 +1,8 @@
 import React, { Component, MouseEvent, CSSProperties, HtmlHTMLAttributes, Fragment } from 'react'
-import styled, { keyframes } from 'styled-components'
+import styled, { keyframes, css } from 'styled-components'
 import { Consumer } from '../ThemeProvider'
 import { omit } from 'lodash'
-import { IStyledProps, transition, IconThemeData, ThemeData } from '../utils'
+import { IStyledProps, transition, IconThemeData, ThemeData, getUnit } from '../utils'
 
 export type iconType = 'logo-google' | 'ios-refresh' | 'md-refresh' | 'ios-document' | 'md-document' | 'md-more' | 'md-arrow-down' | 'md-image' | 'ios-image' | 'ios-more' | 'ios-paper-plane' | 'ios-arrow-forward' | 'md-close-circle' | 'ios-arrow-down' | 'md-thumbs-up' | 'md-thumbs-down' | 'ios-home' | 'md-home' | 'ios-arrow-dropdown' | 'md-arrow-dropdown' | 'md-volume-mute' | 'ios-volume-high' | 'menu-open' | 'menu-close' | 'ios-close-circle-outline' | 'ios-close' | 'md-close' | 'md-checkmark' | 'ios-checkmark' | 'md-add' | 'ios-add' | 'loading' | 'ios-menu' | 'ios-settings' | 'md-settings' | 'ios-keypad' | 'md-create' | 'ios-arrow-back' | 'md-arrow-back' | 'md-search' | 'ios-search' | 'md-exit' | 'ios-exit' | 'shop' | 'double-arrow-left' | 'double-arrow-right' | 'shopping' | 'md-person' | 'ios-person' | 'shop-setting' | 'md-gift' | 'ios-gift' | 'purse' | 'md-trending-up' | 'ios-trending-up' | 'small-routine' | 'md-apps' | 'ios-apps' | 'md-remove' | 'ios-remove' | 'md-close-circle-outline' | 'md-expand' | 'ios-expand' | 'md-contract' | 'ios-contract' | 'msg' | 'file-box' | 'notifice' | 'md-lock' | 'ios-lock' | 'md-folder' | 'ios-folder' | 'security' | 'ios-filing' | 'md-filing' | 'md-alarm' | 'ios-alarm' | 'md-help' | 'ios-help' | 'md-help-circle' | 'ios-help-circle' | 'md-help-circle-outline' | 'ios-help-circle-outline' | 'md-pin' | 'ios-pin' | 'md-cart' | 'ios-cart'
 
@@ -148,23 +148,23 @@ const rotate = keyframes`
 const shake = keyframes`
     10%,
     90% {
-        transform: translate3d(${ -1 * ThemeData.ratio + ThemeData.unit}, 0, 0);
+        transform: translate3d(${getUnit(-1)}, 0, 0);
     }
 
     20%,
     80% {
-        transform: translate3d(${2 * ThemeData.ratio + ThemeData.unit}, 0, 0);
+        transform: translate3d(${getUnit(2)}, 0, 0);
     }
 
     30%,
     50%,
     70% {
-        transform: translate3d(${-4 * ThemeData.ratio + ThemeData.unit}, 0, 0);
+        transform: translate3d(${getUnit(-4)}, 0, 0);
     }
 
     40%,
     60% {
-        transform: translate3d(${4 * ThemeData.ratio + ThemeData.unit}, 0, 0);
+        transform: translate3d(${getUnit(4)}, 0, 0);
     }
 `
 
@@ -177,14 +177,22 @@ const Svg = styled.svg<IsrtleProps>`
     fill: ${({ iconTheme }) => iconTheme.color.toString()};
     font-style: normal;
     line-height: 0;
-    font-size:${({ iconTheme }) => iconTheme.size * ThemeData.ratio + ThemeData.unit};
-    width: ${({ iconTheme }) => iconTheme.size * ThemeData.ratio + ThemeData.unit};
-    height: ${({ iconTheme }) => iconTheme.size * ThemeData.ratio + ThemeData.unit};
+    font-size:${({ iconTheme }) => getUnit(iconTheme.size)};
+    width: ${({ iconTheme }) => getUnit(iconTheme.size)};
+    height: ${({ iconTheme }) => getUnit(iconTheme.size)};
     text-align: center;
     text-transform: none;
-    vertical-align: ${() => -3 * ThemeData.ratio + ThemeData.unit};
+    vertical-align: ${() => getUnit(-3)};
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    &:hover {
+        ${({ iconTheme }) => {
+        if (iconTheme.hoverColor) {
+            return css`fill: ${iconTheme.hoverColor.toString()};`
+        }
+    }}
+
+    }
     
     ${transition(0.5)};
 

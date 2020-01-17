@@ -28,11 +28,11 @@ const UploadView = styled.div`
 interface IUploadViewBoxProps {
     uploadTheme: UploadThemeData
 }
-
+/* height: ${({ uploadTheme }) => getUnit(uploadTheme.height)}; */
 const UploadViewBox = styled.div<IUploadViewBoxProps>`
     border-radius: ${({ uploadTheme, theme }) => getUnit(uploadTheme.borderRadius || theme.borderRadius)};
     ${({ uploadTheme }) => css`${uploadTheme.border.toString()};`}
-    height: ${({ uploadTheme }) => getUnit(uploadTheme.height)};
+    
     background: #fafafa;
     position: relative;
     cursor: pointer;
