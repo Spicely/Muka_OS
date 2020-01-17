@@ -948,12 +948,14 @@ export default class Form extends Component<IFormProps, IState> {
                         const _props: any = item.props || {}
                         const baseUrl = _props.baseUrl || ''
                         if (_props.maxLength === 1) {
-                            vals[field] = [{
-                                uid: '-1',
-                                name: 'xxx.png',
-                                status: 'done',
-                                url: baseUrl + params[field],
-                            }]
+                            if (params[field]) {
+                                vals[field] = [{
+                                    uid: '-1',
+                                    name: 'xxx.png',
+                                    status: 'done',
+                                    url: baseUrl + params[field],
+                                }]
+                            }
                         } else {
                             // tslint:disable-next-line: no-shadowed-variable
                             vals[field] = params[field].map((i: string, index: number) => {
