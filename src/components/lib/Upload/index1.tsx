@@ -1,18 +1,20 @@
 import React, { Component } from 'react'
-import { UploadChangeParam, UploadProps } from 'antd/lib/upload'
 import { message, Upload } from 'antd'
-import styled from 'styled-components'
 import { omit, isFunction, hash } from 'muka'
+import styled from 'styled-components'
+import { UploadChangeParam, UploadProps } from 'antd/lib/upload'
+import Dragger from './dragger'
+import { Consumer } from '../ThemeProvider'
 import Icon from '../Icon'
 
 
-export interface ILUploadResponse {
+export interface IUploadResponse {
     data: string
     [params: string]: any
 }
 
 // tslint:disable-next-line: no-empty-interface
-export interface ILUploadChangeParam extends UploadChangeParam { }
+export interface IUploadChangeParam extends UploadChangeParam { }
 
 const UploadBox = styled(Upload)`
     .ant-upload {
@@ -23,22 +25,24 @@ const UploadBox = styled(Upload)`
     }
 `
 
-export interface ILUpload extends UploadProps {
+export interface IUpload extends UploadProps {
     fileTypes?: string[]
     fileSize?: number
     baseUrl?: string
-    onDone?: (params: ILUploadResponse[]) => void
+    onDone?: (params: IUploadResponse[]) => void
     maxLength?: number
 }
 
-export default class LUpload extends Component<ILUpload, any> {
-    public static defaultProps: ILUpload = {
+export default class LUpload extends Component<IUpload, any> {
+    public static defaultProps: IUpload = {
         listType: 'picture-card',
         fileTypes: ['image/jpeg', 'image/jpg', 'image/png'],
         name: 'avatar',
         baseUrl: '',
         fileList: []
     }
+
+    public static Dragger = Dragger
 
     public state = {
         loading: false,
@@ -56,15 +60,22 @@ export default class LUpload extends Component<ILUpload, any> {
         )
         const props = omit(this.props, ['className', 'onChange', 'onDone', 'fileTypes', 'fileSize', 'maxLength', 'action', 'baseUrl'])
         return (
-            <UploadBox
-                {...props}
-                action={action}
-                className={className}
-                beforeUpload={this.beforeUpload}
-                onChange={this.handleChange}
-            >
-                {(fileList && fileList.length >= (maxLength || 3)) ? null : uploadButton}
-            </UploadBox>
+            <Consumer>
+                {
+                    (val) => (
+                        <UploadBox
+                            {...props}
+                            action={action}
+                            className={className}
+                            beforeUpload={this.beforeUpload}
+                            onChange={this.handleChange}
+                        >
+                            {(fileList && fileList.length >= (maxLength || 3)) ? null : uploadButton}
+                        </UploadBox>
+                    )
+                }
+            </Consumer>
+
         )
     }
 

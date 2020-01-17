@@ -7,7 +7,7 @@ import { IButtonProps } from '../Button'
 import { RadioGroupProps } from 'antd/lib/radio'
 import { TimePickerProps } from 'antd/lib/time-picker'
 import Input, { IInputProps } from '../Input'
-import { ILUpload, ILUploadChangeParam } from '../LUpload'
+import { IUploadProps } from '../Upload'
 import { ILDatePicker } from '../DatePicker'
 import { IImagePickerProps } from '../ImagePicker'
 import { IMapProps } from '../Map'
@@ -16,7 +16,6 @@ import { IColorsProps } from '../Colors'
 import { ICarouselProps } from '../Carousel'
 import { ISelectProps } from '../Select'
 import { ICheckBoxProps } from '../CheckBox'
-import { IUploadProps } from '../Upload'
 import { IEditorProps } from '../Editor'
 import { IItemProps } from '../Item'
 import { ColorResult } from 'react-color'
@@ -27,12 +26,12 @@ const inputThemeData = new InputThemeData({
     width: '100%'
 })
 
-interface IFormUpload extends ILUpload {
+interface IFormUpload extends IUploadProps {
     label?: string | JSX.Element
 }
 
-type component = 'Colors' | 'Input' | 'Button' | 'Radio' | 'DatePicker' | 'LUpload' | 'RangePicker' | 'NULL' | 'Label' | 'RadioGroup' | 'Select' | 'ImagePicker' | 'Map' | 'Textarea' | 'Carousel' | 'Slider' | 'CheckBox' | 'Editor' | 'TimePicker' | 'Upload' | 'Item' | 'ItemInput'
-type props = RadioGroupProps | IInputProps | IButtonProps | ILDatePicker | IFormUpload | IImagePickerProps | IMapProps | ICarouselProps | ITextareaProps | IColorsProps | ISelectProps | ICheckBoxProps | IEditorProps | TimePickerProps | IUploadProps | IItemProps | undefined
+type component = 'Colors' | 'Input' | 'Button' | 'Radio' | 'DatePicker' | 'Upload' | 'RangePicker' | 'NULL' | 'Label' | 'RadioGroup' | 'Select' | 'ImagePicker' | 'Map' | 'Textarea' | 'Carousel' | 'Slider' | 'CheckBox' | 'Editor' | 'TimePicker' | 'Upload' | 'Item' | 'ItemInput' | 'Dragger'
+type props = RadioGroupProps | IInputProps | IButtonProps | ILDatePicker | IFormUpload | IImagePickerProps | IMapProps | ICarouselProps | ITextareaProps | IColorsProps | ISelectProps | ICheckBoxProps | IEditorProps | TimePickerProps | IItemProps | undefined
 
 export interface IFormItem {
     component: component
@@ -152,7 +151,7 @@ export default class Form extends Component<IFormProps, IState> {
         const vals: any = {}
         const childs: IFormChild[] = []
         this.items = getItems(this.lref)
-        this.items.map((item: IFormItem, index: number) => {
+        this.items.forEach((item: IFormItem, index: number) => {
             const field = item.field || `${item.component}_${index}`
             const _porps: any = item.props || {}
             switch (item.component) {
@@ -164,7 +163,7 @@ export default class Form extends Component<IFormProps, IState> {
                     vals[field] = _porps.initColor || ''; break
                 case 'CheckBox': vals[field] = _porps.value || []; break
                 case 'Input': vals[field] = isNil(_porps.value) ? '' : _porps.value; break
-                case 'LUpload': vals[field] = _porps.fileList || (_porps.maxLength > 1 ? [] : ''); break
+                case 'Upload': vals[field] = _porps.fileList || (_porps.maxLength > 1 ? [] : ''); break
                 case 'RadioGroup': vals[field] = isUndefined(_porps.value) ? '' : _porps.value; break
                 case 'ImagePicker': vals[field] = _porps.value || []; break
                 case 'Carousel': vals[field] = _porps.value || []; break
@@ -218,7 +217,7 @@ export default class Form extends Component<IFormProps, IState> {
                     case 'Radio': vals[field] = _porps.value; break
                     case 'Slider': vals[field] = _porps.value || _porps.defaultValue || 0; break
                     case 'Colors': vals[field] = _porps.initColor || ''; break
-                    case 'LUpload': vals[field] = _porps.fileList || (_porps.maxLength > 1 ? [] : ''); break
+                    case 'Upload': vals[field] = _porps.fileList || (_porps.maxLength > 1 ? [] : ''); break
                     case 'ImagePicker': vals[field] = _porps.value || []; break
                     case 'Carousel': vals[field] = _porps.value || []; break
                     case 'RadioGroup': vals[field] = isUndefined(_porps.value) ? '' : _porps.value; break
@@ -309,8 +308,8 @@ export default class Form extends Component<IFormProps, IState> {
             case 'Button': return loadableComponent(import('../Button'))
             case 'Radio': return loadableComponent(import('../Radio'))
             case 'DatePicker': return loadableComponent(import('../DatePicker'))
-            case 'LUpload': return loadableComponent(import('../LUpload'))
-            case 'Upload': return loadableComponent(import('../Upload/dragger'))
+            case 'Upload': return loadableComponent(import('../Upload'))
+            case 'Dragger': return loadableComponent(import('../Upload/dragger'))
             case 'Label': return loadableComponent(import('../Label'))
             case 'RadioGroup': return loadableComponent(import('../RadioGroup'))
             case 'Select': return loadableComponent(import('../Select'))
@@ -656,7 +655,7 @@ export default class Form extends Component<IFormProps, IState> {
                     </FormItem>
                 )
             }
-            case 'LUpload': {
+            case 'Upload': {
                 const vProps = omit(props, ['fileList', 'onChange'])
                 const _porps: any = props
                 const onChange: any = _porps.onChange
@@ -768,7 +767,7 @@ export default class Form extends Component<IFormProps, IState> {
         }
     }
 
-    private setUploadVal(field: string, cb: (file: ILUploadChangeParam) => void, file: ILUploadChangeParam) {
+    private setUploadVal(field: string, cb: (file: any) => void, file: any) {
         const { vals } = this.state
         vals[field] = file.fileList
         if (isFunction(cb)) {
@@ -874,7 +873,7 @@ export default class Form extends Component<IFormProps, IState> {
     private getComVal(item: IFormChild, field: string) {
         const { vals } = this.state
         switch (item.type) {
-            case 'LUpload': {
+            case 'Upload': {
                 const _props: any = item.props || {}
                 const baseUrl: string = _props.baseUrl || ''
                 if (_props.maxLength === 1) {
@@ -906,7 +905,7 @@ export default class Form extends Component<IFormProps, IState> {
         const val: IValue = {}
         childs.forEach((item: IFormChild, index: number) => {
             if (params) {
-                params.map((i: string) => {
+                params.forEach((i: string) => {
                     if (item.field === i) {
                         val[i] = this.getComVal(item, i)
                     }
@@ -920,13 +919,13 @@ export default class Form extends Component<IFormProps, IState> {
 
     private cleanFieldValue() {
         const { vals } = this.state
-        this.items.map((item: IFormItem, index: number) => {
+        this.items.forEach((item: IFormItem, index: number) => {
             const field = item.field || `${item.component}_${index}`
             // tslint:disable-next-line: no-shadowed-variable
             const props: any = item.props || {}
             switch (item.component) {
                 case 'Radio': vals[field] = props.value; break
-                case 'LUpload': vals[field] = []; break
+                case 'Upload': vals[field] = []; break
                 case 'CheckBox': vals[field] = []; break
                 case 'RangePicker': vals[field] = []; break
                 case 'Carousel': vals[field] = []; break
@@ -941,11 +940,11 @@ export default class Form extends Component<IFormProps, IState> {
 
     private setFieldValue(params: IValue) {
         const { vals } = this.state
-        this.items.map((item: IFormItem, index: number) => {
+        this.items.forEach((item: IFormItem, index: number) => {
             const field = item.field || `${item.component}_${index}`
             if (!isNil(params[field])) {
                 switch (item.component) {
-                    case 'LUpload': {
+                    case 'Upload': {
                         const _props: any = item.props || {}
                         const baseUrl = _props.baseUrl || ''
                         if (_props.maxLength === 1) {

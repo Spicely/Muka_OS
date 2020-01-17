@@ -102,6 +102,27 @@ export default class Index extends Component<IProps, IState> {
                 placeholder: '请输入阿里云oss Bucket'
             },
             field: 'ossBucket'
+        }, {
+            component: 'Input',
+            label: <FormLabel>阿里云oss 外网地址</FormLabel>,
+            props: {
+                placeholder: '请输入阿里云oss外网地址'
+            },
+            field: 'ossServer'
+        }, {
+            component: 'Input',
+            label: <FormLabel>阿里云oss 内网地址</FormLabel>,
+            props: {
+                placeholder: '请输入阿里云oss外网地址'
+            },
+            field: 'ossServerInternal'
+        }, {
+            component: 'Input',
+            label: <FormLabel>阿里云oss 自定义地址</FormLabel>,
+            props: {
+                placeholder: '请输入阿里云oss自定义地址'
+            },
+            field: 'ossDomaim'
         }]
         return items
     }

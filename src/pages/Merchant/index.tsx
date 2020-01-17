@@ -352,7 +352,7 @@ class Index extends Component<IProps, IState> {
             },
             field: 'pid'
         }, {
-            component: 'LUpload',
+            component: 'Upload',
             label: <FormLabel>营业执照</FormLabel>,
             props: {
                 // localStorage.getItem('imgUrl') http://mistep-fund.maixiaobu.cn/common/upload

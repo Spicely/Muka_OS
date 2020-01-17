@@ -1,6 +1,6 @@
 import React, { Component, ChangeEvent, DragEvent, CSSProperties } from 'react'
 import axios from 'axios'
-import { isString, isArray, isNumber, isObject, isFunction, isBoolean } from 'lodash'
+import { isString, isArray, isNumber, isObject, isFunction } from 'lodash'
 import styled, { css } from 'styled-components'
 import { Consumer as ThemeConsumer } from '../ThemeProvider'
 import { IValue, UploadThemeData, getRatioUnit, getUnit, transition, Color, IconThemeData } from '../utils'
