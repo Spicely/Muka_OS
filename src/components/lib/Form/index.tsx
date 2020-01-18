@@ -164,7 +164,7 @@ export default class Form extends Component<IFormProps, IState> {
                 case 'Input': vals[field] = isNil(_porps.value) ? '' : _porps.value; break
                 case 'Dragger': vals[field] = _porps.fileList || (_porps.maxLength > 1 ? [] : ''); break
                 case 'RadioGroup': vals[field] = isUndefined(_porps.value) ? '' : _porps.value; break
-                case 'Upload': vals[field] = _porps.value ? isString(_porps.value) ? [{ url: _porps.value }] : _porps.value : []; break
+                case 'Upload': vals[field] = _porps.value ? _porps.value : []; break
                 case 'Carousel': vals[field] = _porps.value || []; break
                 case 'Map': vals[field] = _porps.value || {}; break
                 default: vals[field] = _porps.value || ''

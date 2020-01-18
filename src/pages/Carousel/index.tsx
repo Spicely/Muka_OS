@@ -177,10 +177,13 @@ class Carousel extends Component<IProps, IState> {
             label: <FormLable><FormRequire color="red">*</FormRequire>图片</FormLable>,
             field: 'img',
             props: {
-                maxLength: 1,
-                crop: true,
-                value: 'https://i.muka.site/pixiv/pixiv_2019_04_27/74350218_p0.png',
+                maxLength: 10,
+                multiple: true,
+                // crop: true,
+                action: 'https://robin-animate.oss-cn-chengdu.aliyuncs.com',
                 theme: uploadTheme,
+                name: 'file',
+                onBeforeUpload: this.handleBeforeUpload
             }
         }, {
             component: 'Input',

@@ -1,6 +1,7 @@
 import React, { Component, ChangeEvent } from 'react'
 import Cropper from 'react-easy-crop'
-import { isFunction, isString } from 'muka'
+import axios from 'axios'
+import { isFunction, isString, isObject } from 'lodash'
 import styled, { css } from 'styled-components'
 import CropImage from './cropImage'
 import Dragger from './dragger'
@@ -8,7 +9,7 @@ import { Consumer } from '../ThemeProvider'
 import Icon, { iconType } from '../Icon'
 import Dialog from '../Dialog'
 import Image from '../Image'
-import { UploadThemeData, getUnit, transition } from '../utils'
+import { UploadThemeData, getUnit, transition, IValue } from '../utils'
 
 export interface ICroppedArea {
     height: number
@@ -28,7 +29,7 @@ const UploadView = styled.div<IStyledProps>`
 
 const UploadIcon = styled(Icon)``
 
-const UploadCloseIcon = styled(Icon)<IStyledProps>`
+const UploadCloseIcon = styled(Icon) <IStyledProps>`
     position: absolute;
     right: ${getUnit(5)};
     top: ${getUnit(5)};
@@ -68,8 +69,8 @@ const UploadItem = styled.div<IUloadItemProps>`
                             fill: ${uploadTheme.uploadColor || theme.primarySwatch};
                         }
                     `
-            }
-        }}
+        }
+    }}
     }
 `
 
@@ -108,6 +109,12 @@ interface ICrop {
 interface IFile {
     url: string | ArrayBuffer | null
     file?: File
+    xhr?: any
+    info: {
+        progress: number,
+        status: 'uploading' | 'done' | 'error'
+    },
+    data?: any
 }
 
 export interface IUploadProps {
@@ -120,8 +127,19 @@ export interface IUploadProps {
     crop?: boolean
     cropProps?: ICropProps
     maxLength?: number
-    value?: IFile[]
+    fileList?: IFile[]
     theme?: UploadThemeData
+    fileTypes?: string[]
+    headers?: IValue
+    name?: string
+    baserUrl?: string
+    action?: string
+    params?: IValue
+    withCredentials?: boolean
+    onFileTypeError?: () => void
+    onUploadSuccess?: (val: IFile, data: any, files: IFile[]) => void
+    onUploadError?: (val: IFile, data: any, files: IFile[]) => void
+    onBeforeUpload?: (file: File) => (boolean | object | Promise<object | boolean>)
 }
 
 interface IState {
@@ -140,7 +158,9 @@ export default class Upload extends Component<IUploadProps, IState> {
         iconStyle: {
             fontSize: '28px',
             color: '#bcbcbc'
-        }
+        },
+        fileTypes: [],
+        onBeforeUpload: () => true
     }
 
     public static Dragger = Dragger
@@ -175,20 +195,20 @@ export default class Upload extends Component<IUploadProps, IState> {
     }
 
     public componentDidMount() {
-        const { value } = this.props
+        const { fileList } = this.props
         const { files } = this.state
-        this.setValue(value, files)
+        this.setValue(fileList, files)
     }
 
     public UNSAFE_componentWillReceiveProps(nextProps: IUploadProps) {
         const { files } = this.state
-        this.setValue(nextProps.value, files)
+        this.setValue(nextProps.fileList, files)
     }
 
     private fileNode: HTMLInputElement | null = null
 
     public render(): JSX.Element {
-        const { className, multiple, crop, cropProps, disabled, theme } = this.props
+        const { className, multiple, crop, cropProps, disabled, theme, fileTypes } = this.props
         const { files, image, cropXY, aspect, zoom, visible } = this.state
         return (
             <Consumer>
@@ -198,7 +218,7 @@ export default class Upload extends Component<IUploadProps, IState> {
                             className={className}
                             uploadTheme={theme || val.theme.uploadTheme}
                         >
-                            <input type="file" style={{ display: 'none' }} ref={(e) => this.fileNode = e} multiple={crop ? false : multiple} onChange={this.handleFileChange} />
+                            <input type="file" style={{ display: 'none' }} accept={(fileTypes || []).join(',')} ref={(e) => this.fileNode = e} multiple={crop ? false : multiple} onChange={this.handleFileChange} />
                             {
                                 files.map((i: IFile, index: number) => {
                                     const iconTheme = theme ? theme.closeIconTheme : val.theme.uploadTheme.closeIconTheme
@@ -289,6 +309,7 @@ export default class Upload extends Component<IUploadProps, IState> {
         if (value) {
             let status: boolean = false
             this.filesList = [...value]
+            console.log(value, files)
             if (value.length && value.length === files.length) {
                 status = value.every((i, index: number) => {
                     if (!files[index]) {
@@ -298,6 +319,8 @@ export default class Upload extends Component<IUploadProps, IState> {
                 })
             }
             if (!status) {
+                console.log(value)
+                console.log(2222222)
                 this.setState({
                     files: value
                 })
@@ -366,21 +389,125 @@ export default class Upload extends Component<IUploadProps, IState> {
     }
 
     private handleOk = async () => {
-        const { onChange } = this.props
-        const { image } = this.state
+        const { onChange, onBeforeUpload } = this.props
+        const { image, files } = this.state
         const croppedImage: any = await CropImage(image, this.croppedAreaPixels)
-        this.filesList.push({
-            file: this.dataURLtoFile(croppedImage, this.fileName),
-            url: croppedImage
-        })
-        this.setState({
-            visible: false,
-            files: [...this.filesList]
-        }, () => {
-            if (isFunction(onChange)) {
-                onChange(this.filesList)
+        const file = this.dataURLtoFile(croppedImage, this.fileName)
+        const fileObj: IFile = {
+            file,
+            url: croppedImage,
+            info: {
+                progress: 0,
+                status: 'uploading',
             }
-        })
+        }
+        if (isFunction(onBeforeUpload)) {
+            const fn = onBeforeUpload(file)
+            if (fn instanceof Promise) {
+                fn.then((value) => {
+                    if (value) {
+                        const obj = this.uploadFile(fileObj, files.length, value)
+                        this.filesList.push(obj)
+                        this.setState({
+                            visible: false,
+                            files: [...this.filesList]
+                        }, () => {
+                            if (isFunction(onChange)) {
+                                onChange(this.filesList)
+                            }
+                        })
+                    }
+                })
+            } else if (fn) {
+                const obj = this.uploadFile(fileObj, files.length)
+                this.filesList.push(obj)
+                this.setState({
+                    visible: false,
+                    files: [...this.filesList]
+                }, () => {
+                    if (isFunction(onChange)) {
+                        onChange(this.filesList)
+                    }
+                })
+            }
+        }
+
+    }
+
+    private uploadFile = (fileObj: IFile, index: number, data?: true | IValue): IFile => {
+        const { onUploadSuccess, onUploadError, headers, action, withCredentials, params, name } = this.props
+        const formData = new FormData()
+        if (isObject(params)) {
+            Object.keys(params).forEach((i: any) => {
+                formData.append(i, params[i])
+            })
+        }
+        if (isObject(data)) {
+            Object.keys(data).forEach((i: string) => {
+                formData.append(i, data[i])
+            })
+        }
+        formData.append(name || 'avatar', fileObj.file || '')
+        if (action) {
+            const xhr = axios({
+                method: 'POST',
+                headers,
+                url: action,
+                data: formData,
+                withCredentials,
+                onUploadProgress: (progressEvent) => {
+                    const { fileList } = this.props
+                    const complete = (progressEvent.loaded / progressEvent.total * 100) || 0
+                    // tslint:disable-next-line: no-shadowed-variable
+                    const { files } = this.state
+                    if (files[index] && fileList) {
+                        files[index].info = {
+                            ...files[index].info,
+                            progress: complete,
+                            status: complete === 100 ? 'done' : 'uploading'
+                        }
+                        this.setState({
+                            files: [...fileList]
+                        })
+                    }
+                }
+            }).then((response) => {
+                // tslint:disable-next-line: no-shadowed-variable
+                const { files } = this.state
+                const { fileList } = this.props
+                if (files[index] && fileList) {
+                    files[index].data = response.data
+                    this.setState({
+                        files: [...fileList]
+                    }, () => {
+                        if (response.status === 200) {
+                            if (isFunction(onUploadSuccess)) {
+                                onUploadSuccess(files[index], response.data, files)
+                            }
+                        } else {
+                            if (isFunction(onUploadError)) {
+                                onUploadError(files[index], response.data, files)
+                            }
+                        }
+                    })
+                }
+            }).catch(() => {
+                const { fileList } = this.props
+                const { files } = this.state
+                if (files[index] && fileList) {
+                    files[index].info = {
+                        ...files[index].info,
+                        progress: 100,
+                        status: 'error'
+                    }
+                    this.setState({
+                        files: [...fileList]
+                    })
+                }
+            })
+            fileObj.xhr = xhr
+        }
+        return fileObj
     }
 
     private readFile(file: File, index: number) {
@@ -418,16 +545,22 @@ export default class Upload extends Component<IUploadProps, IState> {
     private handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
         const { onChange } = this.props
         if (e.currentTarget.files) {
-            const { crop } = this.props
+            const { crop, fileTypes, onFileTypeError, onBeforeUpload } = this.props
             const { files } = this.state
             const length = files.length
             const fileList = e.currentTarget.files
             if (crop) {
                 this.index = length
                 const _file = fileList.item(0)
-                if (_file) {
-                    this.fileName = _file.name
-                    await this.readFile(_file, length)
+                if (_file && fileTypes) {
+                    if (!fileTypes.length || fileTypes.includes(_file.type) || fileTypes.some((i) => _file.name.includes(i))) {
+                        this.fileName = _file.name
+                        await this.readFile(_file, length)
+                    } else {
+                        if (isFunction(onFileTypeError)) {
+                            onFileTypeError()
+                        }
+                    }
                 }
             } else {
                 const { maxLength } = this.props
@@ -437,12 +570,53 @@ export default class Upload extends Component<IUploadProps, IState> {
                 }
                 for (let i = 0; i < fileLength; i++) {
                     const _file = fileList.item(i)
-                    if (_file) {
-                        this.filesList.push({
-                            file: _file,
-                            url: ''
-                        })
-                        await this.readFile(_file, length + i)
+                    if (_file && fileTypes) {
+                        if (!fileTypes.length || fileTypes.includes(_file.type) || fileTypes.some((i) => _file.name.includes(i))) {
+                            const fileObj: IFile = {
+                                file: _file,
+                                url: '',
+                                info: {
+                                    progress: 0,
+                                    status: 'uploading',
+                                }
+                            }
+                            this.filesList.push(fileObj)
+                            await this.readFile(_file, length + i)
+                            if (isFunction(onBeforeUpload)) {
+                                const fn = onBeforeUpload(_file)
+                                if (fn instanceof Promise) {
+                                    fn.then((value) => {
+                                        if (value) {
+                                            const obj = this.uploadFile(fileObj, files.length + i, value)
+                                            this.filesList.push(obj)
+                                            this.setState({
+                                                visible: false,
+                                                files: [...this.filesList]
+                                            }, () => {
+                                                if (isFunction(onChange)) {
+                                                    onChange(this.filesList)
+                                                }
+                                            })
+                                        }
+                                    })
+                                } else if (fn) {
+                                    const obj = this.uploadFile(fileObj, files.length)
+                                    this.filesList.push(obj)
+                                    this.setState({
+                                        visible: false,
+                                        files: [...this.filesList]
+                                    }, () => {
+                                        if (isFunction(onChange)) {
+                                            onChange(this.filesList)
+                                        }
+                                    })
+                                }
+                            }
+                        } else {
+                            if (isFunction(onFileTypeError)) {
+                                onFileTypeError()
+                            }
+                        }
                     }
                 }
             }

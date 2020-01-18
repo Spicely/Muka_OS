@@ -373,8 +373,8 @@ export default class Upload extends Component<IUploadProps, IState> {
                 }
                 return i
             }
-            const formData = new FormData()
             const uplodaFile = (val: IValue | boolean) => {
+                const formData = new FormData()
                 if (isObject(val)) {
                     Object.keys(val).forEach((i: any) => {
                         formData.append(i, val[i])
@@ -387,7 +387,6 @@ export default class Upload extends Component<IUploadProps, IState> {
                     })
                 }
                 i.xhr = axios({
-                    baseURL: baserUrl,
                     method: 'POST',
                     headers,
                     url: action,
@@ -419,6 +418,18 @@ export default class Upload extends Component<IUploadProps, IState> {
                         if (isFunction(onUploadError)) {
                             onUploadError(i, response.data, fileList)
                         }
+                    }
+                }).catch(() => {
+                    const { fileList } = this.state
+                    if (fileList[index]) {
+                        fileList[index].info = {
+                            ...fileList[index].info,
+                            progress: 100,
+                            status: 'error'
+                        }
+                        this.setState({
+                            fileList: [...fileList]
+                        })
                     }
                 })
             }
