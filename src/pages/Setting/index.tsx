@@ -122,7 +122,7 @@ class Index extends Component<IProps, IState> {
             props: {
                 placeholder: '请输入ios版本号',
             },
-            field: 'android_ios'
+            field: 'ios_version'
         }, {
             component: 'Input',
             label: <FormLabel>android下载地址</FormLabel>,
