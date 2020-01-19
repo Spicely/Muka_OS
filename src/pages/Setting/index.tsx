@@ -61,7 +61,7 @@ class Index extends Component<IProps, IState> {
                         <Button mold="primary" async onClick={this.handleOk}>更新</Button>
                     }
                 />
-                <Form getItems={this.getItems} style={{width: getUnit(560)}}/>
+                <Form getItems={this.getItems} style={{ width: getUnit(560) }} />
             </GlobalView>
         )
     }
@@ -109,6 +109,34 @@ class Index extends Component<IProps, IState> {
                 placeholder: '请输入支付宝公钥',
             },
             field: 'public_key'
+        }, {
+            component: 'Input',
+            label: <FormLabel>android版本号</FormLabel>,
+            props: {
+                placeholder: '请输入android版本号',
+            },
+            field: 'android_version'
+        }, {
+            component: 'Input',
+            label: <FormLabel>ios版本号</FormLabel>,
+            props: {
+                placeholder: '请输入ios版本号',
+            },
+            field: 'android_ios'
+        }, {
+            component: 'Input',
+            label: <FormLabel>android下载地址</FormLabel>,
+            props: {
+                placeholder: '请输入android下载地址',
+            },
+            field: 'android_url'
+        }, {
+            component: 'Input',
+            label: <FormLabel>ios下载地址</FormLabel>,
+            props: {
+                placeholder: '请输入ios下载地址',
+            },
+            field: 'ios_url'
         }]
         return items
     }
