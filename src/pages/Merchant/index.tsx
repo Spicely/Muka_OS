@@ -419,7 +419,11 @@ class Index extends Component<IProps, IState> {
                 }
                 if (value.pid != '0') {
                     if (value.id) {
-                        await http(`merchant-manage/${value.id}`, { ...value }, { method: 'PUT' })
+                        await http(`merchant-manage/${value.id}`, {
+                            ...value,
+                            random_min_num: Number(value.random_min_num) * 100,
+                            random_max_num: Number(value.random_max_num) * 100,
+                        }, { method: 'PUT' })
                         message.success('修改下级商户成功')
                     } else {
                         await http('merchant-manage/create', { ...value })
@@ -446,6 +450,7 @@ class Index extends Component<IProps, IState> {
                     visible: false
                 })
                 this.getData()
+                this.fn && this.fn.cleanFieldValue()
             }
         } catch (e) {
             message.error('网络不稳定,请稍后再试')
