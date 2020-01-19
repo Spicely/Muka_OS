@@ -177,9 +177,14 @@ class Carousel extends Component<IProps, IState> {
             label: <FormLable><FormRequire color="red">*</FormRequire>图片</FormLable>,
             field: 'img',
             props: {
-                maxLength: 10,
-                multiple: true,
-                // crop: true,
+                maxLength: 1,
+                crop: true,
+                cropProps: {
+                    cropSize: {
+                        width: 620,
+                        height: 310,
+                    }
+                },
                 action: 'https://robin-animate.oss-cn-chengdu.aliyuncs.com',
                 theme: uploadTheme,
                 name: 'file',

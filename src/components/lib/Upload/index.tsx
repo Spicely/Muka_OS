@@ -29,7 +29,7 @@ const UploadView = styled.div<IStyledProps>`
 
 const UploadIcon = styled(Icon)``
 
-const UploadCloseIcon = styled(Icon)<IStyledProps>`
+const UploadCloseIcon = styled(Icon) <IStyledProps>`
     position: absolute;
     right: ${getUnit(5)};
     top: ${getUnit(5)};
@@ -580,15 +580,15 @@ export default class Upload extends Component<IUploadProps, IState> {
                                     status: 'uploading',
                                 }
                             }
-                            this.filesList.push(fileObj)
-                            await this.readFile(_file, length + i)
+                            // this.filesList.push(fileObj)
                             if (isFunction(onBeforeUpload)) {
                                 const fn = onBeforeUpload(_file)
                                 if (fn instanceof Promise) {
-                                    fn.then((value) => {
+                                    fn.then(async (value) => {
                                         if (value) {
                                             const obj = this.uploadFile(fileObj, length + i, value)
                                             this.filesList.push(obj)
+                                            await this.readFile(_file, length + i)
                                             this.setState({
                                                 visible: false,
                                                 files: [...this.filesList]
@@ -602,6 +602,7 @@ export default class Upload extends Component<IUploadProps, IState> {
                                 } else if (fn) {
                                     const obj = this.uploadFile(fileObj, files.length)
                                     this.filesList.push(obj)
+                                    await this.readFile(_file, length + i)
                                     this.setState({
                                         visible: false,
                                         files: [...this.filesList]
