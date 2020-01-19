@@ -239,20 +239,20 @@ class Index extends Component<IProps, IState> {
     }
 
     private handleChildDel = (id: string) => {
-        try {
-            confirm({
-                content: '删除无法恢复,请确认删除',
-                okText: '确认',
-                okType: 'danger',
-                cancelText: '取消',
-                onOk: async () => {
+        confirm({
+            content: '删除无法恢复,请确认删除',
+            okText: '确认',
+            okType: 'danger',
+            cancelText: '取消',
+            onOk: async () => {
+                try {
                     await http(`merchant-manage/${id}`, {}, { method: 'DELETE' })
                     this.getData()
+                } catch (e) {
+                    message.error('网络不稳定,请稍后再试')
                 }
-            })
-        } catch (e) {
-            message.error('网络不稳定,请稍后再试')
-        }
+            }
+        })
     }
 
 
