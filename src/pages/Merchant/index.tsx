@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { message } from 'antd'
+import { message, Modal } from 'antd'
 import styled from 'styled-components'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
 import { LabelHeader, Button, Dialog, Form, Table, Label, Image } from 'components'
@@ -13,6 +13,7 @@ import { NavBarThemeData, Color, getUnit, DialogThemeData } from 'src/components
 import { GlobalView } from 'src/utils/node'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { ITableColumns } from 'src/components/lib/Table'
+const { confirm } = Modal
 
 interface IProps {
     lastIds: string[]
@@ -237,10 +238,18 @@ class Index extends Component<IProps, IState> {
         })
     }
 
-    private handleChildDel = async (id: string) => {
+    private handleChildDel = (id: string) => {
         try {
-            await http(`merchant-manage/${id}`, {}, { method: 'DELETE' })
-            this.getData()
+            confirm({
+                content: '删除无法恢复,请确认删除',
+                okText: '确认',
+                okType: 'danger',
+                cancelText: '取消',
+                onOk: async () => {
+                    await http(`merchant-manage/${id}`, {}, { method: 'DELETE' })
+                    this.getData()
+                }
+            })
         } catch (e) {
             message.error('网络不稳定,请稍后再试')
         }
