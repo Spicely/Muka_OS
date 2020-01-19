@@ -705,7 +705,7 @@ export default class Form extends Component<IFormProps, IState> {
                                 <View
                                     {...vProps}
                                     value={vals[field]}
-                                    className={`flex_1 ${_porps.className || ''}`}
+                                    className={_porps.className}
                                     onChange={this.setRVal.bind(this, field, onChange)}
                                 />
                             </div>

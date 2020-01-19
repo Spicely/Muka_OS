@@ -19,6 +19,7 @@ import CardThemeData from './CardThemeData'
 import ItemThemeData from './ItemThemeData'
 import BorderRadius from './BorderRadius'
 import ToastThemeData from './ToastThemeData'
+import SelectThemeData from './SelectThemeData'
 
 export type IUnit = 'px' | 'rem'
 
@@ -49,6 +50,7 @@ interface IThemeDataProps {
     disabledBorderColor?: Color
     itemTheme?: ItemThemeData
     toastTheme?: ToastThemeData
+    selectTheme?: SelectThemeData
 }
 
 export default class ThemeData {
@@ -80,6 +82,7 @@ export default class ThemeData {
             if (data.itemTheme) this.itemTheme = data.itemTheme
             if (data.disabledBorderColor) this.disabledBorderColor = data.disabledBorderColor
             if (data.toastTheme) this.toastTheme = data.toastTheme
+            if (data.selectTheme) this.selectTheme = data.selectTheme
         }
     }
 
@@ -138,6 +141,8 @@ export default class ThemeData {
     public itemTheme: ItemThemeData = new ItemThemeData()
 
     public toastTheme: ToastThemeData = new ToastThemeData()
+
+    public selectTheme: SelectThemeData = new SelectThemeData()
 
     public unit: IUnit = 'rem'
 

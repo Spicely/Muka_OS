@@ -22,6 +22,7 @@ export { default as UploadThemeData } from './UploadThemeData'
 export { default as TextareaThemeData } from './TextareaThemeData'
 export { default as ItemThemeData } from './ItemThemeData'
 export { default as ToastThemeData } from './ToastThemeData'
+export { default as SelectThemeData } from './SelectThemeData'
 
 export const prefix: string = 'mk_'
 
