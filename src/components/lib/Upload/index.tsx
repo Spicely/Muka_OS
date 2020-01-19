@@ -29,7 +29,7 @@ const UploadView = styled.div<IStyledProps>`
 
 const UploadIcon = styled(Icon)``
 
-const UploadCloseIcon = styled(Icon) <IStyledProps>`
+const UploadCloseIcon = styled(Icon)<IStyledProps>`
     position: absolute;
     right: ${getUnit(5)};
     top: ${getUnit(5)};
@@ -587,7 +587,7 @@ export default class Upload extends Component<IUploadProps, IState> {
                                 if (fn instanceof Promise) {
                                     fn.then((value) => {
                                         if (value) {
-                                            const obj = this.uploadFile(fileObj, files.length + i, value)
+                                            const obj = this.uploadFile(fileObj, length + i, value)
                                             this.filesList.push(obj)
                                             this.setState({
                                                 visible: false,
