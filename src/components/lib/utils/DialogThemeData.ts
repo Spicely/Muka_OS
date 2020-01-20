@@ -29,7 +29,7 @@ export default class DialogThemeData {
 
     public width: number | string = 600
 
-    public height: number | string = 100
+    public height: number | string = 400
 
     public borderRadius?: number
 

@@ -17,6 +17,12 @@ import { IComponentData } from '../reducers/componentData'
 import { ISettingsShopUnits } from '../action/settings/shopUnits'
 import { ISettingsShopSpecs } from '../action/settings/shopSpecs'
 
+export namespace MukaOS {
+    export class Region {
+
+    }
+}
+
 export interface IInitState {
     routers: IRouters[]
     collapsed: boolean
@@ -40,4 +46,5 @@ export interface IInitState {
     isLogin: boolean
     solo: boolean
     imageModalVisible: boolean
+    region: MukaOS.Region[]
 }

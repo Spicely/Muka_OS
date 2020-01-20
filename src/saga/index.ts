@@ -1,11 +1,11 @@
-import { GET_USERLIST } from './../store/action/index';
 import { put, takeEvery, all, call } from 'redux-saga/effects'
-import { GET_LAYOUT_DATA, SET_ROUTER_DATA, SET_JURISD_DATA, SET_LOGIN, GET_ROUTER, GET_JURISDICTION } from '../store/action'
+import { GET_LAYOUT_DATA, SET_ROUTER_DATA, SET_JURISD_DATA, SET_LOGIN, GET_ROUTER, GET_JURISDICTION , GET_REGION, GET_USERLIST} from '../store/action'
 import { createBrowserHistory } from 'history'
 import http, { httpUtils } from '../utils/axios'
 import routersAsync from './router'
 import jurisdictionAsync from './jurisdiction'
 import userListAsync from './userList'
+import regionAsync from './region'
 
 export const history = createBrowserHistory()
 
@@ -35,6 +35,7 @@ export function* watchIncrementAsync() {
     yield takeEvery(GET_ROUTER, routersAsync)
     yield takeEvery(GET_JURISDICTION, jurisdictionAsync)
     yield takeEvery(GET_USERLIST, userListAsync)
+    yield takeEvery(GET_REGION, regionAsync)
 }
 
 export default function* rootSaga() {

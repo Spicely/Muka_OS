@@ -35,6 +35,9 @@ export const routes: IRoutes[] = [{
 }, {
     component: import('../pages/Carousel'),
     path: '/platform/carousel'
+},{
+    component: import('../pages/Region'),
+    path: '/platform/region'
 },]
 
 export const loadable = (component: Promise<React.ComponentClass<any> | React.StatelessComponent<any> | { default: React.ComponentType<any> }>) => {
