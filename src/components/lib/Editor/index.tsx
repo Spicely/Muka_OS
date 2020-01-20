@@ -1,6 +1,17 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
 import { isFunction } from 'lodash'
-import { getClassName, IValue } from '../utils'
+import Quill from 'react-quill'
+import { getClassName, IValue, getUnit } from '../utils'
+import styled from 'styled-components'
+import 'react-quill/dist/quill.snow.css'
+import 'react-quill/dist/quill.bubble.css'
+import 'react-quill/dist/quill.core.css'
+
+const QuillView = styled(Quill)`
+    .ql-editor {
+        min-height: ${getUnit(200)};
+    }
+`
 
 export interface IEditorProps {
     className?: string
@@ -14,12 +25,6 @@ export interface IEditorProps {
 const prefixClass = 'editor'
 
 export default class Editor extends Component<IEditorProps, any> {
-    constructor(props: IEditorProps) {
-        super(props)
-        if (typeof document !== 'undefined') {
-            this.quill = require('react-quill')
-        }
-    }
 
     public static defaultProps: IEditorProps = {
         theme: 'snow',
@@ -47,35 +52,28 @@ export default class Editor extends Component<IEditorProps, any> {
 
     private quillRef: any
 
-    private quill: any
-
     public render(): JSX.Element {
         const { className, handlers, container, theme } = this.props
         const { value } = this.state
-        const Quill = this.quill
 
-        if (Quill) {
-            return (
-                <Quill
-                    ref={(el: Element) => { this.quillRef = el }}
-                    className={getClassName(prefixClass, className)}
-                    value={this.props.value || value}
-                    onChange={this.handleChange}
-                    theme={theme}
-                    modules={{
-                        toolbar: {
-                            container,
-                            handlers: {
-                                ...handlers,
-                                image: this.handleImgUpload
-                            },
-                        }
-                    }}
-                />
-            )
-        } else {
-            return <Fragment />
-        }
+        return (
+            <QuillView
+                ref={(el: any) => { this.quillRef = el }}
+                className={getClassName(prefixClass, className)}
+                value={this.props.value || value}
+                onChange={this.handleChange}
+                theme={theme}
+                modules={{
+                    toolbar: {
+                        container,
+                        handlers: {
+                            ...handlers,
+                            image: this.handleImgUpload
+                        },
+                    }
+                }}
+            />
+        )
 
     }
 
@@ -86,7 +84,7 @@ export default class Editor extends Component<IEditorProps, any> {
         const quill = this.quillRef.getEditor()
         const range = quill.getSelection()
         const index = range ? range.index : 0
-        quill.insertEmbed(index, 'image', url, this.quill.Quill.sources.USER)
+        quill.insertEmbed(index, 'image', url, quill.Quill.sources.USER)
         quill.setSelection(index + 1)
     }
 

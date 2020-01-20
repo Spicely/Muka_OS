@@ -673,6 +673,7 @@ export default class Form extends Component<IFormProps, IState> {
                                 )}
                             </div>
                         </div>
+                        {extend}
                     </FormItem>
                 )
             }

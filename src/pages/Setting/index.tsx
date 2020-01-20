@@ -137,6 +137,26 @@ class Index extends Component<IProps, IState> {
                 placeholder: '请输入ios下载地址',
             },
             field: 'ios_url'
+        }, {
+            component: 'Editor',
+            label: <FormLabel>更新内容</FormLabel>,
+            props: {
+                placeholder: '请输入更新内容',
+                container: [
+                    [{ 'size': ['small', false, 'large', 'huge'] }],
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'header': 1 }, { 'header': 2 }],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    [{ 'script': 'sub' }, { 'script': 'super' }],
+                    [{ 'indent': '-1' }, { 'indent': '+1' }],
+                    [{ 'direction': 'rtl' }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'align': [] }],
+                    ['clean']
+                ]
+            },
+            field: 'content'
         }]
         return items
     }

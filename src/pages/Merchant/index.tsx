@@ -32,6 +32,10 @@ interface IState {
 const FormLabel = styled.div`
     width: ${getUnit(90)};
 `
+const FormExtend = styled.div`
+    margin-left: ${getUnit(98)};
+    color: red;
+`
 const dialogTheme = new DialogThemeData({
     width: 800,
     height: '80%'
@@ -285,6 +289,7 @@ class Index extends Component<IProps, IState> {
                 method: 'POST',
                 name: 'file'
             },
+            extend: <FormExtend>请上传小于1MB的图片</FormExtend>,
             field: 'business'
         }, {
             component: 'Input',
