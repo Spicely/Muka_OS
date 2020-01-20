@@ -222,6 +222,7 @@ export default class Dialog extends Component<IDialogProps, IState> {
                                     >
                                         {children}
                                     </DialogBox>
+                                    {isNull(footer) ? null : 
                                     <NavBar
                                         className="mk_divider_top"
                                         theme={theme ? theme.navBarTheme : value.theme.dialogTheme.navBarTheme}
@@ -230,7 +231,7 @@ export default class Dialog extends Component<IDialogProps, IState> {
                                         right={
                                             <div className="flex">
                                                 {
-                                                    isNull(footer) ? null : isUndefined(footer) ?
+                                                    isUndefined(footer) ?
                                                         (
                                                             <Fragment>
                                                                 <Button onClick={this.handleClose} style={{ marginRight: '10px' }}>取消</Button>
@@ -240,7 +241,7 @@ export default class Dialog extends Component<IDialogProps, IState> {
                                                 }
                                             </div>
                                         }
-                                    />
+                                    />}
                                 </DialogContent>
                             </Div>
                         )
