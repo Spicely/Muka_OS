@@ -14,12 +14,14 @@ import currency from './currency'
 import icons from './icons'
 import shopList from './shopList'
 import actionsList from './actionsList'
-import carouselList from './carouselList'
 import componentData from './componentData'
 import settingsShopUnits from './settings/shopUnits'
 import settingsShopSpecs from './settings/shopSpecs'
 import isLogin from './isLogin'
 import solo from './solo'
+import region from './region'
+import spinLoading from './spinLoading'
+import carousel from './carousel'
 import imageModalVisible from './imageModal/index'
 
 export interface IConfig {
@@ -42,11 +44,13 @@ export default combineReducers({
     icons,
     shopList,
     actionsList,
-    carouselList,
     componentData,
     settingsShopUnits,
     settingsShopSpecs,
     isLogin,
     solo,
     imageModalVisible,
+    region,
+    spinLoading,
+    carousel,
 })

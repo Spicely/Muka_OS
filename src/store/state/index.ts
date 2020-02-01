@@ -17,9 +17,39 @@ import { IComponentData } from '../reducers/componentData'
 import { ISettingsShopUnits } from '../action/settings/shopUnits'
 import { ISettingsShopSpecs } from '../action/settings/shopSpecs'
 
-export namespace MukaOS {
-    export class Region {
+export interface CarouselData {
+    status: boolean
+    img: {
+        filename: string
+        size: number
+        mimeType: string
+        height: number
+    }
+    url: string
+    region: {
+        parent: string
+        sort: number
+        status: true,
+        name: string,
+        createdAt: number
+    }
+    createdAt: number
+    updatedAt: number
+    id: string
+}
 
+export namespace MukaOS {
+    export interface Region {
+        id: string
+        name: string
+        status: boolean
+        children?: MukaOS.Region[]
+    }
+
+    export interface Carousel {
+        page: number
+        skip: number
+        data: CarouselData[]
     }
 }
 
@@ -47,4 +77,6 @@ export interface IInitState {
     solo: boolean
     imageModalVisible: boolean
     region: MukaOS.Region[]
+    spinLoading: boolean
+    carousel: MukaOS.Carousel
 }

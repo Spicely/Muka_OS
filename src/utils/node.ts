@@ -1,3 +1,4 @@
+import { getUnit } from './../components/lib/utils/index';
 import { ThemeData, getRatioUnit } from 'src/components/lib/utils'
 import styled, { css, createGlobalStyle } from 'styled-components'
 import { Label } from 'src/components'
@@ -9,7 +10,7 @@ interface IGlobalViewProps {
 export const GlobalStyle = createGlobalStyle`
     .login_int{
         background: transparent;
-        margin-top: ${() => 20 * ThemeData.ratio + ThemeData.unit};
+        margin-top: ${getUnit(20)};
 
         input {
             border-color: #fff;
@@ -24,7 +25,7 @@ export const GlobalStyle = createGlobalStyle`
 
 export const GlobalView = styled.div<IGlobalViewProps>`
     ${({ notColor }) => {
-        if (!notColor) return css`background: #fff; padding: ${20 * ThemeData.ratio + ThemeData.unit} ${30 * ThemeData.ratio + ThemeData.unit};`
+        if (!notColor) return css`background: #fff; padding: ${getUnit(20)} ${getUnit(30)};`
     }}
     min-height: 100%;
 `

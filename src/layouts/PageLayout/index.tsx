@@ -4,7 +4,7 @@ import { connect, DispatchProp } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router'
 import { Tooltip, message } from 'antd'
 import styled, { css } from 'styled-components'
-import { Icon, Input, Layout, Menu, NavBar, Image, Dialog, Form } from 'components'
+import { Icon, Input, Layout, Menu, NavBar, Image, Dialog, Form, Spin } from 'components'
 import { IInitState } from 'src/store/state'
 import { IRouter } from 'src/store/reducers/router'
 import { IUserInfo } from 'src/store/reducers/userInfo'
@@ -19,6 +19,7 @@ interface IPageLayout extends DispatchProp {
     solo: boolean
     collapsed: boolean
     isLogin: boolean
+    spinLoading: boolean
     userInfo: IUserInfo
     router: IRouter[]
     navBar?: JSX.Element
@@ -82,11 +83,11 @@ interface ILayoutNavList {
 }
 
 const LayoutNavList = styled.div<ILayoutNavList>`
-    min-width: ${() => 50 * ThemeData.ratio + ThemeData.unit};
+    min-width: ${() => getUnit(50)};
     cursor: pointer;
-    height: ${() => 50 * ThemeData.ratio + ThemeData.unit};
+    height: ${() => getUnit(50)};
     ${({ userBox }) => {
-        if (userBox) return css`width: ${160 * ThemeData.ratio + ThemeData.unit};`
+        if (userBox) return css`width: ${getUnit(160)};`
     }}
     position: relative;
     ${({ hasAfter }) => {
@@ -94,7 +95,7 @@ const LayoutNavList = styled.div<ILayoutNavList>`
             &::after {
                 content: "";
                 position: absolute;
-                width: ${() => 1 * ThemeData.ratio + ThemeData.unit};
+                width: ${() => getUnit(1)};
                 height: 100%;
                 background: ${({ theme }) => theme.dividerColor};
                 transform: scaleX(0.5);
@@ -108,7 +109,7 @@ const LayoutNavList = styled.div<ILayoutNavList>`
             &::before {
                 content: "";
                 position: absolute;
-                width: ${() => 1 * ThemeData.ratio + ThemeData.unit};
+                width: ${() => getUnit(1)};
                 height: 100%;
                 background: ${({ theme }) => theme.dividerColor};
                 transform: scaleX(0.5);
@@ -125,21 +126,30 @@ const LayoutNavList = styled.div<ILayoutNavList>`
 `
 
 const LayoutScroll = styled.div`
-    padding: ${() => 10 * ThemeData.ratio + ThemeData.unit} ${() => 25 * ThemeData.ratio + ThemeData.unit};
+    padding: ${() => getUnit(10)} ${() => getUnit(25)};
     overflow: auto;
+    position: relative;
+`
+
+const SpinLoading = styled.div`
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
 `
 
 const LayoutSolo = styled.div<ILayoutSoloProps>`
     position: absolute;
     cursor: pointer;
-    height: ${() => 30 * ThemeData.ratio + ThemeData.unit};
-    width: ${() => 20 * ThemeData.ratio + ThemeData.unit};
+    height: ${() => getUnit(30)};
+    width: ${() => getUnit(20)};
     right: 0;
-    top: ${() => 30 * ThemeData.ratio + ThemeData.unit};
+    top: ${() => getUnit(30)};
     transform: translate(0, -50%);
     background: #f5f7f9;
     ${({ show }) => {
-        if (show) return css` background: #fff;right:${-20 * ThemeData.ratio + ThemeData.unit};${transition(0.5)};`
+        if (show) return css` background: #fff;right:${getUnit(-20)};${transition(0.5)};`
     }}
 `
 class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState> {
@@ -153,7 +163,7 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
     private fn?: IFormFun
 
     public render(): JSX.Element {
-        const { children, navBar, collapsed, title, router, userInfo, solo } = this.props
+        const { children, navBar, collapsed, title, router, userInfo, solo, spinLoading } = this.props
         const { visible, selected, extendSelected } = this.state
         const items: any[] = router
         let extendRoute = []
@@ -320,6 +330,9 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                             ) : null
                         }
                         <LayoutScroll className="flex_1">
+                            <SpinLoading className="flex_center" style={{ display: spinLoading ? '' : 'none' }}>
+                                <Spin spinning={spinLoading} />
+                            </SpinLoading>
                             {children}
                         </LayoutScroll>
                         <div id="actions_view"></div>
@@ -479,12 +492,13 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
         dispatch({ type: SET_COLLAPSED, data: !collapsed })
     }
 }
-const mapStateToProps = ({ collapsed, router, userInfo, isLogin, solo }: IInitState) => ({
+const mapStateToProps = ({ collapsed, router, userInfo, isLogin, solo, spinLoading }: IInitState) => ({
     collapsed,
     router,
     userInfo,
     isLogin,
-    solo
+    solo,
+    spinLoading
 })
 export default withRouter(connect(mapStateToProps)(PageLayout)) as any
 

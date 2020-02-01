@@ -3,18 +3,18 @@ import { message, Spin } from 'antd'
 import styled from 'styled-components'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
 import { Button, Dialog, LabelHeader, Form, Tag, Table, Label, Image, Icon } from 'components'
-import http, { httpUtils, getTitle, getJurisd } from 'src/utils/axios'
+import http, { httpUtils, getTitle, getJurisd, baseUrl, imgUrl } from 'src/utils/axios'
 import { IArticle } from 'src/store/reducers/article'
 import { IJurisd } from 'src/store/reducers/jurisd'
 import { connect, DispatchProp } from 'react-redux'
-import { IInitState } from 'src/store/state'
+import { IInitState, MukaOS } from 'src/store/state'
 import moment from 'moment'
 import { IImages } from 'src/store/reducers/images'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { ITableColumns } from 'src/components/lib/Table'
 import { GlobalView, FormLable, FormRequire } from 'src/utils/node'
-import { NavBarThemeData, Color, UploadThemeData, IconThemeData } from 'src/components/lib/utils'
-import { SET_ARTICLE_DATA } from 'src/store/action'
+import { NavBarThemeData, Color, UploadThemeData, IconThemeData, getUnit } from 'src/components/lib/utils'
+import { SET_ARTICLE_DATA, GET_REGION, GET_CAROUSEL } from 'src/store/action'
 
 const uploadTheme = new UploadThemeData({
     itemWidth: 375,
@@ -26,9 +26,8 @@ const uploadTheme = new UploadThemeData({
 })
 
 interface IProps extends DispatchProp {
-    article: IArticle[]
-    jurisd: IJurisd[]
-    images: IImages[]
+    carousel: MukaOS.Carousel
+    region: MukaOS.Region[]
 }
 
 interface IState {
@@ -73,31 +72,24 @@ class Carousel extends Component<IProps, IState> {
 
     private title = getTitle('/platform/carousel')
 
-    private index: number = 0
-
     private columns: ITableColumns<any>[] = [{
-        title: '标题',
-        dataIndex: 'title',
-        key: 'title',
-        width: '4rem',
-
+        title: '图片',
+        dataIndex: 'img',
+        key: 'img',
+        render: (value) => {
+            return <Image src={imgUrl + value.filename} style={{ height: getUnit(60) }} />
+        }
     }, {
-        title: '简介',
-        dataIndex: 'synopsis',
-        key: 'synopsis',
-        width: '4rem',
-    }, {
-        title: '内容',
-        dataIndex: 'content',
-        key: 'content',
-        render: (val: string) => {
-            return <ArticleContent>{val}</ArticleContent>
+        title: '地区',
+        dataIndex: 'region',
+        key: 'region',
+        render: (value) => {
+            return <ArticleContent>{value.name}</ArticleContent>
         }
     }, {
         title: '创建时间',
         dataIndex: 'createdAt',
         key: 'createdAt',
-        width: '8rem',
         render: (time: number) => {
             return moment(time).format('YYYY-MM-DD HH:mm:ss')
         }
@@ -105,9 +97,8 @@ class Carousel extends Component<IProps, IState> {
         title: '状态',
         dataIndex: 'status',
         key: 'status',
-        width: '4rem',
         render: (status: boolean) => {
-            return <Tag color={status ? 'green' : 'red'}>{status ? '使用中' : '禁用中'}</Tag>
+            return <Tag color={status ? 'green' : 'red'}>{status ? '使用中' : '未启用'}</Tag>
         }
     }, {
         title: '操作',
@@ -115,12 +106,10 @@ class Carousel extends Component<IProps, IState> {
         key: 'actions',
         width: '8rem',
         render: (val: any, data: IArticle, index: number) => {
-            const { jurisd } = this.props
-            if (!jurisd.find((i) => i.type === 12)) return ''
             return (
                 <div>
-                    {!data.status ? <Label onClick={this.handleUpdate.bind(this, data.id, true, index)} color="green">启用</Label> : null}
-                    {data.status ? <Label onClick={this.handleUpdate.bind(this, data.id, false, index)} color="red">禁用</Label> : null}
+                    {(!data.status && getJurisd(5)) ? <Label onClick={this.handleUpdate.bind(this, data.id, false, index)} color="green">启用</Label> : null}
+                    {(data.status && getJurisd(5)) ? <Label onClick={this.handleUpdate.bind(this, data.id, false, index)} color="red">禁用</Label> : null}
                     <Label onClick={this.handleEdit.bind(this, data, index)}>修改</Label>
                 </div>
             )
@@ -128,7 +117,7 @@ class Carousel extends Component<IProps, IState> {
     }]
 
     public render(): JSX.Element {
-        const { article } = this.props
+        const { carousel } = this.props
         const { visible, dialogName, spinning } = this.state
         return (
             <GlobalView>
@@ -143,7 +132,7 @@ class Carousel extends Component<IProps, IState> {
                 <Spin tip="Loading..." spinning={spinning}>
                     <Table
                         columns={this.columns}
-                        dataSource={article}
+                        dataSource={carousel.data}
                         rowKey={(data: any) => data.id}
                     />
                 </Spin>
@@ -160,14 +149,31 @@ class Carousel extends Component<IProps, IState> {
         )
     }
 
-    private handleUploadVisible = (status: boolean) => {
-        this.setState({
-            uploadDialog: status,
-            fileList: []
-        })
+    private handleUpdate = () => {
+
     }
 
     private getItems = (fn: IFormFun) => {
+        const { region } = this.props
+        const selectOptions: { label: string, value: string }[] = []
+        region.forEach((i) => {
+            if (i.children) {
+                i.children.forEach((v) => {
+                    if (v.status) {
+                        selectOptions.push({
+                            label: v.name,
+                            value: v.id
+                        })
+                    }
+
+                })
+            } else if (i.status) {
+                selectOptions.push({
+                    label: i.name,
+                    value: i.id
+                })
+            }
+        })
         this.fn = fn
         const items: IFormItem[] = [{
             component: 'NULL',
@@ -197,6 +203,14 @@ class Carousel extends Component<IProps, IState> {
                 placeholder: '请输入跳转地址',
             },
             field: 'url'
+        }, {
+            component: 'Select',
+            label: <FormLable><FormRequire color="red">*</FormRequire>地区</FormLable>,
+            props: {
+                placeholder: '请选择地区',
+                options: selectOptions,
+            },
+            field: 'region'
         }]
         return items
     }
@@ -220,46 +234,40 @@ class Carousel extends Component<IProps, IState> {
     private async getData() {
         try {
             const { dispatch } = this.props
-            const data = await Promise.all([
-                http('article/find'),
-                http('image/find')
-            ])
-            dispatch({ type: SET_ARTICLE_DATA, data: data[0].data })
-
+            dispatch({ type: GET_CAROUSEL })
         } catch (data) {
             httpUtils.verify(data)
         }
     }
 
-    private handleUpdate = async (id: string, status: boolean, index: number) => {
-        try {
-            this.setState({
-                spinning: true
-            })
-            const { dispatch, article } = this.props
-            const userList = await http('article/update', {
-                id,
-                status,
-            })
-            article[index] = userList.data
-            dispatch({ type: SET_ARTICLE_DATA, data: article })
-            message.success(userList.msg)
-            this.setState({
-                spinning: false
-            })
-        } catch (data) {
-            httpUtils.verify(data)
-            this.setState({
-                spinning: false
-            })
-        }
-    }
+    // private handleUpdate = async (id: string, status: boolean, index: number) => {
+    //     try {
+    //         this.setState({
+    //             spinning: true
+    //         })
+    //         const { dispatch, article } = this.props
+    //         const userList = await http('article/update', {
+    //             id,
+    //             status,
+    //         })
+    //         article[index] = userList.data
+    //         dispatch({ type: SET_ARTICLE_DATA, data: article })
+    //         message.success(userList.msg)
+    //         this.setState({
+    //             spinning: false
+    //         })
+    //     } catch (data) {
+    //         httpUtils.verify(data)
+    //         this.setState({
+    //             spinning: false
+    //         })
+    //     }
+    // }
     private handleUpdateOrCreate = async () => {
         try {
             if (this.fn) {
                 const carousel = this.fn.getFieldValue()
-                console.log(carousel)
-                if (!carousel.logo) {
+                if (!carousel.img.length) {
                     message.error('请上传图片')
                     return
                 }
@@ -267,37 +275,36 @@ class Carousel extends Component<IProps, IState> {
                     message.error('请输跳转地址')
                     return
                 }
-                let url = 'article/create'
+                if (!carousel.img[0].data) {
+                    message.error('请等待图片完成上传')
+                    return
+                }
+                let url = 'carousel/create'
                 if (carousel.id) {
                     url = 'article/update'
                 }
-                const { dispatch, article } = this.props
-                const userList = await http(url, {
-                    ...carousel
+                const { dispatch } = this.props
+                const data = await http(url, {
+                    url: carousel.url,
+                    region: carousel.region,
+                    ...carousel.img[0].data.data,
                 })
-                if (carousel.id) {
-                    article[this.index] = userList.data
-                } else {
-                    article.unshift(userList.data)
-                }
-                dispatch({ type: SET_ARTICLE_DATA, data: article })
-                message.success(userList.msg)
+                dispatch({ type: SET_ARTICLE_DATA, data: data.data })
+                message.success(data.msg)
                 this.setState({
                     visible: false
                 })
                 this.fn.cleanFieldValue()
             }
         } catch (data) {
-            console.log(data)
             httpUtils.verify(data)
         }
     }
 
     private handleEdit = (data: IArticle, index: number) => {
-        this.index = index
         this.setState({
             visible: true,
-            dialogName: '修改文章'
+            dialogName: '修改轮播'
         }, () => {
             setTimeout(() => {
                 this.fn && this.fn.setFieldValue(data)
@@ -320,8 +327,9 @@ class Carousel extends Component<IProps, IState> {
 }
 
 export default connect(
-    ({ article, images }: IInitState) => ({
-        article,
-        images
+    ({ carousel, images, region }: IInitState) => ({
+        carousel,
+        images,
+        region
     })
 )(Carousel)
