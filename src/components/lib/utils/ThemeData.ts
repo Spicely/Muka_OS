@@ -21,6 +21,8 @@ import BorderRadius from './BorderRadius'
 import ToastThemeData from './ToastThemeData'
 import SelectThemeData from './SelectThemeData'
 import TreeThemeData from './TreeThemeData'
+import NoticeThemeData from './NoticeThemeData'
+import GridThemeData from './GridThemeData'
 
 export type IUnit = 'px' | 'rem'
 
@@ -53,6 +55,8 @@ interface IThemeDataProps {
     toastTheme?: ToastThemeData
     selectTheme?: SelectThemeData
     treeTheme?: TreeThemeData
+    noticeTheme?: NoticeThemeData
+    gridTheme?: GridThemeData
 }
 
 export default class ThemeData {
@@ -86,6 +90,8 @@ export default class ThemeData {
             if (data.toastTheme) this.toastTheme = data.toastTheme
             if (data.selectTheme) this.selectTheme = data.selectTheme
             if (data.treeTheme) this.treeTheme = data.treeTheme
+            if (data.noticeTheme) this.noticeTheme = data.noticeTheme
+            if (data.gridTheme) this.gridTheme = data.gridTheme
         }
     }
 
@@ -148,6 +154,10 @@ export default class ThemeData {
     public selectTheme: SelectThemeData = new SelectThemeData()
 
     public treeTheme: TreeThemeData = new TreeThemeData()
+
+    public noticeTheme: NoticeThemeData = new NoticeThemeData()
+
+    public gridTheme: GridThemeData = new GridThemeData()
 
     public unit: IUnit = 'rem'
 

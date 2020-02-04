@@ -123,6 +123,7 @@ export default class NavBar extends Component<INavBarProps, any> {
                                                 icon={item.url}
                                                 color={item.color}
                                                 onClick={this.handleClick.bind(this, item.link, item.onClick)}
+                                                theme={theme ? theme.rightIconTheme : value.theme.navBarTheme.rightIconTheme}
                                             />
                                         </NavItem>
 
@@ -158,7 +159,10 @@ export default class NavBar extends Component<INavBarProps, any> {
                                                 className={`flex_justify ${leftClassName || ''}`}
                                                 onClick={this.handleBack}
                                             >
-                                                {left ? left : <Icon icon="ios-arrow-back" />}
+                                                {left ? left : <Icon
+                                                    icon="ios-arrow-back"
+                                                    theme={theme ? theme.iconTheme : value.theme.navBarTheme.iconTheme}
+                                                />}
                                             </NavLeft>
                                         )
                                     }

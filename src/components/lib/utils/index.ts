@@ -1,6 +1,7 @@
 import ThemeData from './ThemeData'
 import { isNumber, isNil } from 'lodash'
 export { default as Border, BorderStyle } from './Border'
+export { default as BorderRadius } from './BorderRadius'
 export { default as Color } from './Color'
 export { default as Padding } from './Padding'
 export { default as ThemeData } from './ThemeData'
@@ -24,6 +25,8 @@ export { default as ItemThemeData } from './ItemThemeData'
 export { default as ToastThemeData } from './ToastThemeData'
 export { default as SelectThemeData } from './SelectThemeData'
 export { default as TreeThemeData } from './TreeThemeData'
+export { default as NoticeThemeData } from './NoticeThemeData'
+export { default as GridThemeData } from './GridThemeData'
 
 export const prefix: string = 'mk_'
 

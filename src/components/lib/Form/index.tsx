@@ -20,11 +20,6 @@ import { IItemProps } from '../Item'
 import { ColorResult } from 'react-color'
 import styled from 'styled-components'
 
-const inputThemeData = new InputThemeData({
-    border: Border.all({ width: 0 }),
-    width: '100%'
-})
-
 interface IFormUpload extends IUploadProps {
     label?: string | JSX.Element
 }
@@ -519,7 +514,7 @@ export default class Form extends Component<IFormProps, IState> {
                                 key={field}
                                 value={
                                     <Input
-                                        theme={inputThemeData}
+                                        theme={vProps.theme ? vProps.theme.inputTheme : undefined}
                                         placeholder={vProps.placeholder}
                                         type={vProps.type}
                                         value={vals[field]}
@@ -531,7 +526,7 @@ export default class Form extends Component<IFormProps, IState> {
                                 onChange={this.setRVal.bind(this, field, onChange)}
                             />
                         </div>
-                        <ItemExtend className="flex_justify">{extend}</ItemExtend>
+                        {extend && <ItemExtend className="flex_justify">{extend}</ItemExtend>}
                     </div>
                 )
             }

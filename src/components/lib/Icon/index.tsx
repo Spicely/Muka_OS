@@ -176,7 +176,7 @@ interface IsrtleProps extends IStyledProps {
 const Svg = styled.svg<IsrtleProps>`
     display: inline-block;
     color: inherit;
-    fill: ${({ iconTheme }) => iconTheme.color.toString()};
+    fill: ${({ iconTheme, fill }) => (fill || iconTheme.color).toString()};
     font-style: normal;
     line-height: 0;
     font-size:${({ iconTheme }) => getUnit(iconTheme.size)};
