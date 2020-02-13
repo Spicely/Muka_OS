@@ -24,6 +24,9 @@ export const routes: IRoutes[] = [{
     component: import('../pages/Icon'),
     path: '/system/icon'
 }, {
+    component: import('../pages/ShopList'),
+    path: '/ShopList'
+},{
     component: import('../pages/Jurisdiction'),
     path: '/system/jurisd'
 }, {

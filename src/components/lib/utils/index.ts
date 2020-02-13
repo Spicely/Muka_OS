@@ -27,6 +27,7 @@ export { default as SelectThemeData } from './SelectThemeData'
 export { default as TreeThemeData } from './TreeThemeData'
 export { default as NoticeThemeData } from './NoticeThemeData'
 export { default as GridThemeData } from './GridThemeData'
+export { default as RangePickerThemeData } from './RangePickerThemeData'
 
 export const prefix: string = 'mk_'
 

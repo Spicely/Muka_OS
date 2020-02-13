@@ -618,11 +618,11 @@ export default class Form extends Component<IFormProps, IState> {
                     <FormItem className={`flex_justify ${className || ''}`} key={field}>
                         <div className="flex">
                             {label && <FormItemLabel className="flex_justify">{label}</FormItemLabel>}
-                            <div className="flex_1 flex">
+                            <div className="flex_1 flex_justify">
                                 <View
                                     {...vProps}
                                     key={field}
-                                    className={`flex_1 ${_porps.className || ''}`}
+                                    className={_porps.className}
                                     value={vals[field] ? vals[field].map((i: string) => moment(i)) : null}
                                     onChange={this.setDatePickerVal.bind(this, field, onChange)}
                                 />

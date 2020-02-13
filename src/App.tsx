@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
+import { ConfigProvider } from 'antd'
+import zhCN from 'antd/es/locale/zh_CN'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import { ThemeProvider } from 'components'
 import PageLayout from 'src/layouts/PageLayout'
@@ -17,23 +19,25 @@ class App extends React.Component {
         return (
             <Provider store={store}>
                 <PersistGate loading={null} persistor={persistor}>
-                    <GlobalStyle />
-                    <ThemeProvider theme={theme}>
-                        <BrowserRouter>
-                            <Switch>
-                                <Route path="/login" exact component={loadable(import('./pages/Login'))} />
-                                <PageLayout>
-                                    <Switch>
-                                        {
-                                            routes.map((item: IRoutes, index: number) => {
-                                                return <Route path={item.path} exact component={loadable(item.component)} key={index} />
-                                            })
-                                        }
-                                    </Switch>
-                                </PageLayout>
-                            </Switch>
-                        </BrowserRouter>
-                    </ThemeProvider>
+                    <ConfigProvider locale={zhCN}>
+                        <GlobalStyle />
+                        <ThemeProvider theme={theme}>
+                            <BrowserRouter>
+                                <Switch>
+                                    <Route path="/login" exact component={loadable(import('./pages/Login'))} />
+                                    <PageLayout>
+                                        <Switch>
+                                            {
+                                                routes.map((item: IRoutes, index: number) => {
+                                                    return <Route path={item.path} exact component={loadable(item.component)} key={index} />
+                                                })
+                                            }
+                                        </Switch>
+                                    </PageLayout>
+                                </Switch>
+                            </BrowserRouter>
+                        </ThemeProvider>
+                    </ConfigProvider>
                 </PersistGate>
             </Provider>
         )
