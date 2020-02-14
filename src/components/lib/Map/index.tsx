@@ -124,8 +124,8 @@ export default class Map extends Component<IMapProps, IState> {
         const win: any = window
         win.aMapInit = () => {
             const map = new AMap.Map(`${prefix}map`, {
-                center: initLatLng ? [initLatLng.lat, initLatLng.lng] : [117.000923, 36.675807],
-                zoom: 16
+                center: initLatLng ? [initLatLng.lat, initLatLng.lng] : undefined,
+                zoom: 12
             })
             if (isFunction(onInit)) {
                 onInit(map)
@@ -138,9 +138,9 @@ export default class Map extends Component<IMapProps, IState> {
         const win: any = window
         let dragendEventStatus = true
         win.tMapInit = async () => {
-            const posLatLng = initLatLng ? new qq.maps.LatLng(initLatLng.lat, initLatLng.lng) : new qq.maps.LatLng(39.916527, 116.397128)
+            const posLatLng = initLatLng ? new qq.maps.LatLng(initLatLng.lat, initLatLng.lng) : undefined
             const map = new qq.maps.Map(this.node, {
-                zoom: 16,
+                zoom: 12,
                 center: posLatLng
             })
             const geocoder = new qq.maps.Geocoder()
