@@ -12,6 +12,7 @@ import { GET_REGION, SET_REGION_DATA, SET_SPINLOADING_DATA } from 'src/store/act
 import styled from 'styled-components'
 import moment from 'moment'
 import { ITableColumns } from 'src/components/lib/Table'
+import { imageModal } from 'src/utils'
 
 interface IProps extends DispatchProp {
     region: MukaOS.Region[]
@@ -209,7 +210,9 @@ class ShopList extends Component<IProps, IState> {
         return items
     }
 
-    private handleImg = () => { }
+    private handleImg = () => {
+        imageModal()
+     }
 
 
     private handleCreate = async () => {
