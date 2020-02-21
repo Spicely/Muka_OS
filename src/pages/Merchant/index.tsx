@@ -93,6 +93,10 @@ class Index extends Component<IProps, IState> {
         key: 'bond',
         dataIndex: 'bond'
     }, {
+        title: '余额',
+        key: 'balance',
+        dataIndex: 'balance'
+    },{
         title: '利息',
         key: 'interest',
         dataIndex: 'interest'
@@ -299,6 +303,13 @@ class Index extends Component<IProps, IState> {
                 placeholder: '请输入使用者密码'
             },
             field: 'password'
+        }, {
+            component: 'Input',
+            label: <FormLabel>余额</FormLabel>,
+            props: {
+                placeholder: '请输入余额'
+            },
+            field: 'balance'
         }, {
             component: 'Input',
             label: <FormLabel>真实姓名</FormLabel>,
