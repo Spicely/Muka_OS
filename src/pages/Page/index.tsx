@@ -109,6 +109,14 @@ class AdminPage extends Component<IProps, IState> {
                 onChange: this.handleTypeChange
             },
             field: 'pageType'
+        }, {
+            component: 'Input',
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>请求地址</FromLabel>,
+            props: {
+                placeholder: '请输入地址'
+            },
+            visible: pageType === 'table',
+            field: 'initUrl'
         }]
         return items
     }

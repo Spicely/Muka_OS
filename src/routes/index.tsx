@@ -44,6 +44,9 @@ export const routes: IRoutes[] = [{
 },{
     component: import('../pages/Region'),
     path: '/platform/region'
+},{
+    component: import('../pages/View'),
+    path: '/view/:id'
 },]
 
 export const loadable = (component: Promise<React.ComponentClass<any> | React.StatelessComponent<any> | { default: React.ComponentType<any> }>) => {
