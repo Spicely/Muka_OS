@@ -35,6 +35,9 @@ export const routes: IRoutes[] = [{
 }, {
     component: import('../pages/Setting'),
     path: '/system'
+},{
+    component: import('../pages/Page'),
+    path: '/page'
 }, {
     component: import('../pages/Carousel'),
     path: '/platform/carousel'
