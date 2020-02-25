@@ -1,7 +1,7 @@
 import React, { Component, Fragment, ChangeEvent } from 'react'
 import { message } from 'antd'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
-import { Button, LabelHeader, Form, Input, Select } from 'components'
+import { Button, LabelHeader, Form, Input, Select, Icon } from 'components'
 import http, { getTitle, getJurisd } from '../../utils/axios'
 import { connect, DispatchProp } from 'react-redux'
 import { IFormItem, IFormFun } from 'src/components/lib/Form'
@@ -18,7 +18,7 @@ interface IProps extends DispatchProp {
 export type IPageType = 'table'
 
 interface IField {
-    type: string
+    type: string | number
     field: string
 }
 
@@ -33,9 +33,26 @@ const FromLabel = styled.div`
     text-align-last: right;
 `
 
+const iconTheme = new IconThemeData({
+    size: 16
+})
+
 const FieldBox = styled.div`
     padding: ${getUnit(5)};
     border: ${getUnit(1)} solid rgb(232,232,232);
+    position: relative;
+`
+const FiledClose = styled(Icon)`
+    position: absolute;
+    right: ${getUnit(10)};
+    background: rgba(0,0,0,0.2);
+    border-radius: 50%;
+    right: ${getUnit(-4)};
+    top: ${getUnit(-4)};
+    cursor: pointer;
+    :hover {
+        background: rgba(0, 0, 0, 0.4);
+    }
 `
 
 const FieldLabel = styled.div`
@@ -147,16 +164,18 @@ class AdminPage extends Component<IProps, IState> {
                                         className="flex_1"
                                         value={i.field}
                                         placeholder="请输入表单字段"
-                                        onChange={this.handleFileChange.bind(this, index)}
+                                        onChange={this.handleFileldChange.bind(this, index)}
                                     />
                                 </div>
-                                <div className="flex" style={{marginTop: getUnit(5)}}>
+                                <div className="flex" style={{ marginTop: getUnit(5) }}>
                                     <FieldLabel className="flex_center">显示类型</FieldLabel>
                                     <Select
                                         className="flex_1"
                                         options={[{ label: '文本', value: 'text' }]}
+                                        onChange={this.handelFileldSelectChange.bind(this, index)}
                                     />
                                 </div>
+                                <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFileldClose.bind(this, index)}/>
                             </FieldBox>
                         ))
                     }
@@ -181,24 +200,44 @@ class AdminPage extends Component<IProps, IState> {
         })
     }
 
-    private handleFileChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
+    private handelFileldSelectChange = (index: number, val: string | number) => {
         if (this.fn) {
-            const { tableFields } = this.state
-            tableFields[index].field = e.target.value
+            const { tableParams } = this.fn.getFieldValue()
+            tableParams[index].type = val
             this.fn.setFieldValue({
-                tableParams: [...tableFields]
+                tableParams: [...tableParams]
+            })
+        }
+    }
+
+    private handleFileldClose = (index: number) => {
+        if (this.fn) {
+            const { tableParams } = this.fn.getFieldValue()
+            tableParams.splice(index, 1)
+            this.fn.setFieldValue({
+                tableParams: [...tableParams]
+            })
+        }
+    }
+
+    private handleFileldChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
+        if (this.fn) {
+            const { tableParams } = this.fn.getFieldValue()
+            tableParams[index].field = e.target.value
+            this.fn.setFieldValue({
+                tableParams: [...tableParams]
             })
         }
     }
 
     private handleAddField = () => {
         if (this.fn) {
-            const { tableFields } = this.state
-            tableFields.push({
+            const { tableParams } = this.fn.getFieldValue()
+            tableParams.push({
                 field: '',
                 type: ''
             })
-            this.fn.updateFieldProps({ tableParams: [...tableFields] })
+            this.fn.updateFieldProps({ tableParams: [...tableParams] })
         }
     }
 
