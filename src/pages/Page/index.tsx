@@ -1,9 +1,8 @@
-import React, { Component, Fragment } from 'react'
-import { difference } from 'lodash'
+import React, { Component, Fragment, ChangeEvent } from 'react'
 import { message } from 'antd'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
-import { Button, Dialog, LabelHeader, Form, Icon, Tree, Spin } from 'components'
-import http, { httpUtils, getTitle, getJurisd } from '../../utils/axios'
+import { Button, LabelHeader, Form, Input, Select } from 'components'
+import http, { getTitle, getJurisd } from '../../utils/axios'
 import { connect, DispatchProp } from 'react-redux'
 import { IFormItem, IFormFun } from 'src/components/lib/Form'
 import { GlobalView } from 'src/utils/node'
@@ -16,10 +15,16 @@ interface IProps extends DispatchProp {
     region: MukaOS.Region[]
 }
 
-type IPageType = 'table'
+export type IPageType = 'table'
+
+interface IField {
+    type: string
+    field: string
+}
 
 interface IState {
     pageType: IPageType
+    tableFields: IField[]
 }
 
 const FromLabel = styled.div`
@@ -28,14 +33,22 @@ const FromLabel = styled.div`
     text-align-last: right;
 `
 
-const treeIconTheme = new IconThemeData({
-    size: 16
-})
+const FieldBox = styled.div`
+    padding: ${getUnit(5)};
+    border: ${getUnit(1)} solid rgb(232,232,232);
+`
+
+const FieldLabel = styled.div`
+    border: ${getUnit(1)} solid rgb(232,232,232);
+    width: ${getUnit(80)};
+    border-right: 0;
+`
 
 class AdminPage extends Component<IProps, IState> {
 
     public state: IState = {
-        pageType: 'table'
+        pageType: 'table',
+        tableFields: []
     }
 
     private fn: IFormFun | null = null
@@ -71,7 +84,7 @@ class AdminPage extends Component<IProps, IState> {
     }
 
     private getItems = (fn: IFormFun) => {
-        const { pageType } = this.state
+        const { pageType, tableFields } = this.state
         this.fn = fn
         const items: IFormItem[] = [{
             component: 'NULL',
@@ -117,6 +130,47 @@ class AdminPage extends Component<IProps, IState> {
             },
             visible: pageType === 'table',
             field: 'initUrl'
+        }, {
+            component: 'Label',
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>表单数据</FromLabel>,
+            props: {
+                value: tableFields,
+            },
+            render: (val: IField[]) => (
+                <div style={{ marginTop: val.length ? getUnit(8) : 0 }}>
+                    {
+                        val.map((i, index: number) => (
+                            <FieldBox key={index} style={{ marginBottom: getUnit(10) }}>
+                                <div className="flex">
+                                    <FieldLabel className="flex_center">字段名</FieldLabel>
+                                    <Input
+                                        className="flex_1"
+                                        value={i.field}
+                                        placeholder="请输入表单字段"
+                                        onChange={this.handleFileChange.bind(this, index)}
+                                    />
+                                </div>
+                                <div className="flex" style={{marginTop: getUnit(5)}}>
+                                    <FieldLabel className="flex_center">显示类型</FieldLabel>
+                                    <Select
+                                        className="flex_1"
+                                        options={[{ label: '文本', value: 'text' }]}
+                                    />
+                                </div>
+                            </FieldBox>
+                        ))
+                    }
+                    <Button
+                        mold="primary"
+                        style={{ width: getUnit(160) }}
+                        onClick={this.handleAddField}
+                    >
+                        添加字段
+                    </Button>
+                </div>
+            ),
+            visible: pageType === 'table',
+            field: 'tableParams'
         }]
         return items
     }
@@ -125,6 +179,27 @@ class AdminPage extends Component<IProps, IState> {
         this.setState({
             pageType: val
         })
+    }
+
+    private handleFileChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
+        if (this.fn) {
+            const { tableFields } = this.state
+            tableFields[index].field = e.target.value
+            this.fn.setFieldValue({
+                tableParams: [...tableFields]
+            })
+        }
+    }
+
+    private handleAddField = () => {
+        if (this.fn) {
+            const { tableFields } = this.state
+            tableFields.push({
+                field: '',
+                type: ''
+            })
+            this.fn.updateFieldProps({ tableParams: [...tableFields] })
+        }
     }
 
     private handleAddPage = async () => {

@@ -748,7 +748,7 @@ export default class Form extends Component<IFormProps, IState> {
                                         </View>
                                     )
                                 }
-
+                                {extend}
                             </div>
                         </div>
                         {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}

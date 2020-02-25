@@ -14,6 +14,7 @@ import { GlobalView, FormLable, FormRequire } from 'src/utils/node'
 import { NavBarThemeData, Color, UploadThemeData, IconThemeData, getUnit } from 'src/components/lib/utils'
 import { SET_ARTICLE_DATA, GET_CAROUSEL, SET_SPINLOADING_DATA } from 'src/store/action'
 import { RouteComponentProps } from 'react-router-dom'
+import { IPageType } from '../Page'
 
 const uploadTheme = new UploadThemeData({
     itemWidth: 375,
@@ -32,6 +33,8 @@ interface IProps extends DispatchProp {
 interface IState {
     title: string
     titleBar: boolean
+    pageType?: IPageType
+    pageData: any[]
 }
 
 const ArticleContent = styled.div`
@@ -52,12 +55,13 @@ const ArticleForm = styled(Form)`
 class View extends Component<IProps & RouteComponentProps<{ id: string }>, IState> {
     public state: IState = {
         title: '',
-        titleBar: false
+        titleBar: false,
+        pageType: undefined,
+        pageData: []
     }
 
     public render(): JSX.Element {
-        const { carousel } = this.props
-        const { title, titleBar } = this.state
+        const { title, titleBar, pageType } = this.state
         return (
             <GlobalView>
                 {
@@ -69,12 +73,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                         />
                     )
                 }
-
-                {/* <Table
-                        columns={this.columns}
-                        dataSource={carousel.data}
-                        rowKey={(data: any) => data.id}
-                    /> */}
+                {this.getPageTypeNode(pageType)}
             </GlobalView>
         )
     }
@@ -87,15 +86,41 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         const { dispatch, match } = this.props
         try {
             dispatch({ type: SET_SPINLOADING_DATA, data: true })
-            const data = await http('adminPage/findOne', { id: match.params.id })
+            const { data } = await http('adminPage/findOne', { id: match.params.id })
+            if (data.initUrl) {
+                await this.getTableUrlData(data.initUrl)
+            }
             this.setState({
-                ...data.data
+                ...data
             })
-            document.title = data.data.title
+            document.title = data.title
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
         } catch (e) {
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
             message.error(e.msg || '网络不稳定,请稍后再试')
+        }
+    }
+
+    private getTableUrlData = async (url: string) => {
+        try {
+            const { data } = await http(url)
+            console.log(data)
+        } catch (e) {
+            message.error(e.msg || '网络不稳定,请稍后再试')
+        }
+    }
+
+    private getPageTypeNode = (pageType?: IPageType) => {
+        const { pageData } = this.state
+        switch (pageType) {
+            case 'table': return (
+                <Table
+                    columns={[]}
+                    dataSource={pageData}
+                    rowKey={(data: any) => data.id}
+                />
+            )
+            default: return null;
         }
     }
 }
