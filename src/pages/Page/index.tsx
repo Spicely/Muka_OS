@@ -3,7 +3,7 @@ import { message } from 'antd'
 import styled from 'styled-components'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
 import { Button, LabelHeader, Form, Input, Select, Icon, Divider } from 'components'
-import http, { getTitle, getJurisd } from '../../utils/axios'
+import http, { getTitle, getJurisd, httpUtils } from '../../utils/axios'
 import { connect, DispatchProp } from 'react-redux'
 import { IFormItem, IFormFun } from 'src/components/lib/Form'
 import { GlobalView } from 'src/utils/node'
@@ -17,7 +17,7 @@ interface IProps extends DispatchProp {
 
 export type IPageType = 'table'
 
-export type IFieldActionType = 'edit' | 'del'
+export type IFieldActionType = 'edit' | 'status'
 
 interface IFieldActions {
     label: string
@@ -30,6 +30,13 @@ export interface IFieldParams {
     label: string
     field: string
     actions: IFieldActions[]
+}
+
+export interface IFieldTableEdits {
+    type: string
+    label: string
+    field: string
+    require: boolean
 }
 
 interface IState {
@@ -104,6 +111,17 @@ class AdminPage extends Component<IProps, IState> {
         value: 'del',
     }]
 
+    private tableFieldTypes = [{
+        label: '文本框',
+        value: 'Input'
+    }, {
+        label: '选项',
+        value: 'Select'
+    }, {
+        label: '图片',
+        value: 'image'
+    }]
+
     public componentDidMount() {
         // this.getData()
     }
@@ -114,7 +132,6 @@ class AdminPage extends Component<IProps, IState> {
     }
 
     public render(): JSX.Element {
-
         return (
             <GlobalView>
                 <LayoutNavBar
@@ -183,7 +200,7 @@ class AdminPage extends Component<IProps, IState> {
             component: 'Label',
             label: <FromLabel><span style={{ color: 'red' }}>*</span>表单数据</FromLabel>,
             props: {
-                value: tableFields,
+                value: [],
             },
             render: (val: IFieldParams[]) => (
                 <div style={{ marginTop: val.length ? getUnit(8) : 0 }}>
@@ -292,9 +309,9 @@ class AdminPage extends Component<IProps, IState> {
             component: 'Label',
             label: <FromLabel><span style={{ color: 'red' }}>*</span>编辑列表</FromLabel>,
             props: {
-                value: tableFields,
+                value: [],
             },
-            render: (val: IFieldParams[]) => (
+            render: (val: IFieldTableEdits[]) => (
                 <div style={{ marginTop: val.length ? getUnit(8) : 0 }}>
                     {
                         val.map((i, index: number) => (
@@ -304,17 +321,17 @@ class AdminPage extends Component<IProps, IState> {
                                     <Input
                                         className="flex_1"
                                         value={i.field}
-                                        placeholder="请输入表单字段"
-                                        onChange={this.handleFileldChange.bind(this, index)}
+                                        placeholder="请输入列表字段名"
+                                        onChange={this.handleFileldTableFieldChange.bind(this, index)}
                                     />
                                 </div>
                                 <div className="flex" style={{ marginTop: getUnit(5) }}>
-                                    <FieldLabel className="flex_center">文本内容</FieldLabel>
+                                    <FieldLabel className="flex_center">列表文字</FieldLabel>
                                     <Input
                                         className="flex_1"
                                         value={i.label}
-                                        placeholder="请输入表单文本"
-                                        onChange={this.handleFileldLabelChange.bind(this, index)}
+                                        placeholder="请输入列表文字"
+                                        onChange={this.handleFileldTableLabelChange.bind(this, index)}
                                     />
                                 </div>
                                 <div className="flex" style={{ marginTop: getUnit(5) }}>
@@ -322,66 +339,11 @@ class AdminPage extends Component<IProps, IState> {
                                     <Select
                                         className="flex_1"
                                         value={i.type}
-                                        options={this.tableFileOptions}
-                                        onChange={this.handelFileldSelectChange.bind(this, index)}
+                                        options={this.tableFieldTypes}
+                                        onChange={this.handelFileldTableSelectChange.bind(this, index)}
                                     />
                                 </div>
                                 <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFileldClose.bind(this, index)} />
-                                {i.actions.length ? (
-                                    <Divider
-                                        borderType="dashed"
-                                        type="horizontal"
-                                        style={{
-                                            borderWidth: getUnit(2),
-                                            marginTop: getUnit(10),
-                                        }}
-                                    />
-                                ) : null}
-                                {
-                                    i.actions.map((v, k) => {
-                                        return (
-                                            <FieldBox key={k} style={{ marginTop: getUnit(10) }}>
-                                                <div className="flex">
-                                                    <FieldLabel className="flex_center">功能名</FieldLabel>
-                                                    <Input
-                                                        className="flex_1"
-                                                        value={v.label}
-                                                        placeholder="请输入功能名称"
-                                                        onChange={this.handleActionLabelChange.bind(this, index, k)}
-                                                    />
-                                                </div>
-                                                <div className="flex" style={{ marginTop: getUnit(5) }}>
-                                                    <FieldLabel className="flex_center">请求地址</FieldLabel>
-                                                    <Input
-                                                        className="flex_1"
-                                                        value={v.url}
-                                                        placeholder="请输入请求地址"
-                                                        onChange={this.handleActionUrlChange.bind(this, index, k)}
-                                                    />
-                                                </div>
-                                                <div className="flex" style={{ marginTop: getUnit(5) }}>
-                                                    <FieldLabel className="flex_center">功能类型</FieldLabel>
-                                                    <Select
-                                                        className="flex_1"
-                                                        value={v.type}
-                                                        options={this.tableActionOptions}
-                                                        onChange={this.handelActionSelectChange.bind(this, index, k)}
-                                                    />
-                                                </div>
-                                                <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleActionClose.bind(this, index, k)} />
-                                            </FieldBox>
-                                        )
-                                    })
-                                }
-                                {i.type === 'actions' && (
-                                    <Button
-                                        mold="primary"
-                                        style={{ width: getUnit(160), marginTop: getUnit(10) }}
-                                        onClick={this.handleAddAction.bind(this, index)}
-                                    >
-                                        添加功能
-                                    </Button>
-                                )}
                             </FieldBox>
 
                         ))
@@ -389,13 +351,13 @@ class AdminPage extends Component<IProps, IState> {
                     <Button
                         mold="primary"
                         style={{ width: getUnit(160) }}
-                        onClick={this.handleAddField}
+                        onClick={this.handleAddForm}
                     >
-                        添加字段
+                        添加编辑列表
                     </Button>
                 </div>
             ),
-            visible: pageType === 'table',
+            visible: false,
             field: 'tableEdits'
         },]
         return items
@@ -431,8 +393,27 @@ class AdminPage extends Component<IProps, IState> {
         if (this.fn) {
             const { tableParams } = this.fn.getFieldValue()
             tableParams[index].actions[k].type = val
+            const status = tableParams.some((i: any) => {
+                if (!i.actions.length) return false
+                return i.actions.some((v: any) => v.type === 'edit')
+            })
+            if (status) {
+                this.fn.showFieldElement(['tableEdits'])
+            } else {
+                this.fn.hideFieldElement(['tableEdits'])
+            }
             this.fn.setFieldValue({
                 tableParams: [...tableParams]
+            })
+        }
+    }
+
+    private handelFileldTableSelectChange = (index: number, val: string | number) => {
+        if (this.fn) {
+            const { tableEdits } = this.fn.getFieldValue()
+            tableEdits[index].type = val
+            this.fn.setFieldValue({
+                tableEdits: [...tableEdits]
             })
         }
     }
@@ -476,6 +457,26 @@ class AdminPage extends Component<IProps, IState> {
         }
     }
 
+    private handleFileldTableLabelChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
+        if (this.fn) {
+            const { tableEdits } = this.fn.getFieldValue()
+            tableEdits[index].label = e.target.value
+            this.fn.setFieldValue({
+                tableEdits: [...tableEdits]
+            })
+        }
+    }
+
+    private handleFileldTableFieldChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
+        if (this.fn) {
+            const { tableEdits } = this.fn.getFieldValue()
+            tableEdits[index].field = e.target.value
+            this.fn.setFieldValue({
+                tableEdits: [...tableEdits]
+            })
+        }
+    }
+
     private handleFileldLabelChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
         if (this.fn) {
             const { tableParams } = this.fn.getFieldValue()
@@ -493,6 +494,18 @@ class AdminPage extends Component<IProps, IState> {
             this.fn.setFieldValue({
                 tableParams: [...tableParams]
             })
+        }
+    }
+
+    private handleAddForm = () => {
+        if (this.fn) {
+            const { tableEdits } = this.fn.getFieldValue()
+            tableEdits.push({
+                field: '',
+                type: '',
+                label: ''
+            })
+            this.fn.updateFieldProps({ tableEdits: [...tableEdits] })
         }
     }
 
@@ -531,7 +544,7 @@ class AdminPage extends Component<IProps, IState> {
             }
         } catch (e) {
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
-            message.error(e.msg || '网络不稳定,请稍后再试')
+            httpUtils.verify(e)
         }
     }
 }

@@ -309,7 +309,6 @@ export default class Upload extends Component<IUploadProps, IState> {
         if (value) {
             let status: boolean = false
             this.filesList = [...value]
-            console.log(value, files)
             if (value.length && value.length === files.length) {
                 status = value.every((i, index: number) => {
                     if (!files[index]) {
@@ -319,8 +318,6 @@ export default class Upload extends Component<IUploadProps, IState> {
                 })
             }
             if (!status) {
-                console.log(value)
-                console.log(2222222)
                 this.setState({
                     files: value
                 })

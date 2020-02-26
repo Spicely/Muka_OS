@@ -1,6 +1,7 @@
 import React, { Component, ComponentProps, Fragment } from 'react'
-import { message, Modal } from 'antd'
+import { Modal } from 'antd'
 import styled from 'styled-components'
+import { isBoolean } from 'lodash'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
 import { Button, Dialog, LabelHeader, Form, Tag, Table, Label, Image, Icon } from 'components'
 import http, { httpUtils, getTitle, getJurisd, imgUrl, baseUrl } from 'src/utils/axios'
@@ -14,7 +15,13 @@ import { GlobalView, FormLable, FormRequire } from 'src/utils/node'
 import { NavBarThemeData, Color, UploadThemeData, IconThemeData, getUnit } from 'src/components/lib/utils'
 import { SET_ARTICLE_DATA, GET_CAROUSEL, SET_SPINLOADING_DATA } from 'src/store/action'
 import { RouteComponentProps } from 'react-router-dom'
-import { IPageType, IFieldParams } from '../Page'
+import { IPageType, IFieldParams, IFieldTableEdits } from '../Page'
+
+const FromLabel = styled.div`
+    width: ${getUnit(60)};
+    text-align: justify;
+    text-align-last: right;
+`
 
 const uploadTheme = new UploadThemeData({
     itemWidth: 375,
@@ -36,6 +43,7 @@ interface IState {
     pageType?: IPageType
     pageData: ITabelRes
     tableParams: IFieldParams[]
+    tableEdits: IFieldTableEdits[]
     editDialogTitle: string
     editVisible: boolean
     imageVisible: boolean
@@ -57,6 +65,11 @@ const iconTheme = new IconThemeData({
 })
 
 class View extends Component<IProps & RouteComponentProps<{ id: string }>, IState> {
+
+    private fn?: IFormFun
+
+    private actionUrl: string = ''
+
     public state: IState = {
         title: '',
         titleBar: false,
@@ -67,6 +80,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             skip: 10
         },
         tableParams: [],
+        tableEdits: [],
         editVisible: false,
         imageVisible: false,
         imageUrl: '',
@@ -104,8 +118,9 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     title={editDialogTitle}
                     visible={editVisible}
                     onClose={this.handleDialogClose}
+                    onOk={this.handleDialogOk}
                 >
-
+                    <Form getItems={this.getItems} />
                 </Dialog>
             </GlobalView>
         )
@@ -113,6 +128,50 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
 
     public componentDidMount() {
         this.getData()
+    }
+
+    private handleDialogOk = () => {
+        console.log(this.actionUrl)
+    }
+
+    private getItems = (fn: IFormFun) => {
+        const { tableEdits } = this.state
+        this.fn = fn
+        const items: IFormItem[] = [{
+            component: 'NULL',
+            field: 'id'
+        }]
+        tableEdits.forEach((i: any) => {
+            switch (i.type) {
+                case 'img': items.push({
+                    component: 'Upload',
+                    props: {
+                        maxLength: 1,
+                        crop: true,
+                        cropProps: {
+                            cropSize: {
+                                width: 620,
+                                height: 310,
+                            }
+                        },
+                        action: 'https://robin-animate.oss-cn-chengdu.aliyuncs.com',
+                        theme: uploadTheme,
+                        name: 'file',
+                        onBeforeUpload: this.handleBeforeUpload,
+                        baseUrl: imgUrl
+                    },
+                    field: i.field,
+                    label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
+                }); break;
+                default: items.push({
+                    component: i.type,
+                    field: i.field,
+                    label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
+                })
+            }
+
+        })
+        return items
     }
 
     private getData = async () => {
@@ -130,7 +189,19 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
         } catch (e) {
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
-            message.error(e.msg || '网络不稳定,请稍后再试')
+            httpUtils.verify(e)
+        }
+    }
+
+    private handleBeforeUpload = async (file: File) => {
+        try {
+            const data = await http('ossSign')
+            return {
+                ...data.data,
+                key: `${data.data.key}.${file.name.split('.')[1]}`,
+            }
+        } catch (e) {
+            httpUtils.verify(e)
         }
     }
 
@@ -141,7 +212,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                 pageData: data
             })
         } catch (e) {
-            message.error(e.msg || '网络不稳定,请稍后再试')
+            httpUtils.verify(e)
         }
     }
 
@@ -175,22 +246,37 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                 }
                             }
                         }
+                        case 'status': {
+                            return {
+                                title: i.label,
+                                dataIndex: i.field,
+                                key: i.field,
+                                render: (status: boolean | number) => {
+                                    if (isBoolean(status)) {
+                                        return <Tag color={status ? 'green' : 'red'}>{status ? '使用中' : '未启用'}</Tag>
+                                    } else {
+                                        return '111'
+                                    }
+                                }
+                            }
+                        }
                         case 'actions': {
                             return {
                                 title: i.label,
                                 dataIndex: i.field,
                                 key: i.field,
-                                render: () => {
+                                render: (val: any, data: any) => {
                                     if (i.actions) {
                                         return (
                                             <Fragment>
                                                 {
                                                     i.actions.map((i, index: number) => {
                                                         switch (i.type) {
-                                                            case 'del': return (
+                                                            case 'status': return (
                                                                 <Label
+                                                                    color="green"
                                                                     key={index}
-                                                                    onClick={this.handleInUrl.bind(this, i.url)}
+                                                                    onClick={this.handleInUrl.bind(this, i.url, { id: data.id })}
                                                                 >
                                                                     {i.label}
                                                                 </Label>
@@ -198,7 +284,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                                             default: return (
                                                                 <Label
                                                                     key={index}
-                                                                    onClick={this.handleEdit.bind(this)}
+                                                                    onClick={this.handleEdit.bind(this, i.url, data)}
                                                                 >
                                                                     {i.label}
                                                                 </Label>
@@ -239,10 +325,15 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         })
     }
 
-    private handleEdit = () => {
+    private handleEdit = (url: string, data: any) => {
+        this.actionUrl = url
         this.setState({
             editDialogTitle: '修改',
             editVisible: true
+        }, () => {
+            setTimeout(() => {
+                this.fn && this.fn.setFieldValue(data)
+            }, 10)
         })
     }
 
@@ -252,7 +343,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         })
     }
 
-    private handleInUrl = async (url: string) => {
+    private handleInUrl = async (url: string, params: any) => {
         const { dispatch } = this.props
         const { pageData } = this.state
         try {
@@ -264,7 +355,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
         } catch (e) {
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
-            message.error(e.msg || '网络不稳定,请稍后再试')
+            httpUtils.verify(e)
         }
     }
 

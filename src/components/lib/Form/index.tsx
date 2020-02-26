@@ -1,6 +1,7 @@
 import React, { Component, ChangeEvent, CSSProperties } from 'react'
 import Loadable from 'react-loadable'
 import moment from 'moment'
+import { get } from 'lodash'
 import { omit, isFunction, isUndefined, hash, isBool, isNil, isArray, isString } from 'muka'
 import { getClassName, getRatioUnit, InputThemeData, Border, getUnit } from '../utils'
 import { IButtonProps } from '../Button'
@@ -19,6 +20,7 @@ import { IEditorProps } from '../Editor'
 import { IItemProps } from '../Item'
 import { ColorResult } from 'react-color'
 import styled from 'styled-components'
+import { format } from 'util'
 
 interface IFormUpload extends IUploadProps {
     label?: string | JSX.Element
@@ -933,7 +935,7 @@ export default class Form extends Component<IFormProps, IState> {
         const { vals } = this.state
         this.items.forEach((item: IFormItem, index: number) => {
             const field = item.field || `${item.component}_${index}`
-            if (!isNil(params[field])) {
+            if (!isNil(params[field] || get(params, field))) {
                 switch (item.component) {
                     case 'Upload': {
                         const _props: any = item.props || {}
@@ -943,11 +945,11 @@ export default class Form extends Component<IFormProps, IState> {
                                 uid: '-1',
                                 name: 'xxx.png',
                                 status: 'done',
-                                url: baseUrl + params[field],
+                                url: baseUrl + (params[field] || get(params, field)),
                             }]
                         } else {
                             // tslint:disable-next-line: no-shadowed-variable
-                            vals[field] = params[field].map((i: string, index: number) => {
+                            vals[field] = (params[field] || get(params, field)).map((i: string, index: number) => {
                                 return {
                                     uid: `${index}`,
                                     name: `reload_${index}.png`,
@@ -959,7 +961,7 @@ export default class Form extends Component<IFormProps, IState> {
                         // tslint:disable-next-line: align
                     } break
                     default: {
-                        vals[field] = params[field]
+                        vals[field] = params[field] || get(params, field)
                     }
                 }
             }
