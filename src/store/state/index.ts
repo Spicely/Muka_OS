@@ -38,6 +38,7 @@ export interface CarouselData {
     id: string
 }
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace MukaOS {
     export interface Region {
         id: string
@@ -51,6 +52,12 @@ export namespace MukaOS {
         skip: number
         data: CarouselData[]
     }
+}
+
+export interface ITabelRes<T = any> {
+    page: number
+    skip: number
+    data: T[]
 }
 
 export interface IInitState {
