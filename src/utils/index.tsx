@@ -2,15 +2,25 @@ import React, { PureComponent } from 'react'
 import { render } from 'react-dom'
 import { connect, Provider } from 'react-redux'
 import styled from 'styled-components'
-import { ThemeProvider, Upload, Dialog, TabBar } from 'components'
+import { ThemeProvider, Upload, Dialog, TabBar, MobileLayout, Image } from 'components'
 import { IActionsProps } from '../saga'
 import { IInitState } from 'src/store/state'
 import { IImages } from 'src/store/reducers/images'
 import { IDialogProps } from 'src/components/lib/Dialog'
 import { store } from 'src/store'
-import { SET_IMAGE_MODAL_VISIBLE } from 'src/store/action'
-import { DialogThemeData, TabBarThemeData, getRatioUnit } from 'src/components/lib/utils'
+import { SET_IMAGE_MODAL_VISIBLE, SET_IMAGES_DATA } from 'src/store/action'
+import { DialogThemeData, TabBarThemeData, getRatioUnit, getUnit } from 'src/components/lib/utils'
 import { IUploadFileListProps } from 'src/components/lib/Upload/dragger'
+import { theme } from 'src/App'
+import http, { httpUtils, imgUrl } from './axios'
+
+const ImageBox = styled.div`
+    height: ${getUnit(200)};
+    width:${getUnit(200)};
+    background: #dedede;
+    overflow: hidden;
+    display: inline-block;
+`
 
 export interface IConnectProps {
     dispatch: (actions: IActionsProps) => void
@@ -21,11 +31,13 @@ interface IImageModalProps {
 }
 
 interface IProps extends IDialogProps {
-    images: IImages[]
+    images: IImages
     imageModalVisible: boolean
 }
 
 class ImageModal extends PureComponent<IProps & IImageModalProps> {
+
+    private type: 'private' | 'public' = 'public'
 
     public render(): JSX.Element {
         const { images, imageModalVisible } = this.props
@@ -41,20 +53,59 @@ class ImageModal extends PureComponent<IProps & IImageModalProps> {
                     height: '80%'
                 })}
             >
-                <TabBar theme={new TabBarThemeData({ height: '100%' })}>
+                <TabBar
+                    theme={new TabBarThemeData({ height: '100%' })}
+                    onChange={this.handleTabChange}
+                >
                     <TabBar.Item title="共享库">
                         <div style={{ color: 'red' }}>sss</div>
                     </TabBar.Item>
                     <TabBar.Item title="私人图库">
-                        <div style={{ color: 'red' }}>sss</div>
+                        <MobileLayout>
+                            {
+                                images.private.map((i, index: number) => {
+                                    return (
+                                        <ImageBox key={index} >
+                                            <div className="flex_center" style={{ height: '100%' }}>
+                                                <Image src={imgUrl + i.filename} style={{ width: '100%' }} />
+                                            </div>
+                                        </ImageBox>
+                                    )
+                                })
+                            }
+                        </MobileLayout>
                     </TabBar.Item>
                 </TabBar>
             </Dialog>
         )
     }
 
-    private handleFirstLoading = () => {
-        console.log(11)
+    private handleFirstLoading = async () => {
+        try {
+            const { images } = this.props
+            const { data } = await http('image/find', {
+                type: this.type,
+                number: 20,
+                time: images[this.type].length ? images[this.type][0]['createdAt'] : Date.now(),
+                query: images[this.type].length ? '$gt' : '$lte'
+            })
+            images[this.type] = data.concat(images[this.type])
+            store.dispatch({ type: SET_IMAGES_DATA, data: { ...images } })
+        } catch (e) {
+            httpUtils.verify(e)
+        }
+    }
+
+    private handleTabChange = (field: number | string) => {
+        if (field === 0) {
+            this.type = 'public'
+        } else {
+            this.type = 'private'
+        }
+        const { images } = this.props
+        if (!images[this.type].length) {
+            this.handleFirstLoading()
+        }
     }
 
     private handleClose = () => {
@@ -78,7 +129,7 @@ export const imageModal = (options?: IImageModalProps) => {
     const data = store.getState()
     console.log(data)
     store.dispatch({ type: SET_IMAGE_MODAL_VISIBLE, data: true })
-    render(<Provider store={store}><ThemeProvider><ConnectImageModal /></ThemeProvider></Provider>, dom)
+    render(<Provider store={store}><ThemeProvider theme={theme}><ConnectImageModal /></ThemeProvider></Provider>, dom)
 }
 
 const UploadBox = styled.div`

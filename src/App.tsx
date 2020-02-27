@@ -11,7 +11,7 @@ import { GlobalStyle } from './utils/node'
 import { routes, IRoutes, loadable } from './routes'
 import { ThemeData, Color } from './components/lib/utils'
 
-const theme = new ThemeData({
+export const theme = new ThemeData({
     primarySwatch: Color.fromRGB(102, 204, 191)
 })
 class App extends React.Component {

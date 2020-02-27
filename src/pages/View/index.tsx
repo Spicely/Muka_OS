@@ -15,12 +15,39 @@ import { GlobalView, FormLable, FormRequire } from 'src/utils/node'
 import { NavBarThemeData, Color, UploadThemeData, IconThemeData, getUnit } from 'src/components/lib/utils'
 import { SET_ARTICLE_DATA, GET_CAROUSEL, SET_SPINLOADING_DATA } from 'src/store/action'
 import { RouteComponentProps } from 'react-router-dom'
-import { IPageType, IFieldParams, IFieldTableEdits } from '../Page'
+import { IPageType, IFieldParams, IFieldTableEdits, IBarActions } from '../Page'
+import { imageModal } from 'src/utils'
 
 const FromLabel = styled.div`
     width: ${getUnit(60)};
     text-align: justify;
     text-align-last: right;
+`
+
+const ActionButton = styled(Button)`
+    margin-right: ${getUnit(5)};
+    :last-child {
+        margin-right: 0;
+    }
+`
+
+const UoloadIcon = styled(Icon)``
+
+const UploadBox = styled.div`
+    height: ${getUnit(200)};
+    width: ${getUnit(375)};
+    border: ${getUnit(1)} dashed rgb(217,217,217);
+    border-radius: 0;
+    cursor: pointer;
+    vertical-align: middle;
+    position: relative;
+    transition: all 0.3s;
+    :hover {
+        border-color: ${({ theme }) => theme.primarySwatch};
+        ${UoloadIcon} {
+            fill:  ${({ theme }) => theme.primarySwatch};
+        }
+    }
 `
 
 const uploadTheme = new UploadThemeData({
@@ -30,6 +57,11 @@ const uploadTheme = new UploadThemeData({
         size: 30,
         color: Color.fromRGB(217, 217, 217),
     })
+})
+
+const uploadIconTheme = new IconThemeData({
+    size: 34,
+    color: Color.fromRGB(217,217,217)
 })
 
 interface IProps extends DispatchProp {
@@ -48,6 +80,7 @@ interface IState {
     editVisible: boolean
     imageVisible: boolean
     imageUrl: string
+    barActions: IBarActions[]
 }
 
 const AntModel = styled(Modal)`
@@ -70,6 +103,10 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
 
     private actionUrl: string = ''
 
+    private index: number = 0
+
+    private btnType: string = ''
+
     public state: IState = {
         title: '',
         titleBar: false,
@@ -79,6 +116,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             data: [],
             skip: 10
         },
+        barActions: [],
         tableParams: [],
         tableEdits: [],
         editVisible: false,
@@ -88,7 +126,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
     }
 
     public render(): JSX.Element {
-        const { title, titleBar, pageType, imageVisible, imageUrl, editVisible, editDialogTitle } = this.state
+        const { title, titleBar, pageType, imageVisible, imageUrl, editVisible, editDialogTitle, barActions } = this.state
         return (
             <GlobalView>
                 {
@@ -97,6 +135,25 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                             left={null}
                             theme={new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255) })}
                             title={<LabelHeader title={title} line="vertical" />}
+                            right={
+                                <div className="flex">
+                                    {
+                                        barActions.map((i, index: number) => {
+                                            switch (i.type) {
+                                                default: return (
+                                                    <ActionButton
+                                                        mold="primary"
+                                                        key={index}
+                                                        onClick={this.handleAddItem.bind(this, i.url)}
+                                                    >
+                                                        {i.label}
+                                                    </ActionButton>
+                                                )
+                                            }
+                                        })
+                                    }
+                                </div>
+                            }
                         />
                     )
                 }
@@ -130,8 +187,41 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         this.getData()
     }
 
-    private handleDialogOk = () => {
-        console.log(this.actionUrl)
+    private handleDialogOk = async () => {
+        const { dispatch } = this.props
+        try {
+            if (this.fn) {
+                dispatch({ type: SET_SPINLOADING_DATA, data: true })
+                const value = this.fn.getFieldValue()
+                const { data } = await http(this.actionUrl, value)
+                if (this.btnType === 'add') {
+                    const { pageData } = this.state
+                    pageData.data.unshift(data)
+                    this.setState({
+                        pageData: { ...pageData }
+                    })
+                } else {
+                    const { pageData } = this.state
+                    pageData.data[this.index] = data
+                    this.setState({
+                        pageData: { ...pageData }
+                    })
+                }
+                dispatch({ type: SET_SPINLOADING_DATA, data: false })
+            }
+        } catch (e) {
+            dispatch({ type: SET_SPINLOADING_DATA, data: false })
+            httpUtils.verify(e)
+        }
+    }
+
+    private handleAddItem = (url: string) => {
+        this.btnType = 'add'
+        this.actionUrl = url
+        this.setState({
+            editDialogTitle: '新增',
+            editVisible: true,
+        })
     }
 
     private getItems = (fn: IFormFun) => {
@@ -144,21 +234,31 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         tableEdits.forEach((i: any) => {
             switch (i.type) {
                 case 'img': items.push({
-                    component: 'Upload',
-                    props: {
-                        maxLength: 1,
-                        crop: true,
-                        cropProps: {
-                            cropSize: {
-                                width: 620,
-                                height: 310,
-                            }
-                        },
-                        action: 'https://robin-animate.oss-cn-chengdu.aliyuncs.com',
-                        theme: uploadTheme,
-                        name: 'file',
-                        onBeforeUpload: this.handleBeforeUpload,
-                        baseUrl: imgUrl
+                    component: 'Label',
+                    // props: {
+                    //     maxLength: 1,
+                    //     crop: true,
+                    //     cropProps: {
+                    //         cropSize: {
+                    //             width: 620,
+                    //             height: 310,
+                    //         }
+                    //     },
+                    //     action: 'https://robin-animate.oss-cn-chengdu.aliyuncs.com',
+                    //     theme: uploadTheme,
+                    //     name: 'file',
+                    //     onBeforeUpload: this.handleBeforeUpload,
+                    //     baseUrl: imgUrl
+                    // },
+                    render: (val: string) => {
+                        return (
+                            <UploadBox 
+                            className="flex_center"
+                            onClick={this.handleImageView}
+                            >
+                                {val ? <Image src={imgUrl + val} /> : <UoloadIcon icon="ios-add" theme={uploadIconTheme} />}
+                            </UploadBox>
+                        )
                     },
                     field: i.field,
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
@@ -191,6 +291,10 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
             httpUtils.verify(e)
         }
+    }
+
+    private handleImageView= () => {
+        imageModal()
     }
 
     private handleBeforeUpload = async (file: File) => {
@@ -230,7 +334,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                 render: (val: string) => {
                                     return <Image
                                         src={imgUrl + val}
-                                        style={{ height: getUnit(60) }}
+                                        style={{ height: getUnit(60), width: getUnit(120) }}
                                         onClick={this.handleImgVisible.bind(this, imgUrl + val)}
                                     />
                                 }
@@ -265,7 +369,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                 title: i.label,
                                 dataIndex: i.field,
                                 key: i.field,
-                                render: (val: any, data: any) => {
+                                render: (val: any, data: any, k: number) => {
                                     if (i.actions) {
                                         return (
                                             <Fragment>
@@ -284,7 +388,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                                             default: return (
                                                                 <Label
                                                                     key={index}
-                                                                    onClick={this.handleEdit.bind(this, i.url, data)}
+                                                                    onClick={this.handleEdit.bind(this, i.url, data, k)}
                                                                 >
                                                                     {i.label}
                                                                 </Label>
@@ -325,7 +429,8 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         })
     }
 
-    private handleEdit = (url: string, data: any) => {
+    private handleEdit = (url: string, data: any, index: number) => {
+        this.index = index
         this.actionUrl = url
         this.setState({
             editDialogTitle: '修改',
@@ -341,6 +446,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         this.setState({
             editVisible: false
         })
+        this.fn && this.fn.cleanFieldValue()
     }
 
     private handleInUrl = async (url: string, params: any) => {

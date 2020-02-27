@@ -21,7 +21,7 @@ import { imageModal } from 'src/utils'
 interface IProps extends DispatchProp {
     article: IArticle[]
     jurisd: IJurisd[]
-    images: IImages[]
+    images: IImages
 }
 
 interface IState {

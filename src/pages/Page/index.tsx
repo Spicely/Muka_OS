@@ -25,6 +25,12 @@ interface IFieldActions {
     url: string
 }
 
+export interface IBarActions {
+    type: string
+    label: string
+    url: string
+}
+
 export interface IFieldParams {
     type: string | number
     label: string

@@ -71,7 +71,7 @@ export interface IInitState {
     userInfo: IUserInfo
     shopList: IShopList
     article: IArticle[]
-    images: IImages[]
+    images: IImages
     currency: ICurrency[]
     icons: IIcons[]
     actionsList: IActionsList[]
