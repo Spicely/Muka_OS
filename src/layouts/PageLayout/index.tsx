@@ -142,6 +142,7 @@ const SpinLoading = styled.div`
 const LayoutSolo = styled.div<ILayoutSoloProps>`
     position: absolute;
     cursor: pointer;
+    z-index: 8;
     height: ${() => getUnit(30)};
     width: ${() => getUnit(20)};
     right: 0;
@@ -167,15 +168,29 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
         const { visible, selected, extendSelected } = this.state
         const items: any[] = router
         let extendRoute = []
+        let typeSeletct = ''
         if (selected) {
-            const data: any = items.find((i) => (i.item && i.item.field === selected))
+            let data: any
+            for (let i = 0; i < router.length; i++) {
+                if (router[i].item.field === selected) {
+                    data = router[i]
+                    break
+                }
+                for (let v = 0; v < router[i].extend.length; v++) {
+                    if (router[i].extend[v].field === selected) {
+                        data = router[i]
+                        typeSeletct = router[i].item.field
+                        break
+                    }
+                }
+            }
             if (data) {
                 extendRoute = data.extend || []
             }
         }
 
         const menuOptions = {
-            selected: selected,
+            selected: typeSeletct || selected,
             fontColor: Color.fromRGB(255, 255, 255),
             fieldToUrl: true,
             items,
@@ -356,13 +371,47 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
     }
 
     private handleChange = (field: any) => {
-        const { history } = this.props
-        const arr = field.split('/')
-        this.setState({
-            selected: arr.length === 2 ? field : `/${arr[1]}`,
-            extendSelected: field
-        })
-        history.push(field)
+        const { history, router } = this.props
+        let type: string = ''
+        let childType: string = ''
+        let selected = ''
+        let initSelectd = ''
+        for (let i = 0; i < router.length; i++) {
+            if (router[i].item.field === field) {
+                selected = field
+                type = router[i].item.type
+                if (router[i].extend.length) {
+                    initSelectd = router[i].extend[0].field
+                    childType = router[i].extend[0].type
+                }
+                break
+            }
+            if (!type) {
+                for (let v = 0; v < router[i].extend.length; v++) {
+                    if (router[i].extend[v].field === field) {
+                        selected = router[i].item.field
+                        type = router[i].extend[v].type
+                        break
+                    }
+                }
+            }
+            if (type) break
+        }
+        if (type === 'path') {
+            const arr = field.split('/')
+            this.setState({
+                selected: arr.length === 2 ? field : `/${arr[1]}`,
+                extendSelected: initSelectd || field
+            })
+            const url = initSelectd ? childType === 'path' ? initSelectd : `/view/${initSelectd}` : field
+            history.push(url)
+        } else if (type === 'query') {
+            this.setState({
+                selected,
+                extendSelected: field
+            })
+            history.push(`/view/${field}`)
+        }
     }
 
     public componentWillReceiveProps(nextProps: IPageLayout) {
@@ -380,9 +429,10 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
             return
         }
         const arr = history.location.pathname.split('/')
+        const selected = arr.length === 2 ? history.location.pathname : arr.includes('view') ? arr[2] : `/${arr[1]}`
         this.setState({
-            selected: arr.length === 2 ? history.location.pathname : `/${arr[1]}`,
-            extendSelected: history.location.pathname
+            selected,
+            extendSelected: arr.includes('view') ? arr[2] : history.location.pathname
         })
         dispatch({ type: GET_LAYOUT_DATA })
     }

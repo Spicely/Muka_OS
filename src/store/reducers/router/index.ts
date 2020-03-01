@@ -6,12 +6,14 @@ export interface IRouter {
         field: string
         icon?: { createdAt: number, updatedAt: number, id: string, name: string, type: 'icon' | 'img' }
         label: string
+        type:  'path' | 'query' | 'url'
     },
     extend: {
         field: string
         icon?: { createdAt: number, updatedAt: number, id: string, name: string, type: 'icon' | 'img' }
         id: string
         label: string
+        type:  'path' | 'query' | 'url'
     }[]
 }
 

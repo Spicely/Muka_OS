@@ -156,6 +156,23 @@ class Routers extends Component<IProps, IState> {
             component: 'NULL',
             field: 'id'
         }, {
+            component: 'Select',
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>路由类型</FromLabel>,
+            props: {
+                options: [{
+                    label: '内部地址',
+                    value: 'path'
+                }, {
+                    label: '自定义页面',
+                    value: 'query'
+                }, {
+                    label: '外部地址',
+                    value: 'url'
+                }],
+                value: 'path'
+            },
+            field: 'type'
+        }, {
             component: 'Input',
             label: <FromLabel><span style={{ color: 'red' }}>*</span>路由名称</FromLabel>,
             props: {
