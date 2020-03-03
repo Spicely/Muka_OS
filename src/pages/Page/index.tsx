@@ -38,6 +38,7 @@ export interface IFieldParams {
     actions: IFieldActions[]
 }
 
+
 export interface IFieldTableEdits {
     type: string
     label: string
@@ -128,6 +129,11 @@ class AdminPage extends Component<IProps, IState> {
         value: 'image'
     }]
 
+    private tableBarOptions = [{
+        label: '新增',
+        value: 'add'
+    }]
+
     public componentDidMount() {
         // this.getData()
     }
@@ -156,7 +162,7 @@ class AdminPage extends Component<IProps, IState> {
     }
 
     private getItems = (fn: IFormFun) => {
-        const { pageType, tableFields } = this.state
+        const { pageType } = this.state
         this.fn = fn
         const items: IFormItem[] = [{
             component: 'NULL',
@@ -204,6 +210,59 @@ class AdminPage extends Component<IProps, IState> {
             field: 'initUrl'
         }, {
             component: 'Label',
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>标题烂按钮</FromLabel>,
+            props: {
+                value: [],
+            },
+            render: (val: IBarActions[]) => (
+                <div style={{ marginTop: val.length ? getUnit(8) : 0 }}>
+                    {
+                        val.map((i, index: number) => (
+                            <FieldBox key={index} style={{ marginBottom: getUnit(10) }}>
+                                <div className="flex">
+                                    <FieldLabel className="flex_center">请求地址</FieldLabel>
+                                    <Input
+                                        className="flex_1"
+                                        value={i.url}
+                                        placeholder="请输入请求地址"
+                                        onChange={this.handleFieldsChange.bind(this, index, 'barActions')}
+                                    />
+                                </div>
+                                <div className="flex" style={{ marginTop: getUnit(5) }}>
+                                    <FieldLabel className="flex_center">文本内容</FieldLabel>
+                                    <Input
+                                        className="flex_1"
+                                        value={i.label}
+                                        placeholder="请输入文本内容"
+                                        onChange={this.handleFileldLabelChange.bind(this, index)}
+                                    />
+                                </div>
+                                <div className="flex" style={{ marginTop: getUnit(5) }}>
+                                    <FieldLabel className="flex_center">显示类型</FieldLabel>
+                                    <Select
+                                        className="flex_1"
+                                        value={i.type}
+                                        options={this.tableBarOptions}
+                                        onChange={this.handelFileldSelectChange.bind(this, index)}
+                                    />
+                                </div>
+                                <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFieldClose.bind(this, index, 'barActions')} />
+                            </FieldBox>
+
+                        ))
+                    }
+                    <Button
+                        mold="primary"
+                        style={{ width: getUnit(160) }}
+                        onClick={this.handleAddField}
+                    >
+                        添加按钮
+                    </Button>
+                </div>
+            ),
+            field: 'barActions',
+        }, {
+            component: 'Label',
             label: <FromLabel><span style={{ color: 'red' }}>*</span>表单数据</FromLabel>,
             props: {
                 value: [],
@@ -219,7 +278,7 @@ class AdminPage extends Component<IProps, IState> {
                                         className="flex_1"
                                         value={i.field}
                                         placeholder="请输入表单字段"
-                                        onChange={this.handleFileldChange.bind(this, index)}
+                                        onChange={this.handleFieldsChange.bind(this, index, 'tableParams')}
                                     />
                                 </div>
                                 <div className="flex" style={{ marginTop: getUnit(5) }}>
@@ -240,7 +299,7 @@ class AdminPage extends Component<IProps, IState> {
                                         onChange={this.handelFileldSelectChange.bind(this, index)}
                                     />
                                 </div>
-                                <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFileldClose.bind(this, index)} />
+                                <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFieldClose.bind(this, index, 'tableParams')} />
                                 {i.actions.length ? (
                                     <Divider
                                         borderType="dashed"
@@ -349,9 +408,12 @@ class AdminPage extends Component<IProps, IState> {
                                         onChange={this.handelFileldTableSelectChange.bind(this, index)}
                                     />
                                 </div>
-                                <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFileldClose.bind(this, index)} />
+                                <FiledClose
+                                    icon="ios-close"
+                                    theme={iconTheme}
+                                    onClick={this.handleFieldClose.bind(this, index, 'tableEdits')}
+                                />
                             </FieldBox>
-
                         ))
                     }
                     <Button
@@ -453,12 +515,12 @@ class AdminPage extends Component<IProps, IState> {
         }
     }
 
-    private handleFileldClose = (index: number) => {
+    private handleFieldClose = (index: number, field: string) => {
         if (this.fn) {
-            const { tableParams } = this.fn.getFieldValue()
-            tableParams.splice(index, 1)
+            const data = this.fn.getFieldValue()
+            data[field].splice(index, 1)
             this.fn.setFieldValue({
-                tableParams: [...tableParams]
+                [field]: [...data[field]]
             })
         }
     }
@@ -493,12 +555,12 @@ class AdminPage extends Component<IProps, IState> {
         }
     }
 
-    private handleFileldChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
+    private handleFieldsChange = (index: number, field: string, e: ChangeEvent<HTMLInputElement>) => {
         if (this.fn) {
-            const { tableParams } = this.fn.getFieldValue()
-            tableParams[index].field = e.target.value
+            const data: any = this.fn.getFieldValue()
+            data[field][index].field = e.target.value
             this.fn.setFieldValue({
-                tableParams: [...tableParams]
+                [field]: [...data[field]]
             })
         }
     }
