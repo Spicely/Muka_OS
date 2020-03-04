@@ -91,11 +91,11 @@ export default http
 export class httpUtils {
     public static verify(data: IRresItem | IRresItems, callback?: (data: any) => void) {
         if (data.status === 203) {
-            message.error(data.msg)
+            message.error(data.msg || '登录失效,请重新登录')
             return
         }
         if (data.status !== 200) {
-            message.error(data.msg)
+            message.error(data.msg || '网络连接失败')
             return
         }
         if (isFunction(callback)) callback(data.data)

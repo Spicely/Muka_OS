@@ -2,7 +2,7 @@ import React, { Component, Fragment, ChangeEvent } from 'react'
 import { message } from 'antd'
 import styled from 'styled-components'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
-import { Button, LabelHeader, Form, Input, Select, Icon, Divider } from 'components'
+import { Button, LabelHeader, Form, Input, Select, Icon, Divider, Dialog } from 'components'
 import http, { getTitle, getJurisd, httpUtils } from '../../utils/axios'
 import { connect, DispatchProp } from 'react-redux'
 import { IFormItem, IFormFun } from 'src/components/lib/Form'
@@ -49,6 +49,7 @@ export interface IFieldTableEdits {
 interface IState {
     pageType: IPageType
     tableFields: IFieldParams[]
+    visible: boolean
 }
 
 const FromLabel = styled.div`
@@ -89,10 +90,13 @@ class AdminPage extends Component<IProps, IState> {
 
     public state: IState = {
         pageType: 'table',
-        tableFields: []
+        tableFields: [],
+        visible: false
     }
 
     private fn: IFormFun | null = null
+
+    private tableFn: IFormFun | null = null
 
     private title = getTitle('/page')
 
@@ -144,6 +148,7 @@ class AdminPage extends Component<IProps, IState> {
     }
 
     public render(): JSX.Element {
+        const { visible } = this.state
         return (
             <GlobalView>
                 <LayoutNavBar
@@ -157,8 +162,20 @@ class AdminPage extends Component<IProps, IState> {
                     }
                 />
                 <Form getItems={this.getItems} style={{ padding: getUnit(10) }} />
+                <Dialog
+                    visible={visible}
+                    title="数据表设置"
+                    onClose={this.handleVisibelClose}
+                >
+                    <Form getItems={this.getTableDataItems} />
+                </Dialog>
             </GlobalView>
         )
+    }
+
+    private getTableDataItems = (fn: IFormFun) => {
+        this.tableFn = fn
+        return []
     }
 
     private getItems = (fn: IFormFun) => {
@@ -197,6 +214,18 @@ class AdminPage extends Component<IProps, IState> {
             },
             field: 'titleBar'
         }, {
+            component: 'RadioGroup',
+            label: <FromLabel>页面类型</FromLabel>,
+            props: {
+                options: [{
+                    label: '表单页面',
+                    value: 'table',
+                }],
+                value: pageType,
+                onChange: this.handleTypeChange
+            },
+            field: 'pageType'
+        }, {
             component: 'Label',
             label: <FromLabel>标题栏按钮</FromLabel>,
             props: {
@@ -233,7 +262,9 @@ class AdminPage extends Component<IProps, IState> {
                                         options={this.tableBarOptions}
                                         onChange={this.handelFileldSelectChange.bind(this, index, 'barActions', 'type')}
                                     />
+                                    <Button mold="primary" disabled={i.type !== 'add'} onClick={this.handleAddVisible.bind(this)}>设置添加数据</Button>
                                 </div>
+
                                 <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFieldClose.bind(this, index, 'barActions')} />
                             </FieldBox>
 
@@ -249,18 +280,6 @@ class AdminPage extends Component<IProps, IState> {
                 </div>
             ),
             field: 'barActions',
-        }, {
-            component: 'RadioGroup',
-            label: <FromLabel>页面类型</FromLabel>,
-            props: {
-                options: [{
-                    label: '表单页面',
-                    value: 'table',
-                }],
-                value: pageType,
-                onChange: this.handleTypeChange
-            },
-            field: 'pageType'
         }, {
             component: 'Label',
             label: <FromLabel><span style={{ color: 'red' }}>*</span>表单数据</FromLabel>,
@@ -431,9 +450,22 @@ class AdminPage extends Component<IProps, IState> {
         return items
     }
 
+    private handleVisibelClose = () => {
+        this.setState({
+            visible: false
+        })
+        this.tableFn && this.tableFn.cleanFieldValue()
+    }
+
     private handleTypeChange = (val: IPageType) => {
         this.setState({
             pageType: val
+        })
+    }
+
+    private handleAddVisible = () => {
+        this.setState({
+            visible: true
         })
     }
 
@@ -515,7 +547,6 @@ class AdminPage extends Component<IProps, IState> {
                     data.tableParams[index].actions = []
                 }
             }
-
             this.fn.setFieldValue({ ...data })
         }
     }
@@ -574,7 +605,7 @@ class AdminPage extends Component<IProps, IState> {
         if (this.fn) {
             const data: any = this.fn.getFieldValue()
             data[field][index][k] = e.target.value
-            this.fn.setFieldValue({...data})
+            this.fn.setFieldValue({ ...data })
         }
     }
 
