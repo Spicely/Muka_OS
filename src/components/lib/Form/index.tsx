@@ -49,7 +49,7 @@ export interface IFormProps {
 }
 
 export interface IFormFun {
-    getFieldValue: (field?: string[]) => void
+    getFieldValue: (field?: string[]) => IValue
     cleanFieldValue: () => void
     setFieldValue: (params: IValue) => void
     showFieldElement: (params: string[]) => void

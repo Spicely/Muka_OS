@@ -175,6 +175,14 @@ class AdminPage extends Component<IProps, IState> {
             },
             field: 'title'
         }, {
+            component: 'Input',
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>数据地址</FromLabel>,
+            props: {
+                placeholder: '请输入初始化数据地址'
+            },
+            visible: pageType === 'table',
+            field: 'initUrl'
+        }, {
             component: 'RadioGroup',
             label: <FromLabel>标题栏</FromLabel>,
             props: {
@@ -189,28 +197,8 @@ class AdminPage extends Component<IProps, IState> {
             },
             field: 'titleBar'
         }, {
-            component: 'RadioGroup',
-            label: <FromLabel>页面类型</FromLabel>,
-            props: {
-                options: [{
-                    label: '表单页面',
-                    value: 'table',
-                }],
-                value: pageType,
-                onChange: this.handleTypeChange
-            },
-            field: 'pageType'
-        }, {
-            component: 'Input',
-            label: <FromLabel><span style={{ color: 'red' }}>*</span>请求地址</FromLabel>,
-            props: {
-                placeholder: '请输入地址'
-            },
-            visible: pageType === 'table',
-            field: 'initUrl'
-        }, {
             component: 'Label',
-            label: <FromLabel><span style={{ color: 'red' }}>*</span>标题烂按钮</FromLabel>,
+            label: <FromLabel>标题栏按钮</FromLabel>,
             props: {
                 value: [],
             },
@@ -225,7 +213,7 @@ class AdminPage extends Component<IProps, IState> {
                                         className="flex_1"
                                         value={i.url}
                                         placeholder="请输入请求地址"
-                                        onChange={this.handleFieldsChange.bind(this, index, 'barActions')}
+                                        onChange={this.handleFieldsChange.bind(this, index, 'barActions', 'url')}
                                     />
                                 </div>
                                 <div className="flex" style={{ marginTop: getUnit(5) }}>
@@ -234,7 +222,7 @@ class AdminPage extends Component<IProps, IState> {
                                         className="flex_1"
                                         value={i.label}
                                         placeholder="请输入文本内容"
-                                        onChange={this.handleFileldLabelChange.bind(this, index)}
+                                        onChange={this.handleFieldsChange.bind(this, index, 'barActions', 'label')}
                                     />
                                 </div>
                                 <div className="flex" style={{ marginTop: getUnit(5) }}>
@@ -243,7 +231,7 @@ class AdminPage extends Component<IProps, IState> {
                                         className="flex_1"
                                         value={i.type}
                                         options={this.tableBarOptions}
-                                        onChange={this.handelFileldSelectChange.bind(this, index)}
+                                        onChange={this.handelFileldSelectChange.bind(this, index, 'barActions', 'type')}
                                     />
                                 </div>
                                 <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFieldClose.bind(this, index, 'barActions')} />
@@ -254,13 +242,25 @@ class AdminPage extends Component<IProps, IState> {
                     <Button
                         mold="primary"
                         style={{ width: getUnit(160) }}
-                        onClick={this.handleAddField}
+                        onClick={this.handleAddBarActions}
                     >
                         添加按钮
                     </Button>
                 </div>
             ),
             field: 'barActions',
+        }, {
+            component: 'RadioGroup',
+            label: <FromLabel>页面类型</FromLabel>,
+            props: {
+                options: [{
+                    label: '表单页面',
+                    value: 'table',
+                }],
+                value: pageType,
+                onChange: this.handleTypeChange
+            },
+            field: 'pageType'
         }, {
             component: 'Label',
             label: <FromLabel><span style={{ color: 'red' }}>*</span>表单数据</FromLabel>,
@@ -278,7 +278,7 @@ class AdminPage extends Component<IProps, IState> {
                                         className="flex_1"
                                         value={i.field}
                                         placeholder="请输入表单字段"
-                                        onChange={this.handleFieldsChange.bind(this, index, 'tableParams')}
+                                        onChange={this.handleFieldsChange.bind(this, index, 'tableParams', 'field')}
                                     />
                                 </div>
                                 <div className="flex" style={{ marginTop: getUnit(5) }}>
@@ -287,7 +287,7 @@ class AdminPage extends Component<IProps, IState> {
                                         className="flex_1"
                                         value={i.label}
                                         placeholder="请输入表单文本"
-                                        onChange={this.handleFileldLabelChange.bind(this, index)}
+                                        onChange={this.handleFieldsChange.bind(this, index, 'tableParams', 'label')}
                                     />
                                 </div>
                                 <div className="flex" style={{ marginTop: getUnit(5) }}>
@@ -296,7 +296,7 @@ class AdminPage extends Component<IProps, IState> {
                                         className="flex_1"
                                         value={i.type}
                                         options={this.tableFileOptions}
-                                        onChange={this.handelFileldSelectChange.bind(this, index)}
+                                        onChange={this.handelFileldSelectChange.bind(this, index, 'tableParams', 'type')}
                                     />
                                 </div>
                                 <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFieldClose.bind(this, index, 'tableParams')} />
@@ -437,6 +437,20 @@ class AdminPage extends Component<IProps, IState> {
         })
     }
 
+    private handleAddBarActions = () => {
+        if (this.fn) {
+            const { barActions } = this.fn.getFieldValue()
+            barActions.push({
+                label: '',
+                url: '',
+                type: ''
+            })
+            this.fn.setFieldValue({
+                barActions: [...barActions]
+            })
+        }
+    }
+
     private handleActionLabelChange = (index: number, k: number, e: ChangeEvent<HTMLInputElement>) => {
         if (this.fn) {
             const { tableParams } = this.fn.getFieldValue()
@@ -486,22 +500,23 @@ class AdminPage extends Component<IProps, IState> {
         }
     }
 
-    private handelFileldSelectChange = (index: number, val: string | number) => {
+    private handelFileldSelectChange = (index: number, field: string, k: string, val: string | number) => {
         if (this.fn) {
-            const { tableParams } = this.fn.getFieldValue()
-            tableParams[index].type = val
-            if (val === 'actions') {
-                tableParams[index].actions = [{
-                    lable: '',
-                    type: '',
-                    url: ''
-                }]
-            } else {
-                tableParams[index].actions = []
+            const data = this.fn.getFieldValue()
+            data[field][index][k] = val
+            if (field === 'tableParams') {
+                if (val === 'actions') {
+                    data.tableParams[index].actions = [{
+                        lable: '',
+                        type: '',
+                        url: ''
+                    }]
+                } else {
+                    data.tableParams[index].actions = []
+                }
             }
-            this.fn.setFieldValue({
-                tableParams: [...tableParams]
-            })
+
+            this.fn.setFieldValue({ ...data })
         }
     }
 
@@ -555,13 +570,11 @@ class AdminPage extends Component<IProps, IState> {
         }
     }
 
-    private handleFieldsChange = (index: number, field: string, e: ChangeEvent<HTMLInputElement>) => {
+    private handleFieldsChange = (index: number, field: string, k: string, e: ChangeEvent<HTMLInputElement>) => {
         if (this.fn) {
             const data: any = this.fn.getFieldValue()
-            data[field][index].field = e.target.value
-            this.fn.setFieldValue({
-                [field]: [...data[field]]
-            })
+            data[field][index][k] = e.target.value
+            this.fn.setFieldValue({...data})
         }
     }
 
