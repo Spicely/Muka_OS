@@ -117,6 +117,10 @@ const FormItemLabel = styled.div`
 const ItemExtend = styled.div`
     padding: 0 ${getUnit(10)};
 `
+
+const itemInputTheme = new InputThemeData({
+    border: Border.none
+})
 export default class Form extends Component<IFormProps, IState> {
 
     public static defaultProps: IFormProps = {
@@ -514,9 +518,10 @@ export default class Form extends Component<IFormProps, IState> {
                             <View
                                 {...vProps}
                                 key={field}
+                                flexType="value"
                                 value={
                                     <Input
-                                        theme={vProps.theme ? vProps.theme.inputTheme : undefined}
+                                        theme={itemInputTheme}
                                         placeholder={vProps.placeholder}
                                         type={vProps.type}
                                         value={vals[field]}

@@ -154,17 +154,15 @@ export default class NavBar extends Component<INavBarProps, any> {
                             >
                                 <div className="flex">
                                     {
-                                        !isNull(left) && (
-                                            <NavLeft
-                                                className={`flex_justify ${leftClassName || ''}`}
-                                                onClick={this.handleBack}
-                                            >
-                                                {left ? left : <Icon
-                                                    icon="ios-arrow-back"
-                                                    theme={theme ? theme.iconTheme : value.theme.navBarTheme.iconTheme}
-                                                />}
-                                            </NavLeft>
-                                        )
+                                        <NavLeft
+                                            className={`flex_justify ${leftClassName || ''}`}
+                                            onClick={this.handleBack}
+                                        >
+                                            {left ? left : !isNull(left) ? <Icon
+                                                icon="ios-arrow-back"
+                                                theme={theme ? theme.iconTheme : value.theme.navBarTheme.iconTheme}
+                                            /> : null}
+                                        </NavLeft>
                                     }
                                     <NavTitle
                                         className={getClassName(`flex_1 ${titleCenter ? 'flex_center' : 'flex_justify'}`, titleClassName)}

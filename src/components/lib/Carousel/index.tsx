@@ -253,7 +253,7 @@ export default class Carousel extends Component<ICarouselProps, IState> {
                                                                 dotType={dotType}
                                                                 dotPos={dotPosition}
                                                                 dotColor={dotColor}
-                                                                active={selectIndex % value.length === index}
+                                                                active={selectIndex % (value.length || Children.count(children)) === index}
                                                                 className={dotClassName}
                                                                 key={index}
                                                                 onClick={this.handleTabIndex.bind(this, index)}
