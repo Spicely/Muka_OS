@@ -14,7 +14,7 @@ import { ITableColumns } from 'src/components/lib/Table'
 import { GlobalView, FormLable, FormRequire } from 'src/utils/node'
 import { NavBarThemeData, Color, UploadThemeData, IconThemeData, getUnit } from 'src/components/lib/utils'
 import { SET_ARTICLE_DATA, GET_CAROUSEL, SET_SPINLOADING_DATA } from 'src/store/action'
-import { RouteComponentProps } from 'react-router-dom'
+import { RouteComponentProps, Link } from 'react-router-dom'
 import { IPageType, IFieldParams, IFieldTableEdits, IBarActions } from '../Page'
 import { imageModal } from 'src/utils'
 
@@ -61,7 +61,7 @@ const uploadTheme = new UploadThemeData({
 
 const uploadIconTheme = new IconThemeData({
     size: 34,
-    color: Color.fromRGB(217,217,217)
+    color: Color.fromRGB(217, 217, 217)
 })
 
 interface IProps extends DispatchProp {
@@ -252,9 +252,9 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     // },
                     render: (val: string) => {
                         return (
-                            <UploadBox 
-                            className="flex_center"
-                            onClick={this.handleImageView}
+                            <UploadBox
+                                className="flex_center"
+                                onClick={this.handleImageView}
                             >
                                 {val ? <Image src={imgUrl + val} /> : <UoloadIcon icon="ios-add" theme={uploadIconTheme} />}
                             </UploadBox>
@@ -293,7 +293,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         }
     }
 
-    private handleImageView= () => {
+    private handleImageView = () => {
         imageModal()
     }
 
@@ -376,6 +376,20 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                                 {
                                                     i.actions.map((i, index: number) => {
                                                         switch (i.type) {
+                                                            case 'link': {
+                                                                const url = i.url.split('/').map((i) => {
+                                                                    if (i.includes(':')) {
+                                                                        return data[i.split(':')[1]]
+                                                                    } else {
+                                                                        return i
+                                                                    }
+                                                                }).join('/')
+                                                                return (
+                                                                    <Link key={index} to={url}>
+                                                                        <Label>{i.label}</Label>
+                                                                    </Link>
+                                                                )
+                                                            }
                                                             case 'status': return (
                                                                 <Label
                                                                     color="green"

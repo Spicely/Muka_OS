@@ -1,5 +1,5 @@
 import React, { Component, Fragment, ChangeEvent } from 'react'
-import { message } from 'antd'
+import { isNil } from 'lodash'
 import styled from 'styled-components'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
 import { Button, LabelHeader, Form, Input, Select, Icon, Divider, Dialog } from 'components'
@@ -10,6 +10,8 @@ import { GlobalView } from 'src/utils/node'
 import { IInitState, MukaOS } from 'src/store/state'
 import { NavBarThemeData, Color, getUnit, IconThemeData } from 'src/components/lib/utils'
 import { GET_REGION, SET_SPINLOADING_DATA } from 'src/store/action'
+import { message } from 'antd'
+import { RouteComponentProps } from 'react-router-dom'
 
 interface IProps extends DispatchProp {
     region: MukaOS.Region[]
@@ -17,7 +19,7 @@ interface IProps extends DispatchProp {
 
 export type IPageType = 'table'
 
-export type IFieldActionType = 'edit' | 'status'
+export type IFieldActionType = 'edit' | 'status' | 'link'
 
 interface IFieldActions {
     label: string
@@ -50,6 +52,7 @@ interface IState {
     pageType: IPageType
     tableFields: IFieldParams[]
     visible: boolean
+    fieldItem: { field: string, data: any[], index: number }
 }
 
 const FromLabel = styled.div`
@@ -86,12 +89,17 @@ const FieldLabel = styled.div`
     border-right: 0;
 `
 
-class AdminPage extends Component<IProps, IState> {
+class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>, IState> {
 
     public state: IState = {
         pageType: 'table',
         tableFields: [],
-        visible: false
+        visible: false,
+        fieldItem: {
+            field: '',
+            data: [],
+            index: 0,
+        }
     }
 
     private fn: IFormFun | null = null
@@ -120,6 +128,9 @@ class AdminPage extends Component<IProps, IState> {
     }, {
         label: '删除',
         value: 'del',
+    }, {
+        label: '路由',
+        value: 'link',
     }]
 
     private tableFieldTypes = [{
@@ -139,12 +150,23 @@ class AdminPage extends Component<IProps, IState> {
     }]
 
     public componentDidMount() {
-        // this.getData()
+        const { params } = this.props.match
+        if (params.id) {
+            this.getData(params.id)
+        }
     }
 
-    private getData() {
+    private async getData(id: string) {
         const { dispatch } = this.props
-        dispatch({ type: GET_REGION })
+        try {
+            dispatch({ type: SET_SPINLOADING_DATA, data: true })
+            const { data } = await http('adminPage/findOne', { id })
+            this.fn && this.fn.setFieldValue(data)
+            dispatch({ type: SET_SPINLOADING_DATA, data: false })
+        } catch (e) {
+            dispatch({ type: SET_SPINLOADING_DATA, data: false })
+            httpUtils.verify(e)
+        }
     }
 
     public render(): JSX.Element {
@@ -166,6 +188,7 @@ class AdminPage extends Component<IProps, IState> {
                     visible={visible}
                     title="数据表设置"
                     onClose={this.handleVisibelClose}
+                    onOk={this.handleVisibleOk}
                 >
                     <Form getItems={this.getTableDataItems} />
                 </Dialog>
@@ -174,8 +197,98 @@ class AdminPage extends Component<IProps, IState> {
     }
 
     private getTableDataItems = (fn: IFormFun) => {
+        const { fieldItem } = this.state
         this.tableFn = fn
-        return []
+        const items: IFormItem[] = [{
+            component: 'Label',
+            props: {
+                value: fieldItem.data
+            },
+            render: (val: any[]) => (
+                <div style={{ marginTop: val.length ? getUnit(8) : 0 }}>
+                    {
+                        val.map((i, index: number) => (
+                            <FieldBox key={index} style={{ marginBottom: getUnit(10) }}>
+                                <div className="flex">
+                                    <FieldLabel className="flex_center">字段</FieldLabel>
+                                    <Input
+                                        className="flex_1"
+                                        value={i.field}
+                                        placeholder="请输入字段"
+                                        onChange={this.handleTableDataChange.bind(this, index, 'field')}
+                                    />
+                                </div>
+                                <div className="flex" style={{ marginTop: getUnit(5) }}>
+                                    <FieldLabel className="flex_center">文本内容</FieldLabel>
+                                    <Input
+                                        className="flex_1"
+                                        value={i.label}
+                                        placeholder="请输入文本内容"
+                                        onChange={this.handleTableDataChange.bind(this, index, 'label')}
+                                    />
+                                </div>
+                                <div className="flex" style={{ marginTop: getUnit(5) }}>
+                                    <FieldLabel className="flex_center">显示类型</FieldLabel>
+                                    <Select
+                                        className="flex_1"
+                                        value={i.type}
+                                        options={this.tableFieldTypes}
+                                        onChange={this.handelTableDataSelectChange.bind(this, index, 'type')}
+                                    />
+                                </div>
+                                <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleTableDataClose.bind(this, index)} />
+                            </FieldBox>
+
+                        ))
+                    }
+                    <Button
+                        mold="primary"
+                        style={{ width: getUnit(160) }}
+                        onClick={this.handleAddTableData}
+                    >
+                        添加按钮
+                    </Button>
+                </div>
+            ),
+            field: fieldItem.field
+        }]
+        return items
+    }
+
+    private handleAddTableData = () => {
+        const { fieldItem } = this.state
+        if (this.tableFn) {
+            const data = this.tableFn.getFieldValue()
+            data[fieldItem.field].push({})
+            this.tableFn.setFieldValue({ ...data })
+        }
+    }
+
+    private handleTableDataChange = (index: number, field: string, e: ChangeEvent<HTMLInputElement>) => {
+        const { fieldItem } = this.state
+        if (this.tableFn) {
+            const data = this.tableFn.getFieldValue()
+            data[fieldItem.field][index][field] = e.target.value
+            this.tableFn.setFieldValue({ ...data })
+        }
+    }
+
+    private handleTableDataClose = (index: number) => {
+        const { fieldItem } = this.state
+        if (this.tableFn) {
+            const data = this.tableFn.getFieldValue()
+            data[fieldItem.field].splice(index, 1)
+            this.tableFn.setFieldValue({ ...data })
+        }
+    }
+
+    private handelTableDataSelectChange = (index: number, field: string, val: string | number) => {
+        const { fieldItem } = this.state
+        if (this.tableFn) {
+            const data = this.tableFn.getFieldValue()
+            data[fieldItem.field][index][field] = val
+            this.tableFn.setFieldValue({ ...data })
+        }
     }
 
     private getItems = (fn: IFormFun) => {
@@ -262,7 +375,7 @@ class AdminPage extends Component<IProps, IState> {
                                         options={this.tableBarOptions}
                                         onChange={this.handelFileldSelectChange.bind(this, index, 'barActions', 'type')}
                                     />
-                                    <Button mold="primary" disabled={i.type !== 'add'} onClick={this.handleAddVisible.bind(this)}>设置添加数据</Button>
+                                    <Button mold="primary" disabled={i.type !== 'add'} onClick={this.handleAddVisible.bind(this, index, 'barActions')}>设置添加数据</Button>
                                 </div>
 
                                 <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFieldClose.bind(this, index, 'barActions')} />
@@ -343,7 +456,7 @@ class AdminPage extends Component<IProps, IState> {
                                                     />
                                                 </div>
                                                 <div className="flex" style={{ marginTop: getUnit(5) }}>
-                                                    <FieldLabel className="flex_center">请求地址</FieldLabel>
+                                                    <FieldLabel className="flex_center">{v.type === 'link' ? '跳转地址' : '请求地址'}</FieldLabel>
                                                     <Input
                                                         className="flex_1"
                                                         value={v.url}
@@ -450,6 +563,23 @@ class AdminPage extends Component<IProps, IState> {
         return items
     }
 
+    private handleVisibleOk = () => {
+        const { fieldItem } = this.state
+        if (this.tableFn && this.fn) {
+            let data = this.tableFn.getFieldValue()
+            data[fieldItem.field] = data[fieldItem.field].filter((i: any) => {
+                if (!isNil(i.label) && !isNil(i.type) && !isNil(i.field)) {
+                    return true
+                } else {
+                    return false
+                }
+            })
+            const pageData = this.fn.getFieldValue()
+            pageData[fieldItem.field][fieldItem.index].data = data[fieldItem.field]
+            this.fn.setFieldValue({ ...pageData })
+        }
+    }
+
     private handleVisibelClose = () => {
         this.setState({
             visible: false
@@ -463,9 +593,14 @@ class AdminPage extends Component<IProps, IState> {
         })
     }
 
-    private handleAddVisible = () => {
+    private handleAddVisible = (index: number, field: string) => {
         this.setState({
-            visible: true
+            visible: true,
+            fieldItem: {
+                field,
+                index,
+                data: [{}]
+            }
         })
     }
 
@@ -649,10 +784,12 @@ class AdminPage extends Component<IProps, IState> {
         const { dispatch } = this.props
         try {
             if (this.fn) {
-                const val = this.fn.getFieldValue()
+                const data = this.fn.getFieldValue()
                 dispatch({ type: SET_SPINLOADING_DATA, data: true })
-                await http('adminPage/create', val)
+                await http('adminPage/create', data)
                 dispatch({ type: SET_SPINLOADING_DATA, data: false })
+                this.fn.cleanFieldValue()
+                message.success('创建成功')
             }
         } catch (e) {
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
