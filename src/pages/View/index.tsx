@@ -1,7 +1,7 @@
 import React, { Component, ComponentProps, Fragment } from 'react'
 import { Modal } from 'antd'
 import styled from 'styled-components'
-import { isBoolean } from 'lodash'
+import { isBoolean, find } from 'lodash'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
 import { Button, Dialog, LabelHeader, Form, Tag, Table, Label, Image, Icon } from 'components'
 import http, { httpUtils, getTitle, getJurisd, imgUrl, baseUrl } from 'src/utils/axios'
@@ -12,7 +12,7 @@ import moment from 'moment'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { ITableColumns } from 'src/components/lib/Table'
 import { GlobalView, FormLable, FormRequire } from 'src/utils/node'
-import { NavBarThemeData, Color, UploadThemeData, IconThemeData, getUnit } from 'src/components/lib/utils'
+import { NavBarThemeData, Color,  IconThemeData, getUnit, DialogThemeData } from 'src/components/lib/utils'
 import { SET_ARTICLE_DATA, GET_CAROUSEL, SET_SPINLOADING_DATA } from 'src/store/action'
 import { RouteComponentProps, Link } from 'react-router-dom'
 import { IPageType, IFieldParams, IFieldTableEdits, IBarActions } from '../Page'
@@ -50,13 +50,9 @@ const UploadBox = styled.div`
     }
 `
 
-const uploadTheme = new UploadThemeData({
-    itemWidth: 375,
-    itemHeight: 200,
-    iconTheme: new IconThemeData({
-        size: 30,
-        color: Color.fromRGB(217, 217, 217),
-    })
+const dialogTheme = new DialogThemeData({
+    height: 'auto',
+    minHeight: 400
 })
 
 const uploadIconTheme = new IconThemeData({
@@ -81,6 +77,7 @@ interface IState {
     imageVisible: boolean
     imageUrl: string
     barActions: IBarActions[]
+    barActionData: IFieldTableEdits[]
 }
 
 const AntModel = styled(Modal)`
@@ -122,7 +119,8 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         editVisible: false,
         imageVisible: false,
         imageUrl: '',
-        editDialogTitle: ''
+        editDialogTitle: '',
+        barActionData: []
     }
 
     public render(): JSX.Element {
@@ -144,7 +142,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                                     <ActionButton
                                                         mold="primary"
                                                         key={index}
-                                                        onClick={this.handleAddItem.bind(this, i.url)}
+                                                        onClick={this.handleAddItem.bind(this, i.url, i.data)}
                                                     >
                                                         {i.label}
                                                     </ActionButton>
@@ -172,6 +170,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     <Image src={imageUrl} style={{ width: '100%' }} />
                 </AntModel>
                 <Dialog
+                    theme={dialogTheme}
                     title={editDialogTitle}
                     visible={editVisible}
                     onClose={this.handleDialogClose}
@@ -215,48 +214,34 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         }
     }
 
-    private handleAddItem = (url: string) => {
+    private handleAddItem = (url: string, data: IFieldTableEdits[]) => {
         this.btnType = 'add'
         this.actionUrl = url
         this.setState({
             editDialogTitle: '新增',
             editVisible: true,
+            barActionData: data
         })
     }
 
     private getItems = (fn: IFormFun) => {
-        const { tableEdits } = this.state
+        const { barActionData } = this.state
         this.fn = fn
         const items: IFormItem[] = [{
             component: 'NULL',
             field: 'id'
         }]
-        tableEdits.forEach((i: any) => {
+        barActionData.forEach((i: any) => {
             switch (i.type) {
-                case 'img': items.push({
+                case 'image': items.push({
                     component: 'Label',
-                    // props: {
-                    //     maxLength: 1,
-                    //     crop: true,
-                    //     cropProps: {
-                    //         cropSize: {
-                    //             width: 620,
-                    //             height: 310,
-                    //         }
-                    //     },
-                    //     action: 'https://robin-animate.oss-cn-chengdu.aliyuncs.com',
-                    //     theme: uploadTheme,
-                    //     name: 'file',
-                    //     onBeforeUpload: this.handleBeforeUpload,
-                    //     baseUrl: imgUrl
-                    // },
                     render: (val: string) => {
                         return (
                             <UploadBox
                                 className="flex_center"
                                 onClick={this.handleImageView}
                             >
-                                {val ? <Image src={imgUrl + val} /> : <UoloadIcon icon="ios-add" theme={uploadIconTheme} />}
+                                {val ? <Image src={imgUrl + val} style={{ width: '100%' }} /> : <UoloadIcon icon="ios-add" theme={uploadIconTheme} />}
                             </UploadBox>
                         )
                     },
@@ -266,11 +251,15 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                 default: items.push({
                     component: i.type,
                     field: i.field,
+                    props: {
+                        placeholder: `请输入${i.label}`
+                    },
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 })
             }
 
         })
+        console.log(items)
         return items
     }
 
@@ -355,12 +344,25 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                 title: i.label,
                                 dataIndex: i.field,
                                 key: i.field,
-                                render: (status: boolean | number) => {
-                                    if (isBoolean(status)) {
-                                        return <Tag color={status ? 'green' : 'red'}>{status ? '使用中' : '未启用'}</Tag>
-                                    } else {
-                                        return '111'
+                                render: (status: boolean | number | string) => {
+                                    const convert = i.convert.split(';').map((i: string) => {
+                                        const v = i.split('=>')
+                                        return {
+                                            k: v[0] || '',
+                                            v: (v[1] || '').split(':')[0],
+                                            c: (v[1] || '').split(':')[1] || ''
+                                        }
+                                    }).filter((i) => {
+                                        if (i.k == status.toString()) {
+                                            return true
+                                        } else {
+                                            return false
+                                        }
+                                    })
+                                    if (convert.length) {
+                                        return <Tag color={convert[0].c || '#4395ff'}>{convert[0].v}</Tag>
                                     }
+                                    return ''
                                 }
                             }
                         }

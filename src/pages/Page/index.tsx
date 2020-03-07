@@ -2,7 +2,7 @@ import React, { Component, Fragment, ChangeEvent } from 'react'
 import { isNil } from 'lodash'
 import styled from 'styled-components'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
-import { Button, LabelHeader, Form, Input, Select, Icon, Divider, Dialog } from 'components'
+import { Button, LabelHeader, Form, Input, Select, Icon, Divider, Dialog, RadioGroup } from 'components'
 import http, { getTitle, getJurisd, httpUtils } from '../../utils/axios'
 import { connect, DispatchProp } from 'react-redux'
 import { IFormItem, IFormFun } from 'src/components/lib/Form'
@@ -31,6 +31,7 @@ export interface IBarActions {
     type: string
     label: string
     url: string
+    data: IFieldTableEdits[]
 }
 
 export interface IFieldParams {
@@ -38,6 +39,7 @@ export interface IFieldParams {
     label: string
     field: string
     actions: IFieldActions[]
+    convert: string
 }
 
 
@@ -118,6 +120,9 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         label: '时间',
         value: 'date',
     }, {
+        label: '状态',
+        value: 'status',
+    }, {
         label: '操作',
         value: 'actions',
     }]
@@ -171,6 +176,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
 
     public render(): JSX.Element {
         const { visible } = this.state
+        const { params } = this.props.match
         return (
             <GlobalView>
                 <LayoutNavBar
@@ -179,7 +185,10 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                     title={<LabelHeader title={this.title} line="vertical" />}
                     right={
                         <Fragment>
-                            {getJurisd(7) && <Button mold="primary" onClick={this.handleAddPage}>新增页面</Button>}
+                            {params.id ?
+                                (getJurisd(10) && <Button mold="primary" onClick={this.handleUpdatePage}>更新页面</Button>) :
+                                (getJurisd(11) && <Button mold="primary" onClick={this.handleAddPage}>新增页面</Button>)
+                            }
                         </Fragment>
                     }
                 />
@@ -236,6 +245,20 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                                         onChange={this.handelTableDataSelectChange.bind(this, index, 'type')}
                                     />
                                 </div>
+                                <div className="flex" style={{ marginTop: getUnit(5) }}>
+                                    <FieldLabel className="flex_center">是否为必须</FieldLabel>
+                                    <div
+                                        className="flex_1 flex_justify"
+                                        style={{ height: getUnit(32), border: '0.05rem solid rgb(232,232,232)' }}
+                                    >
+                                        <RadioGroup
+                                            style={{ marginLeft: getUnit(10) }}
+                                            value={i.require}
+                                            options={[{ label: '是', value: true }, { label: '否', value: false }]}
+                                            onChange={this.handelTableDataSelectChange.bind(this, index, 'require')}
+                                        />
+                                    </div>
+                                </div>
                                 <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleTableDataClose.bind(this, index)} />
                             </FieldBox>
 
@@ -259,7 +282,9 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         const { fieldItem } = this.state
         if (this.tableFn) {
             const data = this.tableFn.getFieldValue()
-            data[fieldItem.field].push({})
+            data[fieldItem.field].push({
+                require: false
+            })
             this.tableFn.setFieldValue({ ...data })
         }
     }
@@ -282,7 +307,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         }
     }
 
-    private handelTableDataSelectChange = (index: number, field: string, val: string | number) => {
+    private handelTableDataSelectChange = (index: number, field: string, val: any) => {
         const { fieldItem } = this.state
         if (this.tableFn) {
             const data = this.tableFn.getFieldValue()
@@ -375,7 +400,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                                         options={this.tableBarOptions}
                                         onChange={this.handelFileldSelectChange.bind(this, index, 'barActions', 'type')}
                                     />
-                                    <Button mold="primary" disabled={i.type !== 'add'} onClick={this.handleAddVisible.bind(this, index, 'barActions')}>设置添加数据</Button>
+                                    <Button mold="primary" disabled={i.type !== 'add'} onClick={this.handleAddVisible.bind(this, index, 'barActions', i.data)}>设置添加数据</Button>
                                 </div>
 
                                 <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFieldClose.bind(this, index, 'barActions')} />
@@ -422,6 +447,19 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                                         onChange={this.handleFieldsChange.bind(this, index, 'tableParams', 'label')}
                                     />
                                 </div>
+                                {
+                                    i.type === 'status' && (
+                                        <div className="flex" style={{ marginTop: getUnit(5) }}>
+                                            <FieldLabel className="flex_center">状态转换</FieldLabel>
+                                            <Input
+                                                className="flex_1"
+                                                value={i.convert}
+                                                placeholder="例: 1=>成功;2=>失败:red;"
+                                                onChange={this.handleFieldsChange.bind(this, index, 'tableParams', 'convert')}
+                                            />
+                                        </div>
+                                    )
+                                }
                                 <div className="flex" style={{ marginTop: getUnit(5) }}>
                                     <FieldLabel className="flex_center">显示类型</FieldLabel>
                                     <Select
@@ -577,6 +615,9 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
             const pageData = this.fn.getFieldValue()
             pageData[fieldItem.field][fieldItem.index].data = data[fieldItem.field]
             this.fn.setFieldValue({ ...pageData })
+            this.setState({
+                visible: false
+            })
         }
     }
 
@@ -593,13 +634,13 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         })
     }
 
-    private handleAddVisible = (index: number, field: string) => {
+    private handleAddVisible = (index: number, field: string, data?: any[]) => {
         this.setState({
             visible: true,
             fieldItem: {
                 field,
                 index,
-                data: [{}]
+                data: data || [{ require: true }]
             }
         })
     }
@@ -763,6 +804,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                 field: '',
                 type: '',
                 actions: [],
+                convert: ''
             })
             this.fn.updateFieldProps({ tableParams: [...tableParams] })
         }
@@ -777,6 +819,22 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                 url: '',
             })
             this.fn.updateFieldProps({ tableParams: [...tableParams] })
+        }
+    }
+
+    private handleUpdatePage = async () => {
+        const { dispatch } = this.props
+        try {
+            if (this.fn) {
+                const data = this.fn.getFieldValue()
+                dispatch({ type: SET_SPINLOADING_DATA, data: true })
+                await http('adminPage/update', data)
+                dispatch({ type: SET_SPINLOADING_DATA, data: false })
+                message.success('更新成功')
+            }
+        } catch (e) {
+            dispatch({ type: SET_SPINLOADING_DATA, data: false })
+            httpUtils.verify(e)
         }
     }
 
