@@ -1,6 +1,7 @@
 import React, { Component, ComponentProps, Fragment } from 'react'
 import { Modal } from 'antd'
 import styled from 'styled-components'
+import { parse } from 'query-string'
 import { isBoolean, find } from 'lodash'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
 import { Button, Dialog, LabelHeader, Form, Tag, Table, Label, Image, Icon } from 'components'
@@ -12,7 +13,7 @@ import moment from 'moment'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { ITableColumns } from 'src/components/lib/Table'
 import { GlobalView, FormLable, FormRequire } from 'src/utils/node'
-import { NavBarThemeData, Color,  IconThemeData, getUnit, DialogThemeData } from 'src/components/lib/utils'
+import { NavBarThemeData, Color, IconThemeData, getUnit, DialogThemeData } from 'src/components/lib/utils'
 import { SET_ARTICLE_DATA, GET_CAROUSEL, SET_SPINLOADING_DATA } from 'src/store/action'
 import { RouteComponentProps, Link } from 'react-router-dom'
 import { IPageType, IFieldParams, IFieldTableEdits, IBarActions } from '../Page'
@@ -257,9 +258,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 })
             }
-
         })
-        console.log(items)
         return items
     }
 
@@ -376,10 +375,10 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                         return (
                                             <Fragment>
                                                 {
-                                                    i.actions.map((i, index: number) => {
-                                                        switch (i.type) {
+                                                    i.actions.map((k, index: number) => {
+                                                        switch (k.type) {
                                                             case 'link': {
-                                                                const url = i.url.split('/').map((i) => {
+                                                                const url = k.url.split('/').map((i) => {
                                                                     if (i.includes(':')) {
                                                                         return data[i.split(':')[1]]
                                                                     } else {
@@ -392,21 +391,43 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                                                     </Link>
                                                                 )
                                                             }
-                                                            case 'status': return (
-                                                                <Label
-                                                                    color="green"
-                                                                    key={index}
-                                                                    onClick={this.handleInUrl.bind(this, i.url, { id: data.id })}
-                                                                >
-                                                                    {i.label}
-                                                                </Label>
-                                                            )
+                                                            case 'status': {
+                                                                const urls = k.url.split(';')
+                                                                const convert = k.label.split(';').map((i: string, index: number) => {
+                                                                    const v = i.split('=>')
+                                                                    return {
+                                                                        k: v[0] || '',
+                                                                        v: (v[1] || '').split(':')[0],
+                                                                        c: (v[1] || '').split(':')[1] || '',
+                                                                        u: urls[index] || ''
+                                                                    }
+                                                                }).filter((z) => {
+                                                                    if (z.k == data[k.field].toString()) {
+                                                                        return true
+                                                                    } else {
+                                                                        return false
+                                                                    }
+                                                                })
+                                                                if (convert.length) {
+                                                                    const u = convert[0].u.split('?')
+                                                                    const params = parse(u[1])
+                                                                    return (
+                                                                        <Label
+                                                                            color={convert[0].c || 'green'}
+                                                                            key={index}
+                                                                            onClick={this.handleInUrl.bind(this, u[0], { id: data.id, ...params })}
+                                                                        >
+                                                                            {convert[0].v}
+                                                                        </Label>
+                                                                    )
+                                                                }
+                                                            }
                                                             default: return (
                                                                 <Label
                                                                     key={index}
-                                                                    onClick={this.handleEdit.bind(this, i.url, data, k)}
+                                                                    onClick={this.handleEdit.bind(this, k.url, data, k)}
                                                                 >
-                                                                    {i.label}
+                                                                    {k.label}
                                                                 </Label>
                                                             )
                                                         }
@@ -446,11 +467,13 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
     }
 
     private handleEdit = (url: string, data: any, index: number) => {
+        const { tableEdits } = this.state
         this.index = index
         this.actionUrl = url
         this.setState({
             editDialogTitle: '修改',
-            editVisible: true
+            editVisible: true,
+            barActionData: tableEdits
         }, () => {
             setTimeout(() => {
                 this.fn && this.fn.setFieldValue(data)
@@ -470,7 +493,11 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         const { pageData } = this.state
         try {
             dispatch({ type: SET_SPINLOADING_DATA, data: true })
-            const { data } = await http(url, { skip: pageData.skip, page: pageData.page })
+            const { data } = await http(url, {
+                ...params,
+                page: pageData.page,
+                skip: pageData.skip,
+            })
             this.setState({
                 pageData: data
             })

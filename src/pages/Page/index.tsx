@@ -25,6 +25,7 @@ interface IFieldActions {
     label: string
     type: IFieldActionType
     url: string
+    field: string
 }
 
 export interface IBarActions {
@@ -136,6 +137,9 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
     }, {
         label: '路由',
         value: 'link',
+    }, {
+        label: '状态',
+        value: 'status',
     }]
 
     private tableFieldTypes = [{
@@ -166,7 +170,22 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         try {
             dispatch({ type: SET_SPINLOADING_DATA, data: true })
             const { data } = await http('adminPage/findOne', { id })
+            let status = false
+            data.tableParams.forEach((i: any) => {
+                if (i.type === 'actions') {
+                    i.actions.forEach((v: any) => {
+                        if (v.type === 'edit') {
+                            status = true
+                        }
+                    })
+                }
+            })
             this.fn && this.fn.setFieldValue(data)
+            if (status) {
+                this.fn && this.fn.showFieldElement(['tableEdits'])
+            } else {
+                this.fn && this.fn.hideFieldElement(['tableEdits'])
+            }
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
         } catch (e) {
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
@@ -489,8 +508,8 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                                                     <Input
                                                         className="flex_1"
                                                         value={v.label}
-                                                        placeholder="请输入功能名称"
-                                                        onChange={this.handleActionLabelChange.bind(this, index, k)}
+                                                        placeholder={v.type === 'status' ? '例：1=>使用:green;2=>禁用:red;' : '请输入功能名称'}
+                                                        onChange={this.handleActionFieldChange.bind(this, index, k, 'label')}
                                                     />
                                                 </div>
                                                 <div className="flex" style={{ marginTop: getUnit(5) }}>
@@ -498,10 +517,23 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                                                     <Input
                                                         className="flex_1"
                                                         value={v.url}
-                                                        placeholder="请输入请求地址"
-                                                        onChange={this.handleActionUrlChange.bind(this, index, k)}
+                                                        placeholder={v.type === 'status' ? 'status/ok?a=b;status/no;' : '请输入请求地址'}
+                                                        onChange={this.handleActionFieldChange.bind(this, index, k, 'url')}
                                                     />
                                                 </div>
+                                                {
+                                                    v.type === 'status' && (
+                                                        <div className="flex" style={{ marginTop: getUnit(5) }}>
+                                                            <FieldLabel className="flex_center">对应字段名</FieldLabel>
+                                                            <Input
+                                                                className="flex_1"
+                                                                value={v.field}
+                                                                placeholder="请输入字段名"
+                                                                onChange={this.handleActionFieldChange.bind(this, index, k, 'field')}
+                                                            />
+                                                        </div>
+                                                    )
+                                                }
                                                 <div className="flex" style={{ marginTop: getUnit(5) }}>
                                                     <FieldLabel className="flex_center">功能类型</FieldLabel>
                                                     <Select
@@ -659,20 +691,10 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         }
     }
 
-    private handleActionLabelChange = (index: number, k: number, e: ChangeEvent<HTMLInputElement>) => {
+    private handleActionFieldChange = (index: number, k: number, field: string, e: ChangeEvent<HTMLInputElement>) => {
         if (this.fn) {
             const { tableParams } = this.fn.getFieldValue()
-            tableParams[index].actions[k].label = e.target.value
-            this.fn.setFieldValue({
-                tableParams: [...tableParams]
-            })
-        }
-    }
-
-    private handleActionUrlChange = (index: number, k: number, e: ChangeEvent<HTMLInputElement>) => {
-        if (this.fn) {
-            const { tableParams } = this.fn.getFieldValue()
-            tableParams[index].actions[k].url = e.target.value
+            tableParams[index].actions[k][field] = e.target.value
             this.fn.setFieldValue({
                 tableParams: [...tableParams]
             })
