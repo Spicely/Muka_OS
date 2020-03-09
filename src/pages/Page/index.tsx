@@ -8,7 +8,7 @@ import { connect, DispatchProp } from 'react-redux'
 import { IFormItem, IFormFun } from 'src/components/lib/Form'
 import { GlobalView } from 'src/utils/node'
 import { IInitState, MukaOS } from 'src/store/state'
-import { NavBarThemeData, Color, getUnit, IconThemeData } from 'src/components/lib/utils'
+import { NavBarThemeData, Color, getUnit, IconThemeData, DialogThemeData } from 'src/components/lib/utils'
 import { GET_REGION, SET_SPINLOADING_DATA } from 'src/store/action'
 import { message } from 'antd'
 import { RouteComponentProps } from 'react-router-dom'
@@ -48,14 +48,19 @@ export interface IFieldTableEdits {
     type: string
     label: string
     field: string
+    url?: string
     require: boolean
+    options?: { label: string, value: any }[]
 }
 
 interface IState {
     pageType: IPageType
     tableFields: IFieldParams[]
     visible: boolean
+    tableEdit: boolean
+    optionsVisible: boolean
     fieldItem: { field: string, data: any[], index: number }
+    optionsItem: { field: string, data: any[], index: number }
 }
 
 const FromLabel = styled.div`
@@ -66,6 +71,10 @@ const FromLabel = styled.div`
 
 const iconTheme = new IconThemeData({
     size: 16
+})
+
+const dialogTheme = new DialogThemeData({
+    height: 'auto'
 })
 
 const FieldBox = styled.div`
@@ -98,7 +107,14 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         pageType: 'table',
         tableFields: [],
         visible: false,
+        optionsVisible: false,
+        tableEdit: false,
         fieldItem: {
+            field: '',
+            data: [],
+            index: 0,
+        },
+        optionsItem: {
             field: '',
             data: [],
             index: 0,
@@ -108,6 +124,8 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
     private fn: IFormFun | null = null
 
     private tableFn: IFormFun | null = null
+
+    private optionsFn: IFormFun | null = null
 
     private title = getTitle('/page')
 
@@ -149,6 +167,9 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         label: '选项',
         value: 'Select'
     }, {
+        label: '异步选项',
+        value: 'AsyncSelect'
+    }, {
         label: '图片',
         value: 'image'
     }]
@@ -181,11 +202,9 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                 }
             })
             this.fn && this.fn.setFieldValue(data)
-            if (status) {
-                this.fn && this.fn.showFieldElement(['tableEdits'])
-            } else {
-                this.fn && this.fn.hideFieldElement(['tableEdits'])
-            }
+            this.setState({
+                tableEdit: status
+            })
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
         } catch (e) {
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
@@ -194,7 +213,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
     }
 
     public render(): JSX.Element {
-        const { visible } = this.state
+        const { visible, optionsVisible } = this.state
         const { params } = this.props.match
         return (
             <GlobalView>
@@ -217,11 +236,71 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                     title="数据表设置"
                     onClose={this.handleVisibelClose}
                     onOk={this.handleVisibleOk}
+                    theme={dialogTheme}
                 >
                     <Form getItems={this.getTableDataItems} />
                 </Dialog>
+                <Dialog
+                    visible={optionsVisible}
+                    title="选项数据"
+                    onClose={this.handleOptionsVisibleClose}
+                    onOk={this.handleOptionsVisibleOk}
+                    theme={dialogTheme}
+                >
+                    <Form getItems={this.getOptionsItems} />
+                </Dialog>
             </GlobalView>
         )
+    }
+
+    private getOptionsItems = (fn: IFormFun) => {
+        const { optionsItem } = this.state
+        this.optionsFn = fn
+        const items: IFormItem[] = [{
+            component: 'Label',
+            props: {
+                value: optionsItem.data
+            },
+            render: (val: any[]) => (
+                <div style={{ marginTop: val.length ? getUnit(8) : 0 }}>
+                    {
+                        val.map((i, index: number) => (
+                            <FieldBox key={index} style={{ marginBottom: getUnit(10) }}>
+                                <div className="flex">
+                                    <FieldLabel className="flex_center">字段</FieldLabel>
+                                    <Input
+                                        className="flex_1"
+                                        value={i.label}
+                                        placeholder="请输入选项文字"
+                                        onChange={this.handleOptionsChange.bind(this, index, 'label')}
+                                    />
+                                </div>
+                                <div className="flex" style={{ marginTop: getUnit(5) }}>
+                                    <FieldLabel className="flex_center">文本内容</FieldLabel>
+                                    <Input
+                                        className="flex_1"
+                                        value={i.value}
+                                        placeholder="请输入选项值"
+                                        onChange={this.handleOptionsChange.bind(this, index, 'value')}
+                                    />
+                                </div>
+                                <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleTableDataClose.bind(this, index)} />
+                            </FieldBox>
+
+                        ))
+                    }
+                    <Button
+                        mold="primary"
+                        style={{ width: getUnit(160) }}
+                        onClick={this.handleAddTableData}
+                    >
+                        添加按钮
+                    </Button>
+                </div>
+            ),
+            field: optionsItem.field
+        }]
+        return items
     }
 
     private getTableDataItems = (fn: IFormFun) => {
@@ -308,6 +387,15 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         }
     }
 
+    private handleOptionsChange = (index: number, field: string, e: ChangeEvent<HTMLInputElement>) => {
+        const { optionsItem } = this.state
+        if (this.optionsFn) {
+            const data = this.optionsFn.getFieldValue()
+            data[optionsItem.field][index][field] = e.target.value
+            this.optionsFn.setFieldValue({ ...data })
+        }
+    }
+
     private handleTableDataChange = (index: number, field: string, e: ChangeEvent<HTMLInputElement>) => {
         const { fieldItem } = this.state
         if (this.tableFn) {
@@ -336,7 +424,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
     }
 
     private getItems = (fn: IFormFun) => {
-        const { pageType } = this.state
+        const { pageType, tableEdit } = this.state
         this.fn = fn
         const items: IFormItem[] = [{
             component: 'NULL',
@@ -589,7 +677,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                                         className="flex_1"
                                         value={i.field}
                                         placeholder="请输入列表字段名"
-                                        onChange={this.handleFileldTableFieldChange.bind(this, index)}
+                                        onChange={this.handleFileldTableLabelChange.bind(this, index, 'field')}
                                     />
                                 </div>
                                 <div className="flex" style={{ marginTop: getUnit(5) }}>
@@ -598,7 +686,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                                         className="flex_1"
                                         value={i.label}
                                         placeholder="请输入列表文字"
-                                        onChange={this.handleFileldTableLabelChange.bind(this, index)}
+                                        onChange={this.handleFileldTableLabelChange.bind(this, index, 'label')}
                                     />
                                 </div>
                                 <div className="flex" style={{ marginTop: getUnit(5) }}>
@@ -609,7 +697,28 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                                         options={this.tableFieldTypes}
                                         onChange={this.handelFileldTableSelectChange.bind(this, index)}
                                     />
+                                    {
+                                        i.type === 'Select' && (
+                                            <Button
+                                                mold="primary"
+                                                onClick={this.handleAddOptions.bind(this, index, 'tableEdits', i.options)}
+                                            >
+                                                添加选项
+                                            </Button>
+                                        )
+                                    }
                                 </div>
+                                {i.type === 'AsyncSelect' && (
+                                    <div className="flex" style={{ marginTop: getUnit(5) }}>
+                                        <FieldLabel className="flex_center">请求地址</FieldLabel>
+                                        <Input
+                                            className="flex_1"
+                                            value={i.url}
+                                            placeholder="请输入请求地址"
+                                            onChange={this.handleFileldTableLabelChange.bind(this, index, 'url')}
+                                        />
+                                    </div>
+                                )}
                                 <FiledClose
                                     icon="ios-close"
                                     theme={iconTheme}
@@ -627,16 +736,27 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                     </Button>
                 </div>
             ),
-            visible: false,
+            visible: tableEdit,
             field: 'tableEdits'
         },]
         return items
     }
 
+    private handleAddOptions = (index: number, field: string, data?: any[]) => {
+        this.setState({
+            optionsVisible: true,
+            optionsItem: {
+                field,
+                index,
+                data: data || [{}]
+            }
+        })
+    }
+
     private handleVisibleOk = () => {
         const { fieldItem } = this.state
         if (this.tableFn && this.fn) {
-            let data = this.tableFn.getFieldValue()
+            const data = this.tableFn.getFieldValue()
             data[fieldItem.field] = data[fieldItem.field].filter((i: any) => {
                 if (!isNil(i.label) && !isNil(i.type) && !isNil(i.field)) {
                     return true
@@ -653,11 +773,38 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         }
     }
 
+    private handleOptionsVisibleOk = () => {
+        const { optionsItem } = this.state
+        if (this.optionsFn && this.fn) {
+            const data = this.optionsFn.getFieldValue()
+            data[optionsItem.field] = data[optionsItem.field].filter((i: any) => {
+                if (!isNil(i.label) && !isNil(i.value)) {
+                    return true
+                } else {
+                    return false
+                }
+            })
+            const pageData = this.fn.getFieldValue()
+            pageData[optionsItem.field][optionsItem.index].options = data[optionsItem.field]
+            this.fn.setFieldValue({ ...pageData })
+            this.setState({
+                optionsVisible: false
+            })
+        }
+    }
+
     private handleVisibelClose = () => {
         this.setState({
             visible: false
         })
         this.tableFn && this.tableFn.cleanFieldValue()
+    }
+
+    private handleOptionsVisibleClose = () => {
+        this.setState({
+            optionsVisible: false
+        })
+        this.optionsFn && this.optionsFn.cleanFieldValue()
     }
 
     private handleTypeChange = (val: IPageType) => {
@@ -769,10 +916,10 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         }
     }
 
-    private handleFileldTableLabelChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
+    private handleFileldTableLabelChange = (index: number, field: string, e: ChangeEvent<HTMLInputElement>) => {
         if (this.fn) {
             const { tableEdits } = this.fn.getFieldValue()
-            tableEdits[index].label = e.target.value
+            tableEdits[index][field] = e.target.value
             this.fn.setFieldValue({
                 tableEdits: [...tableEdits]
             })

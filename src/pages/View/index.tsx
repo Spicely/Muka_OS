@@ -124,6 +124,21 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         barActionData: []
     }
 
+    public UNSAFE_componentWillReceiveProps(nextProps: IProps & RouteComponentProps<{ id: string }>) {
+        const { params } = this.props.match
+        if (params.id !== nextProps.match.params.id) {
+            this.setState({
+                barActions: [],
+                tableParams: [],
+                tableEdits: [],
+                barActionData: []
+            }, () => {
+                this.getData(nextProps.match.params.id)
+            })
+
+        }
+    }
+
     public render(): JSX.Element {
         const { title, titleBar, pageType, imageVisible, imageUrl, editVisible, editDialogTitle, barActions } = this.state
         return (
@@ -249,6 +264,19 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     field: i.field,
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 }); break;
+                case 'Select': items.push({
+                    component: 'Select',
+                    props: {
+                        options: i.options,
+                    },
+                    field: i.field,
+                    label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
+                }); break;
+                case 'AsyncSelect': items.push({
+                    component: 'Select',
+                    field: i.field,
+                    label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
+                }); break;
                 default: items.push({
                     component: i.type,
                     field: i.field,
@@ -262,11 +290,11 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         return items
     }
 
-    private getData = async () => {
+    private getData = async (id?: string) => {
         const { dispatch, match } = this.props
         try {
             dispatch({ type: SET_SPINLOADING_DATA, data: true })
-            const { data } = await http('adminPage/findOne', { id: match.params.id })
+            const { data } = await http('adminPage/findOne', { id: id || match.params.id })
             if (data.initUrl) {
                 await this.getTableUrlData(data.initUrl)
             }
@@ -387,7 +415,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                                                 }).join('/')
                                                                 return (
                                                                     <Link key={index} to={url}>
-                                                                        <Label>{i.label}</Label>
+                                                                        <Label>{k.label}</Label>
                                                                     </Link>
                                                                 )
                                                             }
