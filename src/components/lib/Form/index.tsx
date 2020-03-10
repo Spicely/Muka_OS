@@ -20,13 +20,12 @@ import { IEditorProps } from '../Editor'
 import { IItemProps } from '../Item'
 import { ColorResult } from 'react-color'
 import styled from 'styled-components'
-import { format } from 'util'
 
 interface IFormUpload extends IUploadProps {
     label?: string | JSX.Element
 }
 
-type component = 'Colors' | 'Input' | 'Button' | 'Radio' | 'DatePicker' | 'Upload' | 'RangePicker' | 'NULL' | 'Label' | 'RadioGroup' | 'Select' | 'Map' | 'Textarea' | 'Carousel' | 'Slider' | 'CheckBox' | 'Editor' | 'TimePicker' | 'Upload' | 'Item' | 'ItemInput' | 'Dragger'
+type component = 'Colors' | 'Input' | 'Button' | 'Radio' | 'DatePicker' | 'Upload' | 'RangePicker' | 'NULL' | 'Label' | 'RadioGroup' | 'Select' | 'AsyncSelect' | 'Map' | 'Textarea' | 'Carousel' | 'Slider' | 'CheckBox' | 'Editor' | 'TimePicker' | 'Upload' | 'Item' | 'ItemInput' | 'Dragger'
 type props = RadioGroupProps | IInputProps | IButtonProps | ILDatePicker | IFormUpload | IMapProps | ICarouselProps | ITextareaProps | IColorsProps | ISelectProps | ICheckBoxProps | IEditorProps | TimePickerProps | IItemProps | undefined
 
 export interface IFormItem {
@@ -313,6 +312,7 @@ export default class Form extends Component<IFormProps, IState> {
             case 'Label': return loadableComponent(import('../Label'))
             case 'RadioGroup': return loadableComponent(import('../RadioGroup'))
             case 'Select': return loadableComponent(import('../Select'))
+            case 'AsyncSelect': return loadableComponent(import('../Select/async'))
             case 'Map': return loadableComponent(import('../Map'))
             case 'Textarea': return loadableComponent(import('../Textarea'))
             case 'Colors': return loadableComponent(import('../Colors'))
@@ -696,6 +696,27 @@ export default class Form extends Component<IFormProps, IState> {
                 )
             }
             case 'Select': {
+                const vProps = omit(props, ['value', 'onChange'])
+                const _porps: any = props
+                const onChange: any = _porps.onChange
+                return (
+                    <FormItem className={`flex_justify ${className || ''}`} key={field}>
+                        <div className="flex">
+                            {label && <FormItemLabel className="flex_justify">{label}</FormItemLabel>}
+                            <div className="flex_1 flex_justify">
+                                <View
+                                    {...vProps}
+                                    value={vals[field]}
+                                    className={_porps.className}
+                                    onChange={this.setRVal.bind(this, field, onChange)}
+                                />
+                            </div>
+                        </div>
+                        {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
+                    </FormItem>
+                )
+            }
+            case 'AsyncSelect': {
                 const vProps = omit(props, ['value', 'onChange'])
                 const _porps: any = props
                 const onChange: any = _porps.onChange

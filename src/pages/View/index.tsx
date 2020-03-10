@@ -273,8 +273,11 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 }); break;
                 case 'AsyncSelect': items.push({
-                    component: 'Select',
+                    component: 'AsyncSelect',
                     field: i.field,
+                    props: {
+                        url: (i.url.includes('http://') || i.url.includes('https://')) ? i.url : baseUrl + i.url
+                    },
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 }); break;
                 default: items.push({
