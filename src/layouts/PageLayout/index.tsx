@@ -414,7 +414,7 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
         }
     }
 
-    public componentWillReceiveProps(nextProps: IPageLayout) {
+    public UNSAFE_componentWillReceiveProps(nextProps: IPageLayout) {
         const { history } = this.props
         if (!nextProps.isLogin) {
             history.replace('/login')

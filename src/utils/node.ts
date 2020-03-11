@@ -1,5 +1,5 @@
 import { getUnit } from './../components/lib/utils/index';
-import { ThemeData, getRatioUnit } from 'src/components/lib/utils'
+import { getRatioUnit } from 'src/components/lib/utils'
 import styled, { css, createGlobalStyle } from 'styled-components'
 import { Label } from 'src/components'
 /** 全局样式DOM */

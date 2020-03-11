@@ -38,7 +38,7 @@ interface IStyleProps {
 
 const SelectIcon = styled(Icon)``
 
-const SelectView = styled(ReactSelect) <IStyleProps>`
+const SelectView = styled(ReactSelect)<IStyleProps>`
     height: ${({ selectTheme }) => getUnit(selectTheme.height)};
     background: #fff;
     ${({ selectTheme, theme }) => selectTheme.borderRadius || theme.borderRadius}
@@ -147,8 +147,6 @@ export default class AsyncSelect extends Component<ISelectProps, IState> {
     public render(): JSX.Element {
         const { className, options, placeholder, isSearchable, isMulti, isDisabled, theme, loadOptions, url } = this.props
         const { value } = this.state
-        let loadOption: any = loadOptions
-
         return (
             <Consumer>
                 {

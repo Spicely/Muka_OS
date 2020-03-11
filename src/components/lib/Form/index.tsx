@@ -1,4 +1,4 @@
-import React, { Component, ChangeEvent, CSSProperties } from 'react'
+import React, { Component, ChangeEvent, CSSProperties, Fragment } from 'react'
 import Loadable from 'react-loadable'
 import moment from 'moment'
 import { get } from 'lodash'
@@ -195,10 +195,17 @@ export default class Form extends Component<IFormProps, IState> {
         const items = getItems(this.lref)
         this.items = items
         const newChild: IFormChild[] = [...childs]
-        items.forEach((item: IFormItem, index: number) => {
+        let newVals: IValue = {}
+        const keys = Object.keys(vals)
+        items.map((i) => {
+            if (i.field && keys.includes(i.field)) {
+                newVals[i.field] = vals[i.field]
+            }
+            return i
+        }).forEach((item: IFormItem, index: number) => {
             // 如果组件不存在 则创建
+            const field = item.field || `${item.component}_${index}`
             if (!newChild[index]) {
-                const field = item.field || `${item.component}_${index}`
                 const _porps: IValue = item.props || {}
                 newChild[index] = {
                     type: item.component,
@@ -213,17 +220,17 @@ export default class Form extends Component<IFormProps, IState> {
                     extend: item.extend
                 }
                 switch (item.component) {
-                    case 'Radio': vals[field] = _porps.value; break
-                    case 'Slider': vals[field] = _porps.value || _porps.defaultValue || 0; break
-                    case 'Colors': vals[field] = _porps.initColor || ''; break
-                    case 'Dragger': vals[field] = _porps.fileList || (_porps.maxLength > 1 ? [] : ''); break
-                    case 'Upload': vals[field] = _porps.value ? isString(_porps.value) ? [{ url: _porps.value }] : _porps.value : []; break
-                    case 'Carousel': vals[field] = _porps.value || []; break
-                    case 'RadioGroup': vals[field] = isUndefined(_porps.value) ? '' : _porps.value; break
-                    case 'CheckBox': vals[field] = _porps.value || []; break
-                    case 'RangePicker': vals[field] = _porps.value || []; break
-                    case 'Map': vals[field] = _porps.value || {}; break
-                    default: vals[field] = _porps.value || ''
+                    case 'Radio': newVals[field] = _porps.value; break
+                    case 'Slider': newVals[field] = _porps.value || _porps.defaultValue || 0; break
+                    case 'Colors': newVals[field] = _porps.initColor || ''; break
+                    case 'Dragger': newVals[field] = _porps.fileList || (_porps.maxLength > 1 ? [] : ''); break
+                    case 'Upload': newVals[field] = _porps.value ? isString(_porps.value) ? [{ url: _porps.value }] : _porps.value : []; break
+                    case 'Carousel': newVals[field] = _porps.value || []; break
+                    case 'RadioGroup': newVals[field] = isUndefined(_porps.value) ? '' : _porps.value; break
+                    case 'CheckBox': newVals[field] = _porps.value || []; break
+                    case 'RangePicker': newVals[field] = _porps.value || []; break
+                    case 'Map': newVals[field] = _porps.value || {}; break
+                    default: newVals[field] = _porps.value || ''
                 }
                 return
             }
@@ -237,11 +244,23 @@ export default class Form extends Component<IFormProps, IState> {
                 newChild[index].visible = isBool(item.visible) ? item.visible : true
                 newChild[index].extend = item.extend
                 newChild[index].render = item.render
+                newChild[index].label = item.label
+            } else if (item.field !== newChild[index].field && item.field) {
+                newChild[index].props = {
+                    ...item.props,
+                    ...newChild[index].props,
+                }
+                newChild[index].field = item.field
+                newChild[index].additional = item.additional
+                newChild[index].visible = isBool(item.visible) ? item.visible : true
+                newChild[index].extend = item.extend
+                newChild[index].render = item.render
+                newChild[index].label = item.label
             }
         })
         this.setState({
             childs: newChild,
-            vals: { ...vals }
+            vals: { ...newVals }
         }, () => {
             this.getTypeChild()
         })
@@ -250,16 +269,20 @@ export default class Form extends Component<IFormProps, IState> {
     public render(): JSX.Element {
         const { className, showType, style } = this.props
         const { childs } = this.state
-        return (
-            <div className={getClassName(`l_form ${showType}`, className)} style={style}>
-                {childs.map((item: IFormChild, index: number) => {
-                    if (item.view && item.visible) {
-                        return this.setTypeCom(this.items[index].component, item.view, item.props, item.field, index, item.className, item.label, item.additional, item.render, item.extend)
-                    }
-                    return undefined
-                })}
-            </div>
-        )
+        try {
+            return (
+                <div className={getClassName(`l_form ${showType}`, className)} style={style}>
+                    {childs.map((item: IFormChild, index: number) => {
+                        if (item.view && item.visible) {
+                            return this.setTypeCom(this.items[index].component, item.view, item.props, item.field, index, item.className, item.label, item.additional, item.render, item.extend)
+                        }
+                        return undefined
+                    })}
+                </div>
+            )
+        } catch (e) {
+            return <Fragment />
+        }
     }
 
     public componentDidMount() {
@@ -268,35 +291,46 @@ export default class Form extends Component<IFormProps, IState> {
 
     private getTypeChild() {
         const { childs } = this.state
-        const newChilds = childs.map((item: IFormChild, index: number) => {
-            if (item.view) {
-                if (item.type !== this.items[index].component) {
+        let newChilds
+        try {
+            newChilds = childs.map((item: IFormChild, index: number) => {
+                if (item.view) {
+                    if (item.type !== this.items[index].component) {
+                        const Com = this.typeChild(this.items[index].component)
+                        if (Com) {
+                            item.view = Com
+                        }
+                    }
+                } else {
                     const Com = this.typeChild(this.items[index].component)
+                    const field = item.field || `${item.type}_${index}`
                     if (Com) {
-                        item.view = Com
+                        item = {
+                            ...item,
+                            view: Com,
+                            type: item.type,
+                            field,
+                            label: item.label,
+                            props: item.props || {},
+                            visible: isUndefined(item.visible) ? true : item.visible,
+                            render: item.render
+                        }
                     }
                 }
-            } else {
-                const Com = this.typeChild(this.items[index].component)
-                const field = item.field || `${item.type}_${index}`
-                if (Com) {
-                    item = {
-                        ...item,
-                        view: Com,
-                        type: item.type,
-                        field,
-                        label: item.label,
-                        props: item.props || {},
-                        visible: isUndefined(item.visible) ? true : item.visible,
-                        render: item.render
-                    }
-                }
-            }
-            return item
-        })
+                return item
+            })
+        } catch (e) {
+            newChilds = []
+        }
         this.setState({
             childs: newChilds
         })
+    }
+
+    public componentWillUnmount() {
+        this.setState = (state, callback) => {
+            return;
+        }
     }
 
     // tslint:disable-next-line: no-shadowed-variable

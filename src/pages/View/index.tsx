@@ -284,7 +284,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     component: i.type,
                     field: i.field,
                     props: {
-                        placeholder: `请输入${i.label}`
+                        placeholder: `请输入${i.label}`,
                     },
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 })
@@ -383,7 +383,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                             c: (v[1] || '').split(':')[1] || ''
                                         }
                                     }).filter((i) => {
-                                        if (i.k == status.toString()) {
+                                        if (i.k === status.toString()) {
                                             return true
                                         } else {
                                             return false
@@ -456,7 +456,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                                             default: return (
                                                                 <Label
                                                                     key={index}
-                                                                    onClick={this.handleEdit.bind(this, k.url, data, k)}
+                                                                    onClick={this.handleEdit.bind(this, k.url, k.label, k.data || [], data, k)}
                                                                 >
                                                                     {k.label}
                                                                 </Label>
@@ -497,18 +497,17 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         })
     }
 
-    private handleEdit = (url: string, data: any, index: number) => {
-        const { tableEdits } = this.state
+    private handleEdit = (url: string, title: string, items: any[], data: any, index: number) => {
         this.index = index
         this.actionUrl = url
         this.setState({
-            editDialogTitle: '修改',
+            editDialogTitle: title,
             editVisible: true,
-            barActionData: tableEdits
+            barActionData: items
         }, () => {
             setTimeout(() => {
                 this.fn && this.fn.setFieldValue(data)
-            }, 10)
+            }, 1)
         })
     }
 
