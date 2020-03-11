@@ -317,6 +317,15 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                         val.map((i, index: number) => (
                             <FieldBox key={index} style={{ marginBottom: getUnit(10) }}>
                                 <div className="flex">
+                                    <FieldLabel className="flex_center">显示类型</FieldLabel>
+                                    <Select
+                                        className="flex_1"
+                                        value={i.type}
+                                        options={this.tableFieldTypes}
+                                        onChange={this.handelTableDataSelectChange.bind(this, index, 'type')}
+                                    />
+                                </div>
+                                <div className="flex" style={{ marginTop: getUnit(5) }}>
                                     <FieldLabel className="flex_center">字段</FieldLabel>
                                     <Input
                                         className="flex_1"
@@ -332,15 +341,6 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                                         value={i.label}
                                         placeholder="请输入文本内容"
                                         onChange={this.handleTableDataChange.bind(this, index, 'label')}
-                                    />
-                                </div>
-                                <div className="flex" style={{ marginTop: getUnit(5) }}>
-                                    <FieldLabel className="flex_center">显示类型</FieldLabel>
-                                    <Select
-                                        className="flex_1"
-                                        value={i.type}
-                                        options={this.tableFieldTypes}
-                                        onChange={this.handelTableDataSelectChange.bind(this, index, 'type')}
                                     />
                                 </div>
                                 <div className="flex" style={{ marginTop: getUnit(5) }}>
@@ -482,6 +482,16 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                         val.map((i, index: number) => (
                             <FieldBox key={index} style={{ marginBottom: getUnit(10) }}>
                                 <div className="flex">
+                                    <FieldLabel className="flex_center">显示类型</FieldLabel>
+                                    <Select
+                                        className="flex_1"
+                                        value={i.type}
+                                        options={this.tableBarOptions}
+                                        onChange={this.handelFileldSelectChange.bind(this, index, 'barActions', 'type')}
+                                    />
+                                    <Button mold="primary" disabled={i.type !== 'add'} onClick={this.handleAddVisible.bind(this, index, 'barActions', i.data)}>设置添加数据</Button>
+                                </div>
+                                <div className="flex" style={{ marginTop: getUnit(5) }}>
                                     <FieldLabel className="flex_center">请求地址</FieldLabel>
                                     <Input
                                         className="flex_1"
@@ -499,17 +509,6 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                                         onChange={this.handleFieldsChange.bind(this, index, 'barActions', 'label')}
                                     />
                                 </div>
-                                <div className="flex" style={{ marginTop: getUnit(5) }}>
-                                    <FieldLabel className="flex_center">显示类型</FieldLabel>
-                                    <Select
-                                        className="flex_1"
-                                        value={i.type}
-                                        options={this.tableBarOptions}
-                                        onChange={this.handelFileldSelectChange.bind(this, index, 'barActions', 'type')}
-                                    />
-                                    <Button mold="primary" disabled={i.type !== 'add'} onClick={this.handleAddVisible.bind(this, index, 'barActions', i.data)}>设置添加数据</Button>
-                                </div>
-
                                 <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFieldClose.bind(this, index, 'barActions')} />
                             </FieldBox>
 
