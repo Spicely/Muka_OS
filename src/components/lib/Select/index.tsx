@@ -53,7 +53,7 @@ const SelectView = styled(ReactSelect)<IStyleProps>`
         height: 100%;
         box-shadow: inherit;
         border-radius: inherit;
-        ${({ selectTheme }) => selectTheme.border};
+        ${({ selectTheme }: any) => selectTheme.border};
         background: inherit;
         ${transition(0.5)};
         ${SelectIcon} {
