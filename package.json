@@ -188,6 +188,14 @@
         },
         "components"
       ],
+      [
+        "import",
+        {
+          "libraryName": "antd",
+          "style": false
+        },
+        "antd"
+      ],
       "lodash"
     ]
   }
