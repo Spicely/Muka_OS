@@ -1,20 +1,17 @@
-import React, { Component, ComponentProps, Fragment } from 'react'
+import React, { Component, Fragment } from 'react'
 import { Modal } from 'antd'
 import styled from 'styled-components'
 import { parse } from 'query-string'
-import { isBoolean, find } from 'lodash'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
 import { Button, Dialog, LabelHeader, Form, Tag, Table, Label, Image, Icon } from 'components'
-import http, { httpUtils, getTitle, getJurisd, imgUrl, baseUrl } from 'src/utils/axios'
-import { IArticle } from 'src/store/reducers/article'
+import http, { httpUtils, imgUrl, baseUrl } from 'src/utils/axios'
 import { connect, DispatchProp } from 'react-redux'
 import { IInitState, MukaOS, ITabelRes } from 'src/store/state'
 import moment from 'moment'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
-import { ITableColumns } from 'src/components/lib/Table'
-import { GlobalView, FormLable, FormRequire } from 'src/utils/node'
+import { GlobalView } from 'src/utils/node'
 import { NavBarThemeData, Color, IconThemeData, getUnit, DialogThemeData } from 'src/components/lib/utils'
-import { SET_ARTICLE_DATA, GET_CAROUSEL, SET_SPINLOADING_DATA } from 'src/store/action'
+import { SET_SPINLOADING_DATA } from 'src/store/action'
 import { RouteComponentProps, Link } from 'react-router-dom'
 import { IPageType, IFieldParams, IFieldTableEdits, IBarActions } from '../Page'
 import { imageModal } from 'src/utils'
@@ -72,7 +69,6 @@ interface IState {
     pageType?: IPageType
     pageData: ITabelRes
     tableParams: IFieldParams[]
-    tableEdits: IFieldTableEdits[]
     editDialogTitle: string
     editVisible: boolean
     imageVisible: boolean
@@ -116,7 +112,6 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         },
         barActions: [],
         tableParams: [],
-        tableEdits: [],
         editVisible: false,
         imageVisible: false,
         imageUrl: '',
@@ -130,8 +125,12 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             this.setState({
                 barActions: [],
                 tableParams: [],
-                tableEdits: [],
-                barActionData: []
+                barActionData: [],
+                pageData: {
+                    page: 1,
+                    data: [],
+                    skip: 10
+                },
             }, () => {
                 this.getData(nextProps.match.params.id)
             })
@@ -433,7 +432,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                                                         u: urls[index] || ''
                                                                     }
                                                                 }).filter((z) => {
-                                                                    if (z.k == data[k.field].toString()) {
+                                                                    if (z.k === data[k.field].toString()) {
                                                                         return true
                                                                     } else {
                                                                         return false
@@ -451,6 +450,8 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                                                             {convert[0].v}
                                                                         </Label>
                                                                     )
+                                                                } else {
+                                                                    return <Fragment />
                                                                 }
                                                             }
                                                             default: return (
