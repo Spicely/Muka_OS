@@ -14,7 +14,7 @@ import { IInitState } from 'src/store/state'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { ITableColumns } from 'src/components/lib/Table'
 import { GlobalView } from 'src/utils/node'
-import { Color, NavBarThemeData, getUnit } from 'src/components/lib/utils'
+import { Color, NavBarThemeData, getUnit, DialogThemeData } from 'src/components/lib/utils'
 import { SET_JURISDICTION_DATA, GET_JURISDICTION } from 'src/store/action'
 import { IJurisdictionOptions } from 'src/store/reducers/jurisdictionOptions'
 
@@ -39,6 +39,11 @@ interface IState {
     treeVal: string[]
     parentVal: string[]
 }
+
+const dialogTheme = new DialogThemeData({
+    height: 'auto',
+    minHeight: 400
+})
 
 class Jurisdiction extends Component<IProps, IState> {
     public state: IState = {
@@ -100,10 +105,10 @@ class Jurisdiction extends Component<IProps, IState> {
                 <Dialog
                     visible={visible}
                     title={dialogName}
+                    theme={dialogTheme}
                     async
                     onOk={this.handleUpdateOrCreate}
                     onClose={this.handleClassifyClose}
-                    style={{ width: '30rem' }}
                 >
                     <div style={{ padding: getUnit(20) }}>
                         <Form getItems={this.getItems} />
@@ -240,6 +245,10 @@ class Jurisdiction extends Component<IProps, IState> {
                         })
                     }
                 })
+            } else {
+                if (data.routers.includes(i.id)) {
+                    treeVal.push(i.id)
+                }
             }
         })
         this.setState({

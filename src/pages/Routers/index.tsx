@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { find } from 'lodash'
 import { message, Modal } from 'antd'
+import styled from 'styled-components'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
 import { Button, Dialog, LabelHeader, Form, Table, Label, Icon, Image, Tag } from 'components'
 import http, { imgUrl, httpUtils, getTitle } from '../../utils/axios'
@@ -11,10 +12,9 @@ import { GlobalView } from 'src/utils/node'
 import { IInitState } from 'src/store/state'
 import { IJurisd } from 'src/store/reducers/jurisd'
 import { IIcons } from 'src/store/reducers/icons'
-import { NavBarThemeData, Color, getUnit } from 'src/components/lib/utils'
+import { NavBarThemeData, Color, getUnit, DialogThemeData } from 'src/components/lib/utils'
 import { SET_ROUTERS_DATA, GET_ROUTER } from 'src/store/action'
 import { IRouters } from 'src/store/reducers/routers'
-import styled from 'styled-components'
 
 const { confirm } = Modal
 
@@ -37,6 +37,12 @@ const FromLabel = styled.div`
     text-align: justify;
     text-align-last: justify;
 `
+
+const dialogTheme = new DialogThemeData({
+    height: 'auto',
+    minHeight: 400
+})
+
 
 class Routers extends Component<IProps, IState> {
 
@@ -125,6 +131,7 @@ class Routers extends Component<IProps, IState> {
                 <Dialog
                     visible={classifyVisible}
                     title={dialogName}
+                    theme={dialogTheme}
                     onOk={this.handleUpdateOrCreate}
                     async
                     onClose={this.handleClassifyClose}
@@ -329,12 +336,8 @@ class Routers extends Component<IProps, IState> {
             this.initIds(data.id)
             setTimeout(() => {
                 this.fn && this.fn.setFieldValue({
-                    name: data.name,
-                    path: data.path,
-                    id: data.id,
-                    parent: data.parent,
+                    ...data,
                     icon: data.icon ? data.icon.id : null,
-                    sort: data.sort
                 })
             }, 10)
         })

@@ -1,23 +1,24 @@
 import React, { Component, Fragment } from 'react'
-import { Modal } from 'antd'
+import { Modal, message } from 'antd'
+import { isNil } from 'lodash'
 import styled from 'styled-components'
 import { parse } from 'query-string'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
-import { Button, Dialog, LabelHeader, Form, Tag, Table, Label, Image, Icon } from 'components'
+import { Button, Dialog, LabelHeader, Form, Tag, Table, Label, Image, Icon, TabBar } from 'components'
 import http, { httpUtils, imgUrl, baseUrl } from 'src/utils/axios'
 import { connect, DispatchProp } from 'react-redux'
 import { IInitState, MukaOS, ITabelRes } from 'src/store/state'
 import moment from 'moment'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { GlobalView } from 'src/utils/node'
-import { NavBarThemeData, Color, IconThemeData, getUnit, DialogThemeData } from 'src/components/lib/utils'
+import { NavBarThemeData, Color, IconThemeData, getUnit, DialogThemeData, TabBarThemeData } from 'src/components/lib/utils'
 import { SET_SPINLOADING_DATA } from 'src/store/action'
 import { RouteComponentProps, Link } from 'react-router-dom'
 import { IPageType, IFieldParams, IFieldTableEdits, IBarActions } from '../Page'
 import { imageModal } from 'src/utils'
 
 const FromLabel = styled.div`
-    width: ${getUnit(60)};
+    width: ${getUnit(100)};
     text-align: justify;
     text-align-last: right;
 `
@@ -75,6 +76,7 @@ interface IState {
     imageUrl: string
     barActions: IBarActions[]
     barActionData: IFieldTableEdits[]
+    tabSelects: IFieldParams[]
 }
 
 const AntModel = styled(Modal)`
@@ -91,21 +93,28 @@ const iconTheme = new IconThemeData({
     size: 24
 })
 
+const tabBarTheme = new TabBarThemeData({
+    height: '100%'
+})
+
 class View extends Component<IProps & RouteComponentProps<{ id: string }>, IState> {
 
     private fn?: IFormFun
+
+    private tabBarFuns: IFormFun[] = []
 
     private actionUrl: string = ''
 
     private index: number = 0
 
-    private btnType: string = ''
+    private initUrl: string = ''
 
     public state: IState = {
         title: '',
         titleBar: false,
         pageType: undefined,
         pageData: {
+            total: 0,
             page: 1,
             data: [],
             skip: 10
@@ -116,7 +125,8 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         imageVisible: false,
         imageUrl: '',
         editDialogTitle: '',
-        barActionData: []
+        barActionData: [],
+        tabSelects: []
     }
 
     public UNSAFE_componentWillReceiveProps(nextProps: IProps & RouteComponentProps<{ id: string }>) {
@@ -127,6 +137,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                 tableParams: [],
                 barActionData: [],
                 pageData: {
+                    total: 0,
                     page: 1,
                     data: [],
                     skip: 10
@@ -188,6 +199,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     theme={dialogTheme}
                     title={editDialogTitle}
                     visible={editVisible}
+                    async
                     onClose={this.handleDialogClose}
                     onOk={this.handleDialogOk}
                 >
@@ -203,25 +215,26 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
 
     private handleDialogOk = async () => {
         const { dispatch } = this.props
+        const { pageData, barActionData } = this.state
         try {
             if (this.fn) {
-                dispatch({ type: SET_SPINLOADING_DATA, data: true })
                 const value = this.fn.getFieldValue()
-                const { data } = await http(this.actionUrl, value)
-                if (this.btnType === 'add') {
-                    const { pageData } = this.state
-                    pageData.data.unshift(data)
-                    this.setState({
-                        pageData: { ...pageData }
-                    })
-                } else {
-                    const { pageData } = this.state
-                    pageData.data[this.index] = data
-                    this.setState({
-                        pageData: { ...pageData }
-                    })
+                for (let i = 0; i < barActionData.length; i++) {
+                    if (barActionData[i].require && (isNil(value[barActionData[i].field]) || value[barActionData[i].field] === '')) {
+                        message.error(`请输入${barActionData[i].label}`)
+                        return
+                    }
                 }
-                dispatch({ type: SET_SPINLOADING_DATA, data: false })
+                const { data } = await http(this.actionUrl, {
+                    ...value,
+                    page: pageData.page,
+                    skip: pageData.skip,
+                })
+                this.setState({
+                    editVisible: false,
+                    pageData: data,
+                })
+                this.fn.cleanFieldValue()
             }
         } catch (e) {
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
@@ -230,7 +243,6 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
     }
 
     private handleAddItem = (url: string, data: IFieldTableEdits[]) => {
-        this.btnType = 'add'
         this.actionUrl = url
         this.setState({
             editDialogTitle: '新增',
@@ -242,11 +254,15 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
     private getItems = (fn: IFormFun) => {
         const { barActionData } = this.state
         this.fn = fn
+        return this.initItems(barActionData || [])
+    }
+
+    private initItems = (data: any[]) => {
         const items: IFormItem[] = [{
             component: 'NULL',
             field: 'id'
-        }]
-        barActionData.forEach((i: any) => {
+        }];
+        data.forEach((i: any) => {
             switch (i.type) {
                 case 'image': items.push({
                     component: 'Label',
@@ -279,11 +295,19 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     },
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 }); break;
+                case 'RadioGroup': items.push({
+                    component: 'RadioGroup',
+                    props: {
+                        options: i.options,
+                    },
+                    field: i.field,
+                    label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
+                }); break;
                 default: items.push({
                     component: i.type,
                     field: i.field,
                     props: {
-                        placeholder: `请输入${i.label}`,
+                        placeholder: i.placeholder || `请输入${i.label}`,
                     },
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 })
@@ -298,7 +322,11 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             dispatch({ type: SET_SPINLOADING_DATA, data: true })
             const { data } = await http('adminPage/findOne', { id: id || match.params.id })
             if (data.initUrl) {
-                await this.getTableUrlData(data.initUrl)
+                this.initUrl = data.initUrl
+                switch (data.pageType) {
+                    case 'table': await this.getTableUrlData(data.initUrl); break;
+                    case 'tabBar': await this.getTabBarData(data.initUrl); break;
+                }
             }
             this.setState({
                 ...data
@@ -327,6 +355,23 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         }
     }
 
+    private getTabBarData = async (url: string) => {
+        try {
+            const { data } = await http(url)
+            this.setState({
+                pageData: data
+            }, () => {
+                setTimeout(() => {
+                    this.tabBarFuns.forEach((i) => {
+                        i.setFieldValue(data)
+                    })
+                }, 10)
+            })
+        } catch (e) {
+            httpUtils.verify(e)
+        }
+    }
+
     private getTableUrlData = async (url: string) => {
         try {
             const { data } = await http(url)
@@ -339,7 +384,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
     }
 
     private getPageTypeNode = (pageType?: IPageType) => {
-        const { pageData, tableParams } = this.state
+        const { pageData, tableParams, tabSelects } = this.state
         switch (pageType) {
             case 'table': {
                 const columns = tableParams.map((i) => {
@@ -352,7 +397,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                 render: (val: string) => {
                                     return <Image
                                         src={imgUrl + val}
-                                        style={{ height: getUnit(60), width: getUnit(120) }}
+                                        style={{ height: getUnit(60), maxWidth: getUnit(120) }}
                                         onClick={this.handleImgVisible.bind(this, imgUrl + val)}
                                     />
                                 }
@@ -482,20 +527,85 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                 })
                 return (
                     <Table
+                        bordered
                         columns={columns}
                         dataSource={pageData.data}
                         rowKey={(data: any) => data.id}
+                        pagination={{
+                            showQuickJumper: true,
+                            total: pageData.total,
+                            current: pageData.page,
+                            pageSize: pageData.skip,
+                            onChange: this.handleTableChange
+                        }}
                     />
+                )
+            }
+            case 'tabBar': {
+                return (
+                    <TabBar
+                        theme={tabBarTheme}
+                    >
+                        {
+                            tabSelects.map((i, index: number) => {
+                                return (
+                                    <TabBar.Item title={i.label} key={index}>
+                                        <Form
+                                            style={{ width: getUnit(450) }}
+                                            getItems={this.getTabBarItems.bind(this, index, i.data || [])}
+                                        />
+                                        {i.field && (
+                                            <Button
+                                                async
+                                                mold="primary"
+                                                style={{ marginLeft: getUnit(108) }}
+                                                onClick={this.handleTableUrl.bind(this, i.field, index, i.data || [])}
+                                            >
+                                                提交
+                                            </Button>
+                                        )}
+                                    </TabBar.Item>
+                                )
+                            })
+                        }
+                    </TabBar>
                 )
             }
             default: return null;
         }
     }
 
+    private getTabBarItems = (index: number, data: any[], fn: IFormFun) => {
+        this.tabBarFuns[index] = fn
+        return this.initItems(data)
+    }
+
     private handleImageClose = () => {
         this.setState({
             imageVisible: false,
         })
+    }
+
+    private handleTableChange = async (size: number) => {
+        const { dispatch } = this.props
+        try {
+            if (this.initUrl) {
+                const { pageData } = this.state
+                dispatch({ type: SET_SPINLOADING_DATA, data: true })
+                const { data } = await http(this.initUrl, {
+                    skip: pageData.skip,
+                    page: size
+                })
+                this.setState({
+                    pageData: data
+                })
+                dispatch({ type: SET_SPINLOADING_DATA, data: false })
+            }
+
+        } catch (e) {
+            dispatch({ type: SET_SPINLOADING_DATA, data: false })
+            httpUtils.verify(e)
+        }
     }
 
     private handleEdit = (url: string, title: string, items: any[], data: any, index: number) => {
@@ -535,6 +645,24 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
         } catch (e) {
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
+            httpUtils.verify(e)
+        }
+    }
+
+    private handleTableUrl = async (url: string, index: number, data: any[]) => {
+        try {
+            if (this.tabBarFuns[index]) {
+                const value = this.tabBarFuns[index].getFieldValue()
+                for (let i = 0; i < data.length; i++) {
+                    if (data[i].require && (isNil(value[data[i].field]) || value[data[i].field] === '')) {
+                        message.error(`请输入${data[i].label}`)
+                        return
+                    }
+                }
+                const res = await http(url, value)
+                message.success(res.msg)
+            }
+        } catch (e) {
             httpUtils.verify(e)
         }
     }

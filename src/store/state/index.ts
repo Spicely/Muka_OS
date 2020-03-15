@@ -57,6 +57,7 @@ export namespace MukaOS {
 export interface ITabelRes<T = any> {
     page: number
     skip: number
+    total: number
     data: T[]
 }
 
