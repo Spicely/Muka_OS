@@ -287,6 +287,14 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     field: i.field,
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 }); break;
+                case 'CheckBox': items.push({
+                    component: 'CheckBox',
+                    props: {
+                        options: i.options,
+                    },
+                    field: i.field,
+                    label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
+                }); break;
                 case 'AsyncSelect': items.push({
                     component: 'AsyncSelect',
                     field: i.field,

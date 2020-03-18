@@ -178,6 +178,9 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         label: '选项',
         value: 'Select'
     }, {
+        label: '多选框',
+        value: 'CheckBox',
+    }, {
         label: '异步选项',
         value: 'AsyncSelect'
     }, {
