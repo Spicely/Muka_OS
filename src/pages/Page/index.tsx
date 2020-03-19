@@ -172,6 +172,9 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
     }]
 
     private tableFieldTypes = [{
+        label: '文本',
+        value: 'Label'
+    }, {
         label: '文本框',
         value: 'Input'
     }, {

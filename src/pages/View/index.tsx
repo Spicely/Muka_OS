@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { Modal, message } from 'antd'
 import { isNil } from 'lodash'
-import styled from 'styled-components'
+import styled, { createGlobalStyle } from 'styled-components'
 import { parse } from 'query-string'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
 import { Button, Dialog, LabelHeader, Form, Tag, Table, Label, Image, Icon, TabBar } from 'components'
@@ -63,6 +63,13 @@ interface IProps extends DispatchProp {
     carousel: MukaOS.Carousel
     region: MukaOS.Region[]
 }
+
+const Gstyle = createGlobalStyle`
+    .evc_q {
+        min-height: ${getUnit(30)};
+        height: ${getUnit(30)};
+    }
+`
 
 interface IState {
     title: string
@@ -153,6 +160,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         const { title, titleBar, pageType, imageVisible, imageUrl, editVisible, editDialogTitle, barActions } = this.state
         return (
             <GlobalView>
+                <Gstyle />
                 {
                     titleBar && (
                         <LayoutNavBar
@@ -264,16 +272,24 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         }];
         data.forEach((i: any) => {
             switch (i.type) {
+                case 'Label': items.push({
+                    component: 'Label',
+                    className: 'evc_q',
+                    render: (val: string) => <div className="flex_justify">{val}</div>,
+                    field: i.field,
+                    label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
+                }); break;
                 case 'image': items.push({
                     component: 'Label',
                     render: (val: string) => {
                         return (
-                            <UploadBox
-                                className="flex_center"
-                                onClick={this.handleImageView}
-                            >
-                                {val ? <Image src={imgUrl + val} style={{ width: '100%' }} /> : <UoloadIcon icon="ios-add" theme={uploadIconTheme} />}
-                            </UploadBox>
+                            // <UploadBox
+                            //     className="flex_center"
+                            //     onClick={this.handleImageView}
+                            // >
+                            //     {val ? <Image src={imgUrl + val} style={{ width: '100%' }} /> : <UoloadIcon icon="ios-add" theme={uploadIconTheme} />}
+                            // </UploadBox>
+                            <Image src={imgUrl + val} style={{ width: '100%' }} />
                         )
                     },
                     field: i.field,
@@ -559,14 +575,13 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                 return (
                                     <TabBar.Item title={i.label} key={index}>
                                         <Form
-                                            style={{ width: getUnit(450) }}
                                             getItems={this.getTabBarItems.bind(this, index, i.data || [])}
                                         />
                                         {i.field && (
                                             <Button
                                                 async
                                                 mold="primary"
-                                                style={{ marginLeft: getUnit(108) }}
+                                                style={{ marginLeft: getUnit(108), marginTop: getUnit(20) }}
                                                 onClick={this.handleTableUrl.bind(this, i.field, index, i.data || [])}
                                             >
                                                 提交
