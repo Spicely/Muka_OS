@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { Modal, message } from 'antd'
-import { isNil } from 'lodash'
+import { isNil, get } from 'lodash'
 import styled, { createGlobalStyle } from 'styled-components'
 import { parse } from 'query-string'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
@@ -262,10 +262,10 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
     private getItems = (fn: IFormFun) => {
         const { barActionData } = this.state
         this.fn = fn
-        return this.initItems(barActionData || [])
+        return this.initItems(barActionData || [], fn)
     }
 
-    private initItems = (data: any[]) => {
+    private initItems = (data: any[], fn: IFormFun) => {
         const items: IFormItem[] = [{
             component: 'NULL',
             field: 'id'
@@ -323,6 +323,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     component: 'RadioGroup',
                     props: {
                         options: i.options,
+                        onChange: this.handleChange.bind(this, i.ref, fn, data)
                     },
                     field: i.field,
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
@@ -360,6 +361,22 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         } catch (e) {
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
             httpUtils.verify(e)
+        }
+    }
+
+    private handleChange = (field: string, fn: IFormFun, data: any[], val: any) => {
+        if (field) {
+            const _v = data.find((i) => i.field === field)
+            if (_v) {
+                for (let i = 0; i < _v.options.length; i++) {
+                    if (_v.options[i].value === val) {
+                        fn.setFieldValue({
+                            [field]: _v.options[i].label
+                        })
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -484,10 +501,19 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                                                         return i
                                                                     }
                                                                 }).join('/')
+                                                                console.log(url)
                                                                 return (
                                                                     <Link key={index} to={url}>
                                                                         <Label>{k.label}</Label>
                                                                     </Link>
+                                                                )
+                                                            }
+                                                            case 'href': {
+                                                                const url = k.url.replace('{{baseUrl}}', imgUrl).replace('{{id}}', data.id)
+                                                                return (
+                                                                    <a key={index} href={url} target="view_window">
+                                                                        <Label>{k.label}</Label>
+                                                                    </a>
                                                                 )
                                                             }
                                                             case 'status': {
@@ -600,7 +626,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
 
     private getTabBarItems = (index: number, data: any[], fn: IFormFun) => {
         this.tabBarFuns[index] = fn
-        return this.initItems(data)
+        return this.initItems(data, fn)
     }
 
     private handleImageClose = () => {
@@ -640,6 +666,21 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             barActionData: items
         }, () => {
             setTimeout(() => {
+                items.forEach((i) => {
+                    if (i.ref) {
+                        const val = get(data, i.field)
+                        items.forEach((v) => {
+                            if (i.ref === v.field && v.options) {
+                                for (let z = 0; z < v.options.length; z++) {
+                                    if (v.options[z].value === val) {
+                                        data[v.field] = v.options[z].label
+                                        break;
+                                    }
+                                }
+                            }
+                        })
+                    }
+                })
                 this.fn && this.fn.setFieldValue(data)
             }, 1)
         })

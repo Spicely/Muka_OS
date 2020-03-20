@@ -26,7 +26,7 @@ export const routes: IRoutes[] = [{
 }, {
     component: import('../pages/ShopList'),
     path: '/ShopList'
-},{
+}, {
     component: import('../pages/Jurisdiction'),
     path: '/system/jurisd'
 }, {
@@ -35,18 +35,21 @@ export const routes: IRoutes[] = [{
 }, {
     component: import('../pages/Setting'),
     path: '/system'
-},{
+}, {
     component: import('../pages/Page'),
     path: '/page/view/:id?'
 }, {
     component: import('../pages/Carousel'),
     path: '/platform/carousel'
-},{
+}, {
     component: import('../pages/Region'),
     path: '/platform/region'
-},{
+}, {
     component: import('../pages/View'),
     path: '/view/:id'
+}, {
+    component: import('../pages/Index'),
+    path: '/'
 },]
 
 export const loadable = (component: Promise<React.ComponentClass<any> | React.StatelessComponent<any> | { default: React.ComponentType<any> }>) => {

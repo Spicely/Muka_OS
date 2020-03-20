@@ -14,6 +14,7 @@ import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import Color from 'src/components/lib/utils/Color'
 import { IconThemeData, MenuThemeData, ThemeData, transition, InputThemeData, NavBarThemeData, getUnit } from 'src/components/lib/utils'
 import { GET_LAYOUT_DATA, SET_COLLAPSED, SET_SOLO, SET_LOGIN } from 'src/store/action'
+import moment from 'moment'
 
 interface IPageLayout extends DispatchProp {
     solo: boolean
@@ -236,14 +237,22 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                         </LayoutNavList>
                     </div>
                 }
+                title={
+                    <div className="flex_center">
+                        <span>
+                            {userInfo.endTime && <span style={{ color: 'red', marginRight: getUnit(60) }}>到期时间：{moment(userInfo.endTime).format('YYYY-MM-DD HH:mm:ss')}</span>}
+                            {userInfo.smsNum && <span style={{ color: 'red' }}>剩余短信数：{userInfo.smsNum}</span>}
+                        </span>
+                    </div>
+                }
                 right={
                     <div className="flex">
                         <LayoutNavList className="flex_center" userBox hasAfter hasBefore>
                             <span className="flex">
-                                <Image
+                                {/* <Image
                                     src={imgUrl + userInfo.avatar}
                                     style={{ width: '1.5rem', height: '1.5rem', borderRadius: '50%', verticalAlign: 'middle' }}
-                                />
+                                /> */}
                                 <span className="flex_center" style={{ paddingLeft: '0.5rem' }}>{userInfo.userName}</span>
                             </span>
                         </LayoutNavList>

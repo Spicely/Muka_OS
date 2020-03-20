@@ -131,7 +131,6 @@ class Login extends Component<IProps & DispatchProp, IState> {
                     label: '保持登录',
                     value: true
                 }],
-                iconColor: '#fff',
                 value: [true],
                 theme: new RadioThemeData({ color: Color.fromRGB(255, 255, 255) })
             },

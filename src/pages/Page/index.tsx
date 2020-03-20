@@ -19,7 +19,7 @@ interface IProps extends DispatchProp {
 
 export type IPageType = 'table' | 'tabBar'
 
-export type IFieldActionType = 'edit' | 'status' | 'link'
+export type IFieldActionType = 'edit' | 'status' | 'link' | 'href'
 
 interface IFieldActions {
     label: string

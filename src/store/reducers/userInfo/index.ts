@@ -8,6 +8,8 @@ export interface IUserInfo {
     avatar: string
     createdAt: number
     status: boolean
+    endTime: number
+    smsNum: number
 }
 
 export interface IUserInfoProps {
@@ -20,7 +22,9 @@ const initData: IUserInfo = {
     jurisdiction: null,
     avatar: '',
     createdAt: 0,
-    status: true
+    status: true,
+    endTime: 0,
+    smsNum: 0
 }
 
 export default function userInfo(state = initData, action: AnyAction) {

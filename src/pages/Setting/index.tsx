@@ -24,7 +24,7 @@ interface IState {
 }
 
 const FormLabel = styled.div`
-    width: ${getUnit(150)};
+    width: ${getUnit(60)};
 `
 
 const tabBarTheme = new TabBarThemeData({
@@ -63,9 +63,6 @@ export default class Setting extends Component<IProps, IState> {
                     <TabBar.Item title="基础设置">
                         <Form getItems={this.getItems} style={{ width: getUnit(560) }} />
                     </TabBar.Item>
-                    <TabBar.Item title="支付设置">
-                        <Form getItems={this.payItems} style={{ width: getUnit(560) }} />
-                    </TabBar.Item>
                 </TabBar>
 
             </GlobalView>
@@ -90,53 +87,32 @@ export default class Setting extends Component<IProps, IState> {
         this.fn = fn
         const items: IFormItem[] = [{
             component: 'Input',
-            label: <FormLabel>高德地图秘钥</FormLabel>,
+            label: <FormLabel>短信账号</FormLabel>,
             props: {
-                placeholder: '请输入高德地图秘钥'
+                placeholder: '请输入短信账号'
             },
-            field: 'amapKey'
+            field: 'smsAccount'
         }, {
             component: 'Input',
-            label: <FormLabel>阿里云oss AccessKeyID</FormLabel>,
+            label: <FormLabel>短信密码</FormLabel>,
             props: {
-                placeholder: '请输入阿里云oss AccessKeyID'
+                placeholder: '请输入短信密码'
             },
-            field: 'ossAccessKeyID'
+            field: 'smsKey'
         }, {
             component: 'Input',
-            label: <FormLabel>阿里云oss AccessKeySecret</FormLabel>,
+            label: <FormLabel>企业ID</FormLabel>,
             props: {
-                placeholder: '请输入阿里云oss AccessKeySecret'
+                placeholder: '请输入企业ID'
             },
-            field: 'ossAccessKeySecret'
+            field: 'smsId'
         }, {
-            component: 'Input',
-            label: <FormLabel>阿里云oss Bucket</FormLabel>,
+            component: 'Editor',
+            label: <FormLabel>系统公告</FormLabel>,
             props: {
-                placeholder: '请输入阿里云oss Bucket'
+                placeholder: '请输入系统公告'
             },
-            field: 'ossBucket'
-        }, {
-            component: 'Input',
-            label: <FormLabel>阿里云oss 外网地址</FormLabel>,
-            props: {
-                placeholder: '请输入阿里云oss外网地址'
-            },
-            field: 'ossServer'
-        }, {
-            component: 'Input',
-            label: <FormLabel>阿里云oss 内网地址</FormLabel>,
-            props: {
-                placeholder: '请输入阿里云oss外网地址'
-            },
-            field: 'ossServerInternal'
-        }, {
-            component: 'Input',
-            label: <FormLabel>阿里云oss 自定义地址</FormLabel>,
-            props: {
-                placeholder: '请输入阿里云oss自定义地址'
-            },
-            field: 'ossDomaim'
+            field: 'notice'
         }, {
             component: 'Button',
             visible: getJurisd(9) || false,
@@ -150,83 +126,10 @@ export default class Setting extends Component<IProps, IState> {
         return items
     }
 
-    private payItems = (fn: IFormFun) => {
-        this.payFn = fn
-        const items: IFormItem[] = [{
-            component: 'RadioGroup',
-            label: <FormLabel>支付宝支付</FormLabel>,
-            props: {
-                options: [{
-                    label: '开',
-                    value: true
-                }, {
-                    label: '关',
-                    value: false
-                }],
-                value: true
-            },
-            field: 'alipayStatus'
-        }, {
-            component: 'RadioGroup',
-            label: <FormLabel>微信支付</FormLabel>,
-            props: {
-                options: [{
-                    label: '开',
-                    value: true
-                }, {
-                    label: '关',
-                    value: false
-                }],
-                value: true
-            },
-            field: 'wxStatus'
-        }, {
-            component: 'Input',
-            label: <FormLabel>支付宝APPID</FormLabel>,
-            props: {
-                placeholder: '请输入支付宝APPID'
-            },
-            field: 'alipayAppId'
-        }, {
-            component: 'Input',
-            label: <FormLabel>微信APPID</FormLabel>,
-            props: {
-                placeholder: '微信APPID'
-            },
-            field: 'wxAppId'
-        }, {
-            component: 'Button',
-            visible: getJurisd(9) || false,
-            props: {
-                async: true,
-                children: '更新',
-                onClick: this.handlePayOk,
-                mold: 'primary',
-            }
-        }]
-        return items
-    }
-
     private handleOk = async () => {
         try {
             if (this.fn) {
                 const value = this.fn.getFieldValue()
-                if (!value.name) {
-                    message.error('请输入支付宝名称')
-                    return
-                }
-                if (!value.pid) {
-                    message.error('请输入应用id')
-                    return
-                }
-                if (!value.private_key) {
-                    message.error('请输入商户私钥')
-                    return
-                }
-                if (!value.public_key) {
-                    message.error('请输入支付宝公钥')
-                    return
-                }
                 await http('config/update', value)
                 message.success('更新成功')
             }
