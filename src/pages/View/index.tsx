@@ -11,7 +11,7 @@ import { IInitState, MukaOS, ITabelRes } from 'src/store/state'
 import moment from 'moment'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { GlobalView } from 'src/utils/node'
-import { NavBarThemeData, Color, IconThemeData, getUnit, DialogThemeData, TabBarThemeData } from 'src/components/lib/utils'
+import { NavBarThemeData, Color, IconThemeData, getUnit, DialogThemeData, TabBarThemeData, UploadThemeData } from 'src/components/lib/utils'
 import { SET_SPINLOADING_DATA } from 'src/store/action'
 import { RouteComponentProps, Link } from 'react-router-dom'
 import { IPageType, IFieldParams, IFieldTableEdits, IBarActions } from '../Page'
@@ -57,6 +57,11 @@ const dialogTheme = new DialogThemeData({
 const uploadIconTheme = new IconThemeData({
     size: 34,
     color: Color.fromRGB(217, 217, 217)
+})
+
+const uploadTheme = new UploadThemeData({
+    itemHeight: 200,
+    itemWidth: 375
 })
 
 interface IProps extends DispatchProp {
@@ -228,6 +233,9 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             if (this.fn) {
                 const value = this.fn.getFieldValue()
                 for (let i = 0; i < barActionData.length; i++) {
+                    if (barActionData[i].type === 'upload') {
+                        value[barActionData[i].field] = value[barActionData[i].field][0].data.data.url
+                    }
                     if (barActionData[i].require && (isNil(value[barActionData[i].field]) || value[barActionData[i].field] === '')) {
                         message.error(`请输入${barActionData[i].label}`)
                         return
@@ -291,6 +299,17 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                             // </UploadBox>
                             <Image src={imgUrl + val} style={{ width: '100%' }} />
                         )
+                    },
+                    field: i.field,
+                    label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
+                }); break;
+                case 'upload': items.push({
+                    component: 'Upload',
+                    props: {
+                        maxLength: 1,
+                        theme: uploadTheme,
+                        action: imgUrl + '/upload/index',
+                        name: 'file',
                     },
                     field: i.field,
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
