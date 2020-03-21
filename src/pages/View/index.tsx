@@ -310,6 +310,8 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                         theme: uploadTheme,
                         action: imgUrl + '/upload/index',
                         name: 'file',
+                        baseUrl: imgUrl,
+                        itemStyle: i.style || {}
                     },
                     field: i.field,
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
@@ -737,6 +739,9 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             if (this.tabBarFuns[index]) {
                 const value = this.tabBarFuns[index].getFieldValue()
                 for (let i = 0; i < data.length; i++) {
+                    if (data[i].type === 'upload') {
+                        value[data[i].field] = value[data[i].field][0].data.data.url
+                    }
                     if (data[i].require && (isNil(value[data[i].field]) || value[data[i].field] === '')) {
                         message.error(`请输入${data[i].label}`)
                         return

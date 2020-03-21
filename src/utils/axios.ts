@@ -7,9 +7,11 @@ import { store } from 'src/store'
 interface IValue {
     [name: string]: any
 }
-export const baseUrl = 'http://ceshi.ekfpb.cn/admin'
+// export const baseUrl = 'http://localhost:7001/admin/'
+export const baseUrl = 'http://ceshi.startanycar.com/admin/'
 // export const baseUrl = 'https://api.muka.site/admin/'
-export const imgUrl = 'http://ceshi.ekfpb.cn/'
+export const imgUrl = 'http://ceshi.startanycar.com'
+// export const imgUrl = 'http://localhost:7001'
 
 export interface IRresItem<T = any> {
     msg: string
