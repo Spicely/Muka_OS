@@ -311,6 +311,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                         action: imgUrl + '/upload/index',
                         name: 'file',
                         baseUrl: imgUrl,
+                        withCredentials: true,
                         itemStyle: i.style || {}
                     },
                     field: i.field,
@@ -740,7 +741,11 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                 const value = this.tabBarFuns[index].getFieldValue()
                 for (let i = 0; i < data.length; i++) {
                     if (data[i].type === 'upload') {
-                        value[data[i].field] = value[data[i].field][0].data.data.url
+                        if (value[data[i].field][0].data) {
+                            value[data[i].field] = value[data[i].field][0].data.data.url
+                        } else {
+                            delete value[data[i].field]
+                        }
                     }
                     if (data[i].require && (isNil(value[data[i].field]) || value[data[i].field] === '')) {
                         message.error(`请输入${data[i].label}`)

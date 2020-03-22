@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { connect, DispatchProp } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router'
 import { Tooltip, message } from 'antd'
+import { isNil } from 'lodash'
 import styled, { css } from 'styled-components'
 import { Icon, Input, Layout, Menu, NavBar, Image, Dialog, Form, Spin } from 'components'
 import { IInitState } from 'src/store/state'
@@ -241,7 +242,7 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                     <div className="flex_center">
                         <span>
                             {userInfo.endTime && <span style={{ color: 'red', marginRight: getUnit(60) }}>到期时间：{moment(userInfo.endTime).format('YYYY-MM-DD HH:mm:ss')}</span>}
-                            {userInfo.smsNum && <span style={{ color: 'red' }}>剩余短信数：{userInfo.smsNum}</span>}
+                            {!isNil(userInfo.smsNum) && <span style={{ color: 'red' }}>剩余短信数：{userInfo.smsNum}</span>}
                         </span>
                     </div>
                 }
