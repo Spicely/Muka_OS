@@ -1,10 +1,13 @@
 import React, { Component, Fragment } from 'react'
-import { Consumer } from '../ThemeProvider'
-import ReactDOM from 'react-dom'
-import styled, { css } from 'styled-components'
 import { isUndefined } from 'lodash'
+import ReactDOM, { createPortal } from 'react-dom'
+import styled, { css } from 'styled-components'
+import { Consumer } from '../ThemeProvider'
 import { getUnit, ToastThemeData } from '../utils'
 import Icon from '../Icon'
+
+let globalNode: Element | null
+let glabalView: Element | null
 
 type IType = 'loading' | 'success' | 'info' | 'warning' | 'error'
 
@@ -12,20 +15,16 @@ interface INotices {
     key?: string
     onClose?: () => void
     duration?: number
-    type?: IType
+    type: IType
     content: string
 }
 
-interface IState {
-    notices: INotices[]
+interface IToastProps {
+    key?: string
+    onClose?: () => void
+    duration?: number
+    content: string
 }
-
-interface ICreateNotification {
-    addNotice: (notice: INotices) => () => void
-    destroy: () => void
-}
-
-
 
 interface IToastMaskPorps {
     type?: IType
@@ -42,12 +41,12 @@ const ToastMask = styled.div<IToastMaskPorps>`
     
 `
 
-interface IToastProps {
+interface IToastViewProps {
     toastTheme: ToastThemeData
     type?: IType
 }
 
-const ToastView = styled.div<IToastProps>`
+const ToastView = styled.div<IToastViewProps>`
     position: absolute;
     ${({ type }) => {
         if (type === 'loading') {
@@ -60,7 +59,7 @@ const ToastView = styled.div<IToastProps>`
     width: 100%;
 `
 
-const ToastContent = styled.span<IToastProps>`
+const ToastContent = styled.span<IToastViewProps>`
     background: ${({ toastTheme }) => toastTheme.toastColor.toString()};
     color: ${({ toastTheme }) => toastTheme.color.toString()};
     ${({ toastTheme, type }) => {
@@ -73,137 +72,132 @@ const ToastContent = styled.span<IToastProps>`
     ${({ toastTheme }) => css`${toastTheme.borderRadius.toString()}`}
 `
 
-let notification: ICreateNotification | undefined
-const notice = (data: INotices) => {
-    if (!notification) notification = createNotification()
-    if (!notification) return () => { }
-    return notification.addNotice(data)
+function createGlobalNode() {
+    if (!glabalView) {
+        glabalView = document.createElement('div')
+        document.body.appendChild(glabalView)
+    }
 }
 
-export default class Notification extends Component<any, IState> {
+let toastData: INotices[] = []
 
-    public static info(data: INotices) {
-        return notice({
+const toastReader = (data: INotices) => {
+    createGlobalNode()
+    const key = `notice_${Date.now()}_${data.type}_${toastData.length}`
+    const duration = isUndefined(data.duration) ? 2000 : data.duration
+    toastData.push({
+        ...data,
+        key,
+        duration
+    })
+    ReactDOM.render(<Notification data={toastData} />, glabalView)
+    if (duration) {
+        const timer = setTimeout(() => {
+            const index = toastData.findIndex((i) => i.key === key)
+            toastData.splice(index, 1)
+            ReactDOM.render(<Notification data={toastData} />, glabalView)
+            clearTimeout(timer)
+        }, duration)
+    }
+    return () => {
+        ReactDOM.render(<Notification data={toastData} />, glabalView)
+    }
+}
+
+export default class Toast {
+
+    public static loading = (content: string = '') => {
+        createGlobalNode()
+        const key = `notice-${Date.now()}`
+        toastData.push({
+            key,
+            type: 'loading',
+            content
+        })
+        ReactDOM.render(<Notification data={toastData} />, glabalView)
+        return () => {
+            const index = toastData.findIndex((i) => i.key === key)
+            toastData.splice(index, 1)
+            ReactDOM.render(<Notification data={toastData} />, glabalView)
+        }
+    }
+
+    public static info = (data: IToastProps) => {
+        return toastReader({
             ...data,
-            duration: isUndefined(data.duration) ? 2000 : data.duration,
             type: 'info'
         })
     }
-    public static success(data: INotices) {
-        return notice({
-            ...data,
-            type: 'success'
-        })
-    }
-    public static warning(data: INotices) {
-        return notice({
-            ...data,
-            duration: isUndefined(data.duration) ? 2000 : data.duration,
-            type: 'warning'
-        })
-    }
-    public static error(data: INotices) {
-        return notice({
-            ...data,
-            duration: isUndefined(data.duration) ? 2000 : data.duration,
-            type: 'error'
-        })
-    }
+}
 
-    public static loading(content?: string) {
-        return notice({
-            content: content || '',
-            type: 'loading'
-        })
-    }
+interface IProps {
+    data: INotices[]
+}
 
-    public state: IState = {
-        notices: []
-    }
+class Notification extends Component<IProps, any> {
 
-    private getNoticeKey() {
-        const { notices } = this.state
-        return `notice-${new Date().getTime()}-${notices.length}`
-    }
+    private node: Element | null = null
 
-    private addNotice(notice: any) {
-        const { notices } = this.state
-        notice.key = this.getNoticeKey()
-        if (notices.every(item => item.key !== notice.key)) {
-            notices[0] = notice
-            this.setState({ notices })
-            if (notice.duration > 0) {
-                setTimeout(() => {
-                    this.remove(notice.key)
-                }, notice.duration)
+    public constructor(props: any) {
+        super(props)
+        if (typeof document !== 'undefined') {
+            globalNode = document.querySelector(`.mk_mask_toast`)
+            if (globalNode) {
+                this.node = globalNode
+            } else {
+                const dom = document.createElement('div')
+                dom.className = 'mk_mask_toast'
+                const body = document.querySelector('body')
+                if (body) {
+                    body.appendChild(dom)
+                }
+                this.node = dom
+                globalNode = dom
             }
         }
-        return () => { this.remove(notice.key) }
-    }
-
-    private remove(key: string) {
-        this.setState(previousState => ({
-            notices: previousState.notices.filter((notice) => {
-                if (notice.key === key) {
-                    if (notice.onClose) notice.onClose()
-                    return false
-                }
-                return true
-            })
-        }))
     }
 
     public render(): JSX.Element {
-        const { notices } = this.state
-        return (
-            <Consumer>
-                {(init) => (
-                    <Fragment>
-                        {
-                            notices.map(notice => (
-                                <ToastMask
-                                    key={notice.key}
-                                    type={notice.type}
-                                >
-                                    <ToastView
-                                        className="flex_center"
-                                        toastTheme={init.theme.toastTheme}
-                                        type={notice.type}
-                                    >
-                                        <ToastContent
-                                            toastTheme={init.theme.toastTheme}
+        const { data } = this.props
+        if (!this.node) {
+            return <Fragment />
+        } else {
+            return createPortal(
+                (
+                    <Consumer>
+                        {(init) => (
+                            <Fragment>
+                                {
+                                    data.map(notice => (
+                                        <ToastMask
+                                            key={notice.key}
                                             type={notice.type}
                                         >
-                                            {notice.type === 'loading' ? <Icon
-                                                icon="loading"
-                                                theme={init.theme.toastTheme.iconTheme}
-                                                rotate
-                                            /> : null}
-                                            {notice.content}
-                                        </ToastContent>
-                                    </ToastView>
-                                </ToastMask>
-                            ))
-                        }
-                    </Fragment>
-                )}
-            </Consumer>
-        )
-    }
-}
-
-function createNotification(): ICreateNotification | undefined {
-    const div = document.createElement('div')
-    document.body.appendChild(div)
-    const notification: any = ReactDOM.render(<Notification />, div)
-    if (!notification) return
-    return {
-        addNotice(notice: INotices) {
-            return notification.addNotice(notice)
-        },
-        destroy() {
-            ReactDOM.unmountComponentAtNode(div)
-            document.body.removeChild(div)
+                                            <ToastView
+                                                className="flex_center"
+                                                toastTheme={init.theme.toastTheme}
+                                                type={notice.type}
+                                            >
+                                                <ToastContent
+                                                    toastTheme={init.theme.toastTheme}
+                                                    type={notice.type}
+                                                >
+                                                    {notice.type === 'loading' ? <Icon
+                                                        icon="loading"
+                                                        theme={init.theme.toastTheme.iconTheme}
+                                                        rotate
+                                                    /> : null}
+                                                    {notice.content}
+                                                </ToastContent>
+                                            </ToastView>
+                                        </ToastMask>
+                                    ))
+                                }
+                            </Fragment>
+                        )}
+                    </Consumer>
+                ), this.node
+            )
         }
     }
 }

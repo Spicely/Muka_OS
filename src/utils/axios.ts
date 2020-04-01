@@ -8,10 +8,10 @@ interface IValue {
     [name: string]: any
 }
 // export const baseUrl = 'http://localhost:7001/admin/'
-// export const baseUrl = 'http://ceshi.startanycar.com/admin/'
-// export const imgUrl = 'http://ceshi.startanycar.com'
-export const baseUrl = 'http://api.qwgkkfm.cn/admin/'
-export const imgUrl = 'http://api.qwgkkfm.cn'
+export const baseUrl = 'http://ceshi.startanycar.com/admin/'
+export const imgUrl = 'http://ceshi.startanycar.com'
+// export const baseUrl = 'http://api.qwgkkfm.cn/admin/'
+// export const imgUrl = 'http://api.qwgkkfm.cn'
 // export const baseUrl = 'https://api.muka.site/admin/'
 // export const imgUrl = 'https://api.muka.site'
 

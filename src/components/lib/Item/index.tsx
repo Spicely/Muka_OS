@@ -1,5 +1,4 @@
 import React, { Component, CSSProperties } from 'react'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { isBoolean, isFunction, isNil, isString, isNull } from 'lodash'
 import styled, { css } from 'styled-components'
 import { Consumer } from '../ThemeProvider'
@@ -7,6 +6,10 @@ import Icon from '../Icon'
 import { getClassName, ItemThemeData, getUnit, Color } from '../utils'
 
 type ILineType = 'solid' | 'dashed' | 'none'
+
+const ItemIconNull = styled.div`
+    width: ${getUnit(10)};
+`
 
 export interface IItemProps {
     activeClassName?: string
@@ -149,7 +152,7 @@ export default class Item extends Component<IItemProps, IState> {
             return <div />
         }
         if (isNull(link)) {
-            return <div />
+            return <ItemIconNull />
         }
         return (
             <ItemLink
