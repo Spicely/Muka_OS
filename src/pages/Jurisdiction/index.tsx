@@ -100,6 +100,7 @@ class Jurisdiction extends Component<IProps, IState> {
                 <Table
                     columns={this.columns}
                     dataSource={jurisdiction}
+                    bordered
                     rowKey={(data: any) => data.id}
                 />
                 <Dialog

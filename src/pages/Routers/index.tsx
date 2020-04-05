@@ -124,6 +124,7 @@ class Routers extends Component<IProps, IState> {
                     right={<Button mold="primary" onClick={this.setClassifyVisble}>添加路由</Button>}
                 />
                 <Table
+                    bordered
                     columns={this.columns}
                     dataSource={routers}
                     rowKey={(data: any) => data.id}

@@ -1,6 +1,8 @@
-import * as React from 'react'
+import React, { Component, MouseEvent } from 'react'
 import { isFunction, isNumber } from 'lodash'
-import { getClassName, prefix, IconThemeData } from '../utils'
+import styled from 'styled-components'
+import { Consumer } from '../ThemeProvider'
+import { getClassName, prefix, IconThemeData, getUnit, ButtonThemeData } from '../utils'
 import Button from '../Button'
 import Icon, { iconType } from '../Icon'
 
@@ -12,12 +14,52 @@ export interface IInputNumberProps {
     max?: number
     addIcon?: iconType
     removeIcon?: iconType
-    onChange?: (val: number) => void
+    onChange?: (val: number, e: MouseEvent<HTMLButtonElement>) => void
 }
+
+const btnTheme = new ButtonThemeData({
+    height: 25,
+    minWidth: 25,
+})
+
+const InputNumberView = styled.div`
+    input {
+        background: #f6f6f6;
+        height: ${getUnit(25)};
+        margin: 0;
+        padding: 0;
+        width: ${getUnit(40)};
+        text-align: center;
+        border: 0;
+        border-radius: ${getUnit(3)};
+        outline: none;
+
+        &::-webkit-outer-spin-button {
+            -webkit-appearance: none !important;
+        }
+
+        &::-webkit-inner-spin-button {
+            -webkit-appearance: none !important;
+        }
+    }
+`
 
 const prefixClass = 'input_number'
 
-export default class InputNumber extends React.Component<IInputNumberProps, any> {
+export default class InputNumber extends Component<IInputNumberProps, any> {
+    public constructor(props: IInputNumberProps) {
+        super(props)
+        this.state.val = props.value || 0
+    }
+
+    public static getDerivedStateFromProps(nextProps: IInputNumberProps, prevState: any) {
+        if (nextProps.value !== prevState.value) {
+            return {
+                value: nextProps.value
+            }
+        }
+        return null
+    }
 
     public static defaultProps: IInputNumberProps = {
         border: true,
@@ -33,11 +75,17 @@ export default class InputNumber extends React.Component<IInputNumberProps, any>
         const { className, value, border, addIcon, removeIcon } = this.props
         const { val } = this.state
         return (
-            <div className={getClassName(`${prefixClass}${border ? ' ' + prefix + 'border' : ''} flex`, className)} >
-                <Button className={getClassName(`${prefixClass}_btn`)} onClick={this.handleReduce}><Icon icon={removeIcon} theme={new IconThemeData({size: 12})} /></Button>
-                <input type="number" onChange={this.handleChange} value={isNumber(value) ? value : val} />
-                <Button className={getClassName(`${prefixClass}_btn`)} onClick={this.handlePlus}><Icon icon={addIcon} theme={new IconThemeData({size: 12})} /></Button>
-            </div>
+            <Consumer>
+                {
+                    (init) => (
+                        <InputNumberView className={getClassName(`${prefixClass}${border ? ' ' + prefix + 'border' : ''} flex`, className)} >
+                            <Button onClick={this.handleReduce} theme={btnTheme}><Icon icon={removeIcon} theme={new IconThemeData({ size: 12 })} /></Button>
+                            <input type="number" onChange={this.handleChange} value={isNumber(value) ? value : val} />
+                            <Button onClick={this.handlePlus} theme={btnTheme}><Icon icon={addIcon} theme={new IconThemeData({ size: 12 })} /></Button>
+                        </InputNumberView>
+                    )
+                }
+            </Consumer>
         )
     }
 
@@ -57,21 +105,21 @@ export default class InputNumber extends React.Component<IInputNumberProps, any>
             val
         })
         if (isFunction(onChange)) {
-            onChange(val)
+            onChange(val, e)
         }
         return
 
     }
 
-    private handleReduce = () => {
+    private handleReduce = (e: MouseEvent<HTMLButtonElement>) => {
         const { value, onChange, min } = this.props
         if (isNumber(value)) {
             if (isFunction(onChange)) {
                 const val = value - 1
                 if (isNumber(min)) {
-                    onChange(val < min ? min : val)
+                    onChange(val < min ? min : val, e)
                 } else {
-                    onChange(val)
+                    onChange(val, e)
                 }
             }
         } else {
@@ -89,15 +137,15 @@ export default class InputNumber extends React.Component<IInputNumberProps, any>
         }
     }
 
-    private handlePlus = () => {
+    private handlePlus = (e: MouseEvent<HTMLButtonElement>) => {
         const { value, onChange, max } = this.props
         if (isNumber(value)) {
             if (isFunction(onChange)) {
                 const val = value + 1
                 if (max) {
-                    onChange(val > max ? max : val)
+                    onChange(val > max ? max : val, e)
                 } else {
-                    onChange(val)
+                    onChange(val, e)
                 }
             }
         } else {

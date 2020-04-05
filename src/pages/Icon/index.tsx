@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { message, Tooltip } from 'antd'
-import { find } from 'lodash'
 import styled from 'styled-components'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
 import { Button, Dialog, LabelHeader, Form, BoxLine, Icon, Image } from 'components'

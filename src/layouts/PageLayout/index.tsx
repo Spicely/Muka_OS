@@ -238,14 +238,6 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                         </LayoutNavList>
                     </div>
                 }
-                title={
-                    <div className="flex_center">
-                        <span>
-                            {userInfo.endTime && <span style={{ color: 'red', marginRight: getUnit(60) }}>到期时间：{moment(userInfo.endTime).format('YYYY-MM-DD HH:mm:ss')}</span>}
-                            {!isNil(userInfo.smsNum) && <span style={{ color: 'red' }}>剩余短信数：{userInfo.smsNum}</span>}
-                        </span>
-                    </div>
-                }
                 right={
                     <div className="flex">
                         <LayoutNavList className="flex_center" userBox hasAfter hasBefore>
