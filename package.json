@@ -191,6 +191,15 @@
       [
         "import",
         {
+          "libraryName": "muka",
+          "camel2DashComponentName": false,
+          "style": false
+        },
+        "muka"
+      ],
+      [
+        "import",
+        {
           "libraryName": "antd",
           "style": false
         },

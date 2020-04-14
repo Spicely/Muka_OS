@@ -22,7 +22,8 @@
     "jsx": "react",
     "paths": {
       "components": ["src/components/"],
-      "store": ["src/store/"]
+      "store": ["src/store/"],
+      "muka": ["src/muka/"]
     }
   },
   "include": [
