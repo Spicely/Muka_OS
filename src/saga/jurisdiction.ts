@@ -7,7 +7,7 @@ export default function* jurisdictionAsync(actions: IActionsProps) {
     try {
         const data = yield all([
             call(http, '/admin/jurisd/find'),
-            call(http, '/admin/jurisdClassify/find'),
+            call(http, '/admin/jurisd_classify/find'),
             call(http, '/admin/router/findAll')
         ])
         yield all([

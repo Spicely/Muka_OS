@@ -242,10 +242,10 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                     <div className="flex">
                         <LayoutNavList className="flex_center" userBox hasAfter hasBefore>
                             <span className="flex">
-                                {/* <Image
+                                <Image
                                     src={imgUrl + userInfo.avatar}
                                     style={{ width: '1.5rem', height: '1.5rem', borderRadius: '50%', verticalAlign: 'middle' }}
-                                /> */}
+                                />
                                 <span className="flex_center" style={{ paddingLeft: '0.5rem' }}>{userInfo.userName}</span>
                             </span>
                         </LayoutNavList>

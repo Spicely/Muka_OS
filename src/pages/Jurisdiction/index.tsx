@@ -204,9 +204,9 @@ class Jurisdiction extends Component<IProps, IState> {
             if (this.fn) {
                 const { treeVal, parentVal } = this.state
                 const jurisd = this.fn.getFieldValue()
-                let url = 'jurisdClassify/create'
+                let url = '/admin/jurisd_classify/create'
                 if (jurisd.id) {
-                    url = 'jurisdClassify/update'
+                    url = '/admin/jurisd_classify/update'
                 }
                 const data = await http(url, {
                     ...jurisd,
