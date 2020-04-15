@@ -348,7 +348,7 @@ class Article extends Component<IProps, IState> {
                 spinning: true
             })
             const { dispatch, article } = this.props
-            const userList = await http('article/update', {
+            const userList = await http('/admin/article/update', {
                 id,
                 status,
             })
@@ -381,9 +381,9 @@ class Article extends Component<IProps, IState> {
                     message.error('请输入内容')
                     return
                 }
-                let url = 'article/create'
+                let url = '/admin/article/create'
                 if (user.id) {
-                    url = 'article/update'
+                    url = '/admin/article/update'
                 }
                 const { dispatch, article } = this.props
                 const userList = await http(url, {

@@ -6,8 +6,8 @@ import { SET_REGION_DATA, SET_CAROUSEL_DATA } from 'src/store/action'
 export default function* carouselAsync(actions: IActionsProps) {
     try {
         const data = yield all([
-            call(http, 'region/get'),
-            call(http, 'carousel/get'),
+            call(http, '/admin/region/get'),
+            call(http, '/admin/carousel/get'),
         ])
         yield all([
             put({ type: SET_REGION_DATA, data: data[0].data }),

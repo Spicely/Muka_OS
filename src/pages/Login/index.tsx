@@ -153,7 +153,7 @@ class Login extends Component<IProps & DispatchProp, IState> {
         try {
             if (this.fn) {
                 const data = this.fn.getFieldValue()
-                const res = await http('login', { ...data, keep: data.keep[0] || false })
+                const res = await http('/admin/login', { ...data, keep: data.keep[0] || false })
                 const { history, dispatch } = this.props
                 dispatch({ type: SET_LOGIN, data: true })
                 dispatch({ type: SET_USERINFO_DATA, data: res.data })

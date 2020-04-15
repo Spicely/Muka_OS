@@ -6,8 +6,8 @@ import { SET_ROUTERS_DATA, SET_ICONS_DATA } from 'src/store/action'
 export default function* routersAsync(actions: IActionsProps) {
     try {
         const data = yield all([
-            call(http, 'router/findAll'),
-            call(http, 'icon/find')
+            call(http, '/admin/router/findAll'),
+            call(http, '/admin/icon/find')
         ])
         yield all([
             put({ type: SET_ROUTERS_DATA, data: data[0].data }),

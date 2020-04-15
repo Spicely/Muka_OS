@@ -178,7 +178,7 @@ class RouterIcons extends Component<IProps, IState> {
                 }
                 let data
                 if (icon.type === 'icon') {
-                    data = await http('icon/create', {
+                    data = await http('/admin/icon/create', {
                         type: icon.type,
                         name: icon.name,
                         alias: icon.alias

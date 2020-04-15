@@ -6,7 +6,7 @@ import { SET_USERLIST_DATA, SET_JURISDICTION_DATA } from 'src/store/action'
 export default function* userListAsync(actions: IActionsProps) {
     try {
         const data = yield all([
-            call(http, 'system-user', { page_size: 6000 })
+            call(http, '/admin/system-user', { page_size: 6000 })
             // call(http, 'user/find'),
             // call(http, 'jurisdiction/classifyFind')
         ])

@@ -20,7 +20,7 @@ export interface IActionsProps {
 export function* layoutAsync() {
     try {
         const data = yield all([
-            call(http, 'router/get'),
+            call(http, '/admin/router/get'),
         ])
         yield all([
             put({ type: SET_ROUTER_DATA, data: data[0].data.router }),

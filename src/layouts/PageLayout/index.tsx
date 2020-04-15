@@ -473,7 +473,7 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
     private handleExit = async () => {
         try {
             const { dispatch } = this.props
-            await http('logout')
+            await http('/admin/logout')
             dispatch({ type: SET_LOGIN, data: false })
             localStorage.setItem('token', '')
         } catch (e) {
@@ -509,7 +509,7 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                 return
             }
             try {
-                const data = await http('user/repass', { ...fieldValue })
+                const data = await http('/admin/user/repass', { ...fieldValue })
                 message.success(data.msg)
                 this.setState({
                     visible: false

@@ -360,7 +360,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
         if (this.loading) return
         this.loading = true
         try {
-            const data: IRresItem = await http('image/globalFind', {
+            const data: IRresItem = await http('/admin/image/globalFind', {
                 total: val
             })
             this.loading = false
@@ -394,7 +394,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
     private getImage = async () => {
         try {
             this.loading = true
-            const data: IRresItem = await http('image/globalFind', {
+            const data: IRresItem = await http('/admin/image/globalFind', {
                 total: 1
             })
             this.loading = false
@@ -435,7 +435,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
 
     private handleLinkDialog = async () => {
         try {
-            const data: IRresItems = await http('apps/findPageClassifyAll')
+            const data: IRresItems = await http('/admin/apps/findPageClassifyAll')
             this.setState({
                 links: data.data
             })
@@ -470,7 +470,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
     }
     private getDialogData = async () => {
         try {
-            const data: IRresItems = await http('icons/find')
+            const data: IRresItems = await http('/admin/icons/find')
             this.setState({
                 icons: data.data
             })

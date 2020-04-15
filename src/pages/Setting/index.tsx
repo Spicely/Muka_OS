@@ -75,7 +75,7 @@ export default class Setting extends Component<IProps, IState> {
 
     private getData = async () => {
         try {
-            const data = await http('config/get')
+            const data = await http('/admin/config/get')
             this.fn && this.fn.setFieldValue(data.data)
             this.payFn && this.payFn.setFieldValue(data.data)
         } catch (e) {
@@ -130,7 +130,7 @@ export default class Setting extends Component<IProps, IState> {
         try {
             if (this.fn) {
                 const value = this.fn.getFieldValue()
-                await http('config/update', value)
+                await http('/admin/config/update', value)
                 message.success('更新成功')
             }
         } catch (e) {
@@ -142,7 +142,7 @@ export default class Setting extends Component<IProps, IState> {
         try {
             if (this.payFn) {
                 const value = this.payFn.getFieldValue()
-                await http('config/update', value)
+                await http('/admin/config/update', value)
                 message.success('更新成功')
             }
         } catch (e) {

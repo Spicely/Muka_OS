@@ -7,7 +7,7 @@ import { store } from 'src/store'
 interface IValue {
     [name: string]: any
 }
-export const baseUrl = 'http://localhost:7001/admin/'
+export const baseUrl = 'http://localhost:7001'
 export const imgUrl = 'http://localhost:7001'
 
 export interface IRresItem<T = any> {
@@ -69,18 +69,13 @@ instance.interceptors.response.use(async function (res: any) {
 })
 
 const http = function (url: string, params?: IValue, config?: AxiosRequestConfig): any {
-    const headers = config ? config.headers : {}
     let param: any = { data: encrypt(params || {}) }
-    if (config && config.method === 'GET') {
+    if (config && config.method?.toUpperCase() === 'GET') {
         param = { params }
     }
     return instance(`${url}`, {
         ...config,
-        ...param,
-        headers: {
-            ...headers,
-            'Authorization': localStorage.getItem('token')
-        }
+        ...param
     })
 }
 

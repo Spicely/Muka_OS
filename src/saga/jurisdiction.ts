@@ -6,9 +6,9 @@ import { SET_JURISDICTION_DATA, SET_JURISDICTION_OPTIONS_DATA, SET_ROUTERS_DATA 
 export default function* jurisdictionAsync(actions: IActionsProps) {
     try {
         const data = yield all([
-            call(http, 'jurisd/find'),
-            call(http, 'jurisdClassify/find'),
-            call(http, 'router/findAll')
+            call(http, '/admin/jurisd/find'),
+            call(http, '/admin/jurisdClassify/find'),
+            call(http, '/admin/router/findAll')
         ])
         yield all([
             put({ type: SET_JURISDICTION_OPTIONS_DATA, data: data[0].data }),

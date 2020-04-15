@@ -192,9 +192,9 @@ class AdminList extends Component<IProps, IState> {
                     return
                 }
                 if (user.id) {
-                    await http('system-user/create', { ...user })
+                    await http('/admin/system-user/create', { ...user })
                 } else {
-                    await http(`system-user/create/${user.id}`, { ...user }, { method: 'PUT' })
+                    await http(`/admin/system-user/create/${user.id}`, { ...user }, { method: 'PUT' })
                 }
                 // const { dispatch, userList } = this.props
 

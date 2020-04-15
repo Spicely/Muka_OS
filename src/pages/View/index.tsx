@@ -367,7 +367,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         const { dispatch, match } = this.props
         try {
             dispatch({ type: SET_SPINLOADING_DATA, data: true })
-            const { data } = await http('adminPage/findOne', { id: id || match.params.id })
+            const { data } = await http('/admin/adminPage/findOne', { id: id || match.params.id })
             if (data.initUrl) {
                 this.initUrl = data.initUrl
                 switch (data.pageType) {
