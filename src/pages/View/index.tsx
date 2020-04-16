@@ -18,9 +18,8 @@ import { IPageType, IFieldParams, IFieldTableEdits, IBarActions } from '../Page'
 import { imageModal } from 'src/utils'
 
 const FromLabel = styled.div`
-    width: ${getUnit(100)};
+    width: ${getUnit(60)};
     text-align: justify;
-    text-align-last: right;
 `
 
 const ActionButton = styled(Button)`
@@ -82,10 +81,12 @@ interface IState {
     pageType?: IPageType
     pageData: ITabelRes
     tableParams: IFieldParams[]
+    editParams: any[]
     editDialogTitle: string
     editVisible: boolean
     imageVisible: boolean
     imageUrl: string
+    editUrl: string
     barActions: IBarActions[]
     barActionData: IFieldTableEdits[]
     tabSelects: IFieldParams[]
@@ -113,6 +114,8 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
 
     private fn?: IFormFun
 
+    private editFn?: IFormFun
+
     private tabBarFuns: IFormFun[] = []
 
     private actionUrl: string = ''
@@ -131,6 +134,8 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             data: [],
             skip: 10
         },
+        editUrl: '',
+        editParams: [],
         barActions: [],
         tableParams: [],
         editVisible: false,
@@ -367,7 +372,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         const { dispatch, match } = this.props
         try {
             dispatch({ type: SET_SPINLOADING_DATA, data: true })
-            const { data } = await http('/admin/adminPage/findOne', { id: id || match.params.id })
+            const { data } = await http('/admin/admin_page/findOne', { id: id || match.params.id })
             if (data.initUrl) {
                 this.initUrl = data.initUrl
                 switch (data.pageType) {
@@ -447,7 +452,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
     }
 
     private getPageTypeNode = (pageType?: IPageType) => {
-        const { pageData, tableParams, tabSelects } = this.state
+        const { pageData, tableParams, tabSelects, editParams, editUrl } = this.state
         switch (pageType) {
             case 'table': {
                 const columns = tableParams.map((i) => {
@@ -642,8 +647,22 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     </TabBar>
                 )
             }
+            case 'edit': {
+                return (
+                    <div>
+                        <Form getItems={this.handleEditItems} />
+                        {(editParams.length && editUrl) ? <Button mold="primary" async onClick={this.handleEditComplete}>确认</Button> : null}
+                    </div>
+                )
+            }
             default: return null;
         }
+    }
+
+    private handleEditItems = (fn: IFormFun) => {
+        const { editParams } = this.state
+        this.editFn = fn
+        return this.initItems(editParams || [], fn)
     }
 
     private getTabBarItems = (index: number, data: any[], fn: IFormFun) => {
@@ -731,6 +750,32 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
         } catch (e) {
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
+            httpUtils.verify(e)
+        }
+    }
+
+    private handleEditComplete = async () => {
+        try {
+            if (this.editFn) {
+                const { editParams, editUrl } = this.state
+                const params = this.editFn.getFieldValue()
+                for (let i = 0; i < editParams.length; i++) {
+                    if (editParams[i].type === 'upload') {
+                        if (params[editParams[i].field][0].data) {
+                            params[editParams[i].field] = params[editParams[i].field][0].data.data.url
+                        } else {
+                            delete params[editParams[i].field]
+                        }
+                    }
+                    if (editParams[i].require && (isNil(params[editParams[i].field]) || params[editParams[i].field] === '')) {
+                        message.error(`请输入${editParams[i].label}`)
+                        return
+                    }
+                }
+                const res = await http(editUrl, params)
+                message.success(res.msg)
+            }
+        } catch (e) {
             httpUtils.verify(e)
         }
     }

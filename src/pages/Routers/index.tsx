@@ -248,9 +248,9 @@ class Routers extends Component<IProps, IState> {
                     message.error('请输入路由地址')
                     return
                 }
-                let url = 'router/create'
+                let url = '/admin/router/create'
                 if (router.id) {
-                    url = 'router/update'
+                    url = '/admin/router/update'
                 }
                 const data = await http(url, {
                     ...router

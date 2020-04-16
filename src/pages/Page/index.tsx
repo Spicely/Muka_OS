@@ -17,7 +17,7 @@ interface IProps extends DispatchProp {
     region: MukaOS.Region[]
 }
 
-export type IPageType = 'table' | 'tabBar'
+export type IPageType = 'table' | 'tabBar' | 'edit'
 
 export type IFieldActionType = 'edit' | 'status' | 'link' | 'href'
 
@@ -210,7 +210,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         const { dispatch } = this.props
         try {
             dispatch({ type: SET_SPINLOADING_DATA, data: true })
-            const { data } = await http('adminPage/findOne', { id })
+            const { data } = await http('/admin/admin_page/findOne', { id })
             let status = false
             data.tableParams.forEach((i: any) => {
                 if (i.type === 'actions') {
@@ -694,6 +694,9 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                 }, {
                     label: '标签设置页面',
                     value: 'tabBar',
+                }, {
+                    label: '编辑页面',
+                    value: 'edit',
                 }],
                 value: pageType,
                 onChange: this.handleTypeChange
@@ -1293,7 +1296,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
             if (this.fn) {
                 const data = this.fn.getFieldValue()
                 dispatch({ type: SET_SPINLOADING_DATA, data: true })
-                await http('adminPage/update', data)
+                await http('/admin/admin_page/update', data)
                 dispatch({ type: SET_SPINLOADING_DATA, data: false })
                 message.success('更新成功')
             }
@@ -1312,12 +1315,12 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                     message.error('请输入标题')
                     return
                 }
-                if (!data.initUrl) {
+                if (!data.initUrl && data.pageType !== 'edit') {
                     message.error('请输入页面初始化请求地址')
                     return
                 }
                 dispatch({ type: SET_SPINLOADING_DATA, data: true })
-                await http('adminPage/create', data)
+                await http('/admin/admin_page/create', data)
                 this.fn.cleanFieldValue()
                 dispatch({ type: SET_SPINLOADING_DATA, data: false })
                 message.success('创建成功')
