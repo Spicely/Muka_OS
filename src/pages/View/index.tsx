@@ -292,23 +292,22 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     field: i.field,
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 }); break;
-                case 'image': items.push({
+                case 'Image': items.push({
                     component: 'Label',
                     render: (val: string) => {
                         return (
-                            // <UploadBox
-                            //     className="flex_center"
-                            //     onClick={this.handleImageView}
-                            // >
-                            //     {val ? <Image src={imgUrl + val} style={{ width: '100%' }} /> : <UoloadIcon icon="ios-add" theme={uploadIconTheme} />}
-                            // </UploadBox>
-                            <Image src={imgUrl + val} style={{ width: '100%' }} />
+                            <UploadBox
+                                className="flex_center"
+                                onClick={this.handleImageView}
+                            >
+                                {val ? <Image src={imgUrl + val} style={{ width: '100%' }} /> : <UoloadIcon icon="ios-add" theme={uploadIconTheme} />}
+                            </UploadBox>
                         )
                     },
                     field: i.field,
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 }); break;
-                case 'upload': items.push({
+                case 'Upload': items.push({
                     component: 'Upload',
                     props: {
                         maxLength: 1,
@@ -650,7 +649,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             case 'edit': {
                 return (
                     <div>
-                        <Form getItems={this.handleEditItems} />
+                        <Form getItems={this.handleEditItems} style={{width: getUnit(500)}}/>
                         {(editParams.length && editUrl) ? <Button mold="primary" async onClick={this.handleEditComplete}>确认</Button> : null}
                     </div>
                 )

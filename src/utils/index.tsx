@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import { render } from 'react-dom'
 import { connect, Provider } from 'react-redux'
 import styled from 'styled-components'
-import { ThemeProvider, Upload, Dialog, TabBar, MobileLayout, Image } from 'components'
+import { Button, ThemeProvider, Upload, Dialog, TabBar, MobileLayout, Image, Empty } from 'components'
 import { IActionsProps } from '../saga'
 import { IInitState } from 'src/store/state'
 import { IImages } from 'src/store/reducers/images'
@@ -12,7 +12,7 @@ import { SET_IMAGE_MODAL_VISIBLE, SET_IMAGES_DATA } from 'src/store/action'
 import { DialogThemeData, TabBarThemeData, getRatioUnit, getUnit } from 'src/components/lib/utils'
 import { IUploadFileListProps } from 'src/components/lib/Upload/dragger'
 import { theme } from 'src/App'
-import http, { httpUtils, imgUrl } from './axios'
+import http, { httpUtils, imgUrl, baseUrl } from './axios'
 
 const ImageBox = styled.div`
     height: ${getUnit(200)};
@@ -35,13 +35,21 @@ interface IProps extends IDialogProps {
     imageModalVisible: boolean
 }
 
-class ImageModal extends PureComponent<IProps & IImageModalProps> {
+interface IState {
+    activeNum: number
+}
+
+class ImageModal extends PureComponent<IProps & IImageModalProps, IState> {
 
     private type: 'private' | 'public' = 'public'
 
+    public state: IState = {
+        activeNum: 0,
+    }
+
     public render(): JSX.Element {
         const { images, imageModalVisible } = this.props
-        console.log(images)
+        const { activeNum } = this.state
         return (
             <Dialog
                 visible={imageModalVisible}
@@ -52,10 +60,16 @@ class ImageModal extends PureComponent<IProps & IImageModalProps> {
                     width: '80%',
                     height: '80%'
                 })}
+                footer={
+                    <div>
+                        <Button mold="primary" onClick={this.handleUpload}>上传文件</Button>
+                    </div>
+                }
             >
                 <TabBar
                     theme={new TabBarThemeData({ height: '100%' })}
                     onChange={this.handleTabChange}
+                    selected={activeNum}
                 >
                     <TabBar.Item title="共享库">
                         <div style={{ color: 'red' }}>sss</div>
@@ -73,6 +87,9 @@ class ImageModal extends PureComponent<IProps & IImageModalProps> {
                                     )
                                 })
                             }
+                            {
+                                !images.private.length ? <div className="flex_center" style={{ height: '100%' }}><Empty /></div> : null
+                            }
                         </MobileLayout>
                     </TabBar.Item>
                 </TabBar>
@@ -83,7 +100,7 @@ class ImageModal extends PureComponent<IProps & IImageModalProps> {
     private handleFirstLoading = async () => {
         try {
             const { images } = this.props
-            const { data } = await http('image/find', {
+            const { data } = await http('/admin/image/find', {
                 type: this.type,
                 number: 20,
                 time: images[this.type].length ? images[this.type][0]['createdAt'] : Date.now(),
@@ -96,6 +113,10 @@ class ImageModal extends PureComponent<IProps & IImageModalProps> {
         }
     }
 
+    private handleUpload = () => {
+        uploadModal()
+    }
+
     private handleTabChange = (field: number | string) => {
         if (field === 0) {
             this.type = 'public'
@@ -106,6 +127,9 @@ class ImageModal extends PureComponent<IProps & IImageModalProps> {
         if (!images[this.type].length) {
             this.handleFirstLoading()
         }
+        this.setState({
+            activeNum: Number(field)
+        })
     }
 
     private handleClose = () => {
@@ -164,12 +188,12 @@ class ImageUpload extends PureComponent<ImageUploadProps, ImageUploadState> {
                 onClose={this.handleClose}
                 theme={new DialogThemeData({
                     width: 600,
-                    height: 300
+                    height: 400
                 })}
             >
                 <UploadBox>
                     <Upload.Dragger
-                        action="http://192.168.1.6:3007/o/upload"
+                        action={baseUrl+ '/upload'}
                         name="file"
                         data={{ module: 'fixed' }}
                         maxLength={1}
@@ -203,14 +227,14 @@ interface IUploadModalProps {
 }
 
 export const uploadModal = (options?: IUploadModalProps) => {
-    let dom = document.querySelector('.image_modal')
+    let dom = document.querySelector('.upload_modal')
     if (!dom) {
         dom = document.createElement('div')
-        dom.className = 'image_modal'
+        dom.className = 'upload_modal'
         document.body.appendChild(dom)
     }
     render((
-        <ThemeProvider>
+        <ThemeProvider theme={theme}>
             <ImageUpload
                 visible={true}
                 {...options}
