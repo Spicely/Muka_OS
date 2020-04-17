@@ -378,12 +378,13 @@ export default class Upload extends Component<IUploadProps, IState> {
                         formData.append(i, val[i])
                     })
                 }
-                formData.append(name || 'avatar', i.file)
                 if (isObject(data)) {
                     Object.keys(data).forEach((i: any) => {
                         formData.append(i, data[i])
                     })
                 }
+                formData.append(name || 'avatar', i.file)
+                
                 i.xhr = axios({
                     method: 'POST',
                     headers,

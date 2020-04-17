@@ -7,6 +7,7 @@ import { store } from 'src/store'
 interface IValue {
     [name: string]: any
 }
+// export const baseUrl = 'https://api.muka.site'
 export const baseUrl = 'http://localhost:7001'
 export const imgUrl = 'https://i.muka.site'
 

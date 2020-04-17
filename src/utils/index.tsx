@@ -195,7 +195,8 @@ class ImageUpload extends PureComponent<ImageUploadProps, ImageUploadState> {
                     <Upload.Dragger
                         action={baseUrl+ '/upload'}
                         name="file"
-                        data={{ module: 'fixed' }}
+                        withCredentials
+                        data={{ type: 'fixed' }}
                         maxLength={1}
                         onUploadSuccess={uploadSuccess}
                         onUploadError={uploadError}
