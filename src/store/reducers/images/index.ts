@@ -3,8 +3,11 @@ import { AnyAction } from 'redux'
 
 interface IImageParams {
     id: string
-    filename: string
-    size: number
+    url: string
+    status: true,
+    original: string
+    preview: string
+    size: string
     mimeType: string
     height: number
     width: number

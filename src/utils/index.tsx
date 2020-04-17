@@ -18,6 +18,7 @@ const ImageBox = styled.div`
     height: ${getUnit(200)};
     width:${getUnit(200)};
     background: #dedede;
+    margin-right: ${getUnit(10)};
     overflow: hidden;
     display: inline-block;
 `
@@ -81,7 +82,7 @@ class ImageModal extends PureComponent<IProps & IImageModalProps, IState> {
                                     return (
                                         <ImageBox key={index} >
                                             <div className="flex_center" style={{ height: '100%' }}>
-                                                <Image src={imgUrl + i.filename} style={{ width: '100%' }} />
+                                                <Image src={imgUrl + i.preview} style={{ width: '100%' }} />
                                             </div>
                                         </ImageBox>
                                     )
@@ -124,9 +125,9 @@ class ImageModal extends PureComponent<IProps & IImageModalProps, IState> {
             this.type = 'private'
         }
         const { images } = this.props
-        if (!images[this.type].length) {
+        // if (!images[this.type].length) {
             this.handleFirstLoading()
-        }
+        // }
         this.setState({
             activeNum: Number(field)
         })
@@ -196,7 +197,7 @@ class ImageUpload extends PureComponent<ImageUploadProps, ImageUploadState> {
                         action={baseUrl+ '/upload'}
                         name="file"
                         withCredentials
-                        data={{ type: 'fixed' }}
+                        data={{ type: 1 }}
                         maxLength={1}
                         onUploadSuccess={uploadSuccess}
                         onUploadError={uploadError}
