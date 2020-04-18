@@ -1,10 +1,11 @@
 import React, { PureComponent } from 'react'
 import { render } from 'react-dom'
-import { connect, Provider } from 'react-redux'
+import { isFunction } from 'lodash'
+import { connect, Provider, DispatchProp } from 'react-redux'
 import styled from 'styled-components'
 import { Button, ThemeProvider, Upload, Dialog, TabBar, MobileLayout, Image, Empty } from 'components'
 import { IActionsProps } from '../saga'
-import { IInitState } from 'src/store/state'
+import { IInitState, MukaOS } from 'src/store/state'
 import { IImages } from 'src/store/reducers/images'
 import { IDialogProps } from 'src/components/lib/Dialog'
 import { store } from 'src/store'
@@ -28,7 +29,8 @@ export interface IConnectProps {
 }
 
 interface IImageModalProps {
-    onSelect?: () => void
+    onSelect?: (data: MukaOS.IImageParams) => void
+    multiple?: boolean
 }
 
 interface IProps extends IDialogProps {
@@ -40,7 +42,11 @@ interface IState {
     activeNum: number
 }
 
-class ImageModal extends PureComponent<IProps & IImageModalProps, IState> {
+class ImageModal extends PureComponent<IProps & IImageModalProps & DispatchProp, IState> {
+
+    public static defaultProps: IImageModalProps = {
+        multiple: false
+    }
 
     private type: 'private' | 'public' = 'public'
 
@@ -80,7 +86,7 @@ class ImageModal extends PureComponent<IProps & IImageModalProps, IState> {
                             {
                                 images.private.map((i, index: number) => {
                                     return (
-                                        <ImageBox key={index} >
+                                        <ImageBox key={index} onClick={this.handleImage.bind(this, i)}>
                                             <div className="flex_center" style={{ height: '100%' }}>
                                                 <Image src={imgUrl + i.preview} style={{ width: '100%' }} />
                                             </div>
@@ -96,6 +102,14 @@ class ImageModal extends PureComponent<IProps & IImageModalProps, IState> {
                 </TabBar>
             </Dialog>
         )
+    }
+
+    private handleImage = (img: MukaOS.IImageParams) => {
+        const { onSelect, multiple, dispatch } = this.props
+        if (isFunction(onSelect) && !multiple) {
+            onSelect(img)
+            dispatch({ type: SET_IMAGE_MODAL_VISIBLE, data: false })
+        }
     }
 
     private handleFirstLoading = async () => {
@@ -126,7 +140,7 @@ class ImageModal extends PureComponent<IProps & IImageModalProps, IState> {
         }
         const { images } = this.props
         // if (!images[this.type].length) {
-            this.handleFirstLoading()
+        this.handleFirstLoading()
         // }
         this.setState({
             activeNum: Number(field)
@@ -152,9 +166,9 @@ export const imageModal = (options?: IImageModalProps) => {
         document.body.appendChild(dom)
     }
     const data = store.getState()
-    console.log(data)
+    // console.log(options)
     store.dispatch({ type: SET_IMAGE_MODAL_VISIBLE, data: true })
-    render(<Provider store={store}><ThemeProvider theme={theme}><ConnectImageModal /></ThemeProvider></Provider>, dom)
+    render(<Provider store={store}><ThemeProvider theme={theme}><ConnectImageModal {...options} /></ThemeProvider></Provider>, dom)
 }
 
 const UploadBox = styled.div`
@@ -194,7 +208,7 @@ class ImageUpload extends PureComponent<ImageUploadProps, ImageUploadState> {
             >
                 <UploadBox>
                     <Upload.Dragger
-                        action={baseUrl+ '/upload'}
+                        action={baseUrl + '/upload'}
                         name="file"
                         withCredentials
                         data={{ type: 1 }}

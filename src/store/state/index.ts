@@ -52,6 +52,22 @@ export namespace MukaOS {
         skip: number
         data: CarouselData[]
     }
+
+    export interface IImageParams {
+        id: string
+        url: string
+        status: true,
+        original: string
+        preview: string
+        size: string
+        mimeType: string
+        height: number
+        width: number
+        type: 'private' | 'public'
+        user: string
+        createdAt: number
+        updatedAt: number
+    }
 }
 
 export interface ITabelRes<T = any> {

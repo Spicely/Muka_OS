@@ -1,25 +1,12 @@
 import { SET_IMAGES_DATA } from '../../action'
 import { AnyAction } from 'redux'
+import { MukaOS } from '../../state'
 
-interface IImageParams {
-    id: string
-    url: string
-    status: true,
-    original: string
-    preview: string
-    size: string
-    mimeType: string
-    height: number
-    width: number
-    type: 'private' | 'public'
-    user: string
-    createdAt: number
-    updatedAt: number
-}
+
 
 export type IImages = {
-    private: IImageParams[]
-    public: IImageParams[]
+    private: MukaOS.IImageParams[]
+    public: MukaOS.IImageParams[]
 }
 
 const initData: IImages = {

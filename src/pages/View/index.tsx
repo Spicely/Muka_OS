@@ -40,6 +40,7 @@ const UploadBox = styled.div`
     vertical-align: middle;
     position: relative;
     transition: all 0.3s;
+    overflow: hidden;
     :hover {
         border-color: ${({ theme }) => theme.primarySwatch};
         ${UoloadIcon} {
@@ -117,6 +118,8 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
     private editFn?: IFormFun
 
     private tabBarFuns: IFormFun[] = []
+
+    private field: string = ''
 
     private actionUrl: string = ''
 
@@ -294,13 +297,13 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                 }); break;
                 case 'Image': items.push({
                     component: 'Label',
-                    render: (val: string) => {
+                    render: (val: MukaOS.IImageParams) => {
                         return (
                             <UploadBox
                                 className="flex_center"
-                                onClick={this.handleImageView}
+                                onClick={this.handleImageView.bind(this, i.field)}
                             >
-                                {val ? <Image src={imgUrl + val} style={{ width: '100%' }} /> : <UoloadIcon icon="ios-add" theme={uploadIconTheme} />}
+                                {val ? <Image src={imgUrl + val.preview} style={{ width: '100%' }} /> : <UoloadIcon icon="ios-add" theme={uploadIconTheme} />}
                             </UploadBox>
                         )
                     },
@@ -406,8 +409,18 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         }
     }
 
-    private handleImageView = () => {
-        imageModal()
+    private handleImageView = (field: string) => {
+        this.field = field
+        imageModal({
+            onSelect: this.handleSelect,
+            multiple: false
+        })
+    }
+
+    private handleSelect = (data: MukaOS.IImageParams) => {
+        this.editFn?.setFieldValue({
+            [this.field]: data
+        })
     }
 
     private handleBeforeUpload = async (file: File) => {
@@ -649,7 +662,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             case 'edit': {
                 return (
                     <div>
-                        <Form getItems={this.handleEditItems} style={{width: getUnit(500)}}/>
+                        <Form getItems={this.handleEditItems} style={{ width: getUnit(500) }} />
                         {(editParams.length && editUrl) ? <Button mold="primary" async onClick={this.handleEditComplete}>确认</Button> : null}
                     </div>
                 )
