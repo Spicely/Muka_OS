@@ -314,7 +314,7 @@ export default class Upload extends Component<IUploadProps, IState> {
     }
 
     private updLoadFiles = (files: FileList) => {
-        const { fileTypes, maxLength, action, name, data, withCredentials, baserUrl, onUploadSuccess, onUploadError, onFileTypeError, headers, onBeforeUpload, maxFileSize, onMaxFileSizeError } = this.props
+        const { fileTypes, maxLength, action, name, data, withCredentials, onUploadSuccess, onUploadError, onFileTypeError, headers, onBeforeUpload, maxFileSize, onMaxFileSizeError } = this.props
         let { fileList } = this.state
         for (let i = 0; i < files.length; i++) {
             const file = files.item(i)

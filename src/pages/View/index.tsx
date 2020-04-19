@@ -11,7 +11,7 @@ import { IInitState, MukaOS, ITabelRes } from 'src/store/state'
 import moment from 'moment'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { GlobalView } from 'src/utils/node'
-import { NavBarThemeData, Color, IconThemeData, getUnit, DialogThemeData, TabBarThemeData, UploadThemeData } from 'src/components/lib/utils'
+import { NavBarThemeData, Color, IconThemeData, getUnit, DialogThemeData, TabBarThemeData, UploadThemeData, ButtonThemeData } from 'src/components/lib/utils'
 import { SET_SPINLOADING_DATA } from 'src/store/action'
 import { RouteComponentProps, Link } from 'react-router-dom'
 import { IPageType, IFieldParams, IFieldTableEdits, IBarActions } from '../Page'
@@ -37,6 +37,7 @@ const UploadBox = styled.div`
     border: ${getUnit(1)} dashed rgb(217,217,217);
     border-radius: 0;
     cursor: pointer;
+    margin-bottom: ${getUnit(10)};
     vertical-align: middle;
     position: relative;
     transition: all 0.3s;
@@ -62,6 +63,18 @@ const uploadIconTheme = new IconThemeData({
 const uploadTheme = new UploadThemeData({
     itemHeight: 200,
     itemWidth: 375
+})
+
+const btnTheme = new ButtonThemeData({
+    width: 140
+})
+
+const iconTheme = new IconThemeData({
+    size: 24
+})
+
+const tabBarTheme = new TabBarThemeData({
+    height: '100%'
 })
 
 interface IProps extends DispatchProp {
@@ -102,14 +115,6 @@ const AntModel = styled(Modal)`
         }
     }
 `
-
-const iconTheme = new IconThemeData({
-    size: 24
-})
-
-const tabBarTheme = new TabBarThemeData({
-    height: '100%'
-})
 
 class View extends Component<IProps & RouteComponentProps<{ id: string }>, IState> {
 
@@ -293,6 +298,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     className: 'evc_q',
                     render: (val: string) => <div className="flex_justify">{val}</div>,
                     field: i.field,
+                    alias: i.alias,
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 }); break;
                 case 'Image': items.push({
@@ -308,6 +314,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                         )
                     },
                     field: i.field,
+                    alias: i.alias,
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 }); break;
                 case 'Upload': items.push({
@@ -322,6 +329,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                         itemStyle: i.style || {}
                     },
                     field: i.field,
+                    alias: i.alias,
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 }); break;
                 case 'Select': items.push({
@@ -330,6 +338,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                         options: i.options,
                     },
                     field: i.field,
+                    alias: i.alias,
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 }); break;
                 case 'CheckBox': items.push({
@@ -338,6 +347,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                         options: i.options,
                     },
                     field: i.field,
+                    alias: i.alias,
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 }); break;
                 case 'AsyncSelect': items.push({
@@ -346,6 +356,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     props: {
                         url: (i.url.includes('http://') || i.url.includes('https://')) ? i.url : baseUrl + i.url
                     },
+                    alias: i.alias,
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 }); break;
                 case 'RadioGroup': items.push({
@@ -355,11 +366,13 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                         onChange: this.handleChange.bind(this, i.ref, fn, data)
                     },
                     field: i.field,
+                    alias: i.alias,
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 }); break;
                 default: items.push({
                     component: i.type,
                     field: i.field,
+                    alias: i.alias,
                     props: {
                         placeholder: i.placeholder || `请输入${i.label}`,
                     },
@@ -418,9 +431,12 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
     }
 
     private handleSelect = (data: MukaOS.IImageParams) => {
-        this.editFn?.setFieldValue({
-            [this.field]: data
-        })
+        const { pageType } = this.state
+        switch (pageType) {
+            case 'edit': this.editFn?.setFieldValue({
+                [this.field]: data
+            }); break;
+        }
     }
 
     private handleBeforeUpload = async (file: File) => {
@@ -663,7 +679,9 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                 return (
                     <div>
                         <Form getItems={this.handleEditItems} style={{ width: getUnit(500) }} />
-                        {(editParams.length && editUrl) ? <Button mold="primary" async onClick={this.handleEditComplete}>确认</Button> : null}
+                        <div style={{ marginLeft: getUnit(68) }}>
+                            {(editParams.length && editUrl) ? <Button mold="primary" theme={btnTheme} onClick={this.handleEditComplete}>确认</Button> : null}
+                        </div>
                     </div>
                 )
             }
@@ -771,21 +789,22 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             if (this.editFn) {
                 const { editParams, editUrl } = this.state
                 const params = this.editFn.getFieldValue()
-                for (let i = 0; i < editParams.length; i++) {
-                    if (editParams[i].type === 'upload') {
-                        if (params[editParams[i].field][0].data) {
-                            params[editParams[i].field] = params[editParams[i].field][0].data.data.url
-                        } else {
-                            delete params[editParams[i].field]
-                        }
-                    }
-                    if (editParams[i].require && (isNil(params[editParams[i].field]) || params[editParams[i].field] === '')) {
-                        message.error(`请输入${editParams[i].label}`)
-                        return
-                    }
-                }
-                const res = await http(editUrl, params)
-                message.success(res.msg)
+                console.log(params)
+                // for (let i = 0; i < editParams.length; i++) {
+                //     if (editParams[i].type === 'upload') {
+                //         if (params[editParams[i].field][0].data) {
+                //             params[editParams[i].field] = params[editParams[i].field][0].data.data.url
+                //         } else {
+                //             delete params[editParams[i].field]
+                //         }
+                //     }
+                //     if (editParams[i].require && (isNil(params[editParams[i].field]) || params[editParams[i].field] === '')) {
+                //         message.error(`请输入${editParams[i].label}`)
+                //         return
+                //     }
+                // }
+                // const res = await http(editUrl, params)
+                // message.success(res.msg)
             }
         } catch (e) {
             httpUtils.verify(e)

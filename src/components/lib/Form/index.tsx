@@ -32,6 +32,7 @@ export interface IFormItem {
     component: component
     props?: props
     field?: string
+    alias?: string
     label?: string | JSX.Element
     additional?: string | JSX.Element
     className?: string
@@ -63,6 +64,7 @@ interface IValue {
 interface IFormChild {
     type: component
     field: string
+    alias?: string
     label?: string | JSX.Element
     className?: string
     props: IValue
@@ -105,12 +107,16 @@ interface IState {
 const prefixClass = 'l_form'
 
 const FormItem = styled.div`
-    min-height: ${getRatioUnit(50)};
+    min-height: ${getUnit(50)};
 `
 
 const FormItemLabel = styled.div`
-    min-height: ${getRatioUnit(50)};
-    margin-right: ${getRatioUnit(8)};
+    min-height: ${getUnit(50)};
+    margin-right: ${getUnit(8)};
+`
+
+const ItemMarBot = styled.div`
+    margin-bottom: ${getUnit(10)};
 `
 
 const ItemExtend = styled.div`
@@ -174,6 +180,7 @@ export default class Form extends Component<IFormProps, IState> {
                 type: item.component,
                 view: null,
                 field,
+                alias: item.alias,
                 additional: item.additional,
                 label: item.label,
                 props: item.props || {},
@@ -211,6 +218,7 @@ export default class Form extends Component<IFormProps, IState> {
                     type: item.component,
                     view: null,
                     field,
+                    alias: item.alias,
                     label: item.label,
                     props: _porps,
                     additional: item.additional,
@@ -247,6 +255,7 @@ export default class Form extends Component<IFormProps, IState> {
                 newChild[index].extend = item.extend
                 newChild[index].render = item.render
                 newChild[index].label = item.label
+                newChild[index].alias = item.alias
             } else if (item.field !== newChild[index].field && item.field) {
                 newChild[index].props = {
                     ...item.props,
@@ -258,6 +267,7 @@ export default class Form extends Component<IFormProps, IState> {
                 newChild[index].extend = item.extend
                 newChild[index].render = item.render
                 newChild[index].label = item.label
+                newChild[index].alias = item.alias
             }
         })
         this.setState({
@@ -402,7 +412,7 @@ export default class Form extends Component<IFormProps, IState> {
                 // tslint:disable-next-line: only-arrow-functions
                 const onChange: any = _porps.onChange || function (e: ChangeEvent<HTMLButtonElement>) { }
                 return (
-                    <div className={getClassName(`${prefixClass}__list`, className)} key={field}>
+                    <ItemMarBot className={className} key={field}>
                         <div className="flex" >
                             {label && <FormItemLabel style={{ paddingTop: getRatioUnit(16) }}>{label}</FormItemLabel>}
                             <div className="flex_1">
@@ -415,7 +425,7 @@ export default class Form extends Component<IFormProps, IState> {
                             </div>
                         </div>
                         {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
-                    </div>
+                    </ItemMarBot>
                 )
             }
             case 'Colors': {
@@ -493,7 +503,7 @@ export default class Form extends Component<IFormProps, IState> {
                 const _porps: any = props
                 const onChange: any = _porps.onChange
                 return (
-                    <FormItem className={`flex_justify ${className || ''}`} key={field}>
+                    <ItemMarBot className={`flex_justify ${className || ''}`} key={field}>
                         <div className="flex">
                             {label && <FormItemLabel style={{ paddingTop: getRatioUnit(16) }}>{label}</FormItemLabel>}
                             <div className="flex_1">
@@ -506,7 +516,7 @@ export default class Form extends Component<IFormProps, IState> {
                             </div>
                         </div>
                         {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
-                    </FormItem>
+                    </ItemMarBot>
                 )
             }
             case 'CheckBox': {
@@ -962,11 +972,13 @@ export default class Form extends Component<IFormProps, IState> {
             if (params) {
                 params.forEach((i: string) => {
                     if (item.field === i) {
-                        val[i] = this.getComVal(item, i)
+                        const ev = item.field.indexOf('.')
+                        val[item.alias || i] = ev === -1 ? this.getComVal(item, i) : get(this.getComVal(item, i), i.substr(ev + 1))
                     }
                 })
             } else {
-                val[item.field] = this.getComVal(item, item.field)
+                const ev = item.field.indexOf('.')
+                val[item.alias || item.field] = ev === -1 ? this.getComVal(item, item.field) : get(this.getComVal(item, item.field), item.field.substr(ev + 1))
             }
         })
         return val
