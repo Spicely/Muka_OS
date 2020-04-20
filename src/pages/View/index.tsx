@@ -393,6 +393,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                 switch (data.pageType) {
                     case 'table': await this.getTableUrlData(data.initUrl); break;
                     case 'tabBar': await this.getTabBarData(data.initUrl); break;
+                    case 'edit': await this.getEditData(data.initUrl); break;
                 }
             }
             this.setState({
@@ -468,6 +469,21 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         }
     }
 
+    private getEditData = async (url: string) => {
+        try {
+            const { data } = await http(url)
+            this.setState({
+                pageData: data
+            }, () => {
+                setTimeout(() => {
+                    this.editFn?.setFieldValue(data)
+                }, 10)
+            })
+        } catch (e) {
+            httpUtils.verify(e)
+        }
+    }
+
     private getTableUrlData = async (url: string) => {
         try {
             const { data } = await http(url)
@@ -486,6 +502,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                 const columns = tableParams.map((i) => {
                     switch (i.type) {
                         case 'img': {
+
                             return {
                                 title: i.label,
                                 dataIndex: i.field,
@@ -790,21 +807,21 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                 const { editParams, editUrl } = this.state
                 const params = this.editFn.getFieldValue()
                 console.log(params)
-                // for (let i = 0; i < editParams.length; i++) {
-                //     if (editParams[i].type === 'upload') {
-                //         if (params[editParams[i].field][0].data) {
-                //             params[editParams[i].field] = params[editParams[i].field][0].data.data.url
-                //         } else {
-                //             delete params[editParams[i].field]
-                //         }
-                //     }
-                //     if (editParams[i].require && (isNil(params[editParams[i].field]) || params[editParams[i].field] === '')) {
-                //         message.error(`请输入${editParams[i].label}`)
-                //         return
-                //     }
-                // }
-                // const res = await http(editUrl, params)
-                // message.success(res.msg)
+                for (let i = 0; i < editParams.length; i++) {
+                    if (editParams[i].type === 'upload') {
+                        if (params[editParams[i].field][0].data) {
+                            params[editParams[i].field] = params[editParams[i].field][0].data.data.url
+                        } else {
+                            delete params[editParams[i].field]
+                        }
+                    }
+                    if (editParams[i].require && (isNil(params[editParams[i].field]) || params[editParams[i].field] === '')) {
+                        message.error(`请输入${editParams[i].label}`)
+                        return
+                    }
+                }
+                const res = await http(editUrl, params)
+                message.success(res.msg)
             }
         } catch (e) {
             httpUtils.verify(e)

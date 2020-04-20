@@ -972,13 +972,22 @@ export default class Form extends Component<IFormProps, IState> {
             if (params) {
                 params.forEach((i: string) => {
                     if (item.field === i) {
-                        const ev = item.field.indexOf('.')
-                        val[item.alias || i] = ev === -1 ? this.getComVal(item, i) : get(this.getComVal(item, i), i.substr(ev + 1))
+                        const ev = item.alias?.indexOf('.')
+                        if (ev) {
+                            val[i] = ev === -1 ? this.getComVal(item, i) : get(this.getComVal(item, i), item.alias?.substr(ev + 1) || i)
+                        } else {
+                            val[i] = this.getComVal(item, i)
+                        }
                     }
                 })
             } else {
-                const ev = item.field.indexOf('.')
-                val[item.alias || item.field] = ev === -1 ? this.getComVal(item, item.field) : get(this.getComVal(item, item.field), item.field.substr(ev + 1))
+                const ev = item.alias?.indexOf('.')
+                if (ev) {
+                    val[item.field] = ev === -1 ? this.getComVal(item, item.field) : get(this.getComVal(item, item.field), item.alias?.substr(ev + 1) || item.field)
+                } else {
+                    val[item.field] = this.getComVal(item, item.field)
+                }
+
             }
         })
         return val
