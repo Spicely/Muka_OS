@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import ReactSelect from 'react-select'
+import { Select as ReactSelect } from 'antd'
 import { isFunction, isNil, isUndefined, isString } from 'lodash'
 import { getClassName, SelectThemeData, getUnit, transition, Color } from '../utils'
 import { Consumer } from '../ThemeProvider'
@@ -35,7 +35,7 @@ interface IStyleProps {
 
 const SelectIcon = styled(Icon)``
 
-const SelectView = styled(ReactSelect)<IStyleProps>`
+const SelectView = styled(ReactSelect) <IStyleProps>`
     height: ${({ selectTheme }) => getUnit(selectTheme.height)};
     background: #fff;
     ${({ selectTheme, theme }) => selectTheme.borderRadius || theme.borderRadius}
@@ -152,23 +152,10 @@ export default class Select extends Component<ISelectProps, IState> {
                             value={value}
                             selectTheme={theme || val.theme.selectTheme}
                             className={className}
-                            classNamePrefix="select"
-                            options={options}
+                            // options={options}
                             onChange={this.handleChange}
-                            isSearchable={isSearchable}
                             placeholder={placeholder}
-                            isMulti={isMulti}
-                            isDisabled={isDisabled}
-                            components={{
-                                IndicatorsContainer: () =>
-                                    <div className={getClassName(`${prefixClass}_icon flex_center`)} >
-                                        <SelectIcon
-                                            icon="ios-arrow-down"
-                                            theme={theme ? theme.iconTheme : val.theme.selectTheme.iconTheme}
-                                        />
-                                    </div>,
-                                NoOptionsMessage: this.handleMessage
-                            }}
+                            
                         />)
                 }
             </Consumer>

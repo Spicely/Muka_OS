@@ -194,7 +194,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                                     <ActionButton
                                                         mold="primary"
                                                         key={index}
-                                                        onClick={this.handleAddItem.bind(this, i.url, i.data)}
+                                                        onClick={this.handleAddItem.bind(this, i.label, i.url, i.data)}
                                                     >
                                                         {i.label}
                                                     </ActionButton>
@@ -271,10 +271,10 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         }
     }
 
-    private handleAddItem = (url: string, data: IFieldTableEdits[]) => {
+    private handleAddItem = (label: string, url: string, data: IFieldTableEdits[]) => {
         this.actionUrl = url
         this.setState({
-            editDialogTitle: '新增',
+            editDialogTitle: label,
             editVisible: true,
             barActionData: data
         })
@@ -435,6 +435,9 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         const { pageType } = this.state
         switch (pageType) {
             case 'edit': this.editFn?.setFieldValue({
+                [this.field]: data
+            }); break;
+            case 'table': this.fn?.setFieldValue({
                 [this.field]: data
             }); break;
         }

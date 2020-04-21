@@ -1,32 +1,31 @@
-import React, { Component } from 'react'
-import ReactSelect from 'react-select/async'
+import React, { Component, Fragment } from 'react'
+import { Select as ReactSelect } from 'antd'
 import Axios from 'axios'
-import { isFunction, isNil, isUndefined, isString } from 'lodash'
-import { getClassName, SelectThemeData, getUnit, transition, Color } from '../utils'
+import { isFunction, isUndefined, isString } from 'lodash'
+import { SelectThemeData, getUnit, Color } from '../utils'
 import { Consumer } from '../ThemeProvider'
 import Empty from '../Empty'
 import Icon from '../Icon'
-import styled from 'styled-components'
+import styled, { createGlobalStyle } from 'styled-components'
 
 interface ISelectOptionsProps {
     value: string | number
     label: string
-    isDisabled?: boolean
+    disabled?: boolean
     color?: string
 }
 
 export interface ISelectProps {
     className?: string
-    options: ISelectOptionsProps[]
     onChange?: (value: string | number) => void
     placeholder?: string
     isSearchable?: boolean
     isMulti?: boolean
     isDisabled?: boolean
-    url?: string
-    loadOptions?: Promise<ISelectOptionsProps[]>
+    url: string
     noOptionsMessage?: string | JSX.Element
     theme?: SelectThemeData
+    withCredentials?: boolean
 }
 
 const prefixClass = 'select'
@@ -37,92 +36,43 @@ interface IStyleProps {
 
 const SelectIcon = styled(Icon)``
 
-const SelectView = styled(ReactSelect)<IStyleProps>`
+const GlobalSelectDropdown = createGlobalStyle<IStyleProps>`
+    .ant-select-dropdown {
+        ${({ selectTheme, theme }: any) => selectTheme.borderRadius || theme.borderRadius}
+    }
+    .ant-select-dropdown-menu-item:hover:not(.ant-select-dropdown-menu-item-disabled) {
+        background: ${({ selectTheme, theme }: any) => Color.setOpacity(selectTheme.selectColor || theme.primarySwatch, 0.65).toString()};
+    }
+    .ant-select-dropdown-menu-item {
+        font-size: inherit;
+    }
+`
+
+const SelectView = styled(ReactSelect) <IStyleProps>`
     height: ${({ selectTheme }) => getUnit(selectTheme.height)};
     background: #fff;
-    ${({ selectTheme, theme }) => selectTheme.borderRadius || theme.borderRadius}
-
-    >span {
-        display: none;
-    }
-
-    .select_icon {
-        width: ${getUnit(24)};
-    }
-
-    .select__control {
-        min-height: initial;
+    .ant-select-selection--single {
         height: 100%;
-        box-shadow: inherit;
-        border-radius: inherit;
-        ${({ selectTheme }: any) => selectTheme.border};
-        background: inherit;
-        ${transition(0.5)};
-        ${SelectIcon} {
-            ${transition(0.5)};
-            transform: rotate(0deg);
-        }
-
-        &--is-focused {
-            border-color: ${({ selectTheme, theme }) => selectTheme.selectColor || theme.primarySwatch};
-            box-sizing: border-box;
-            border-width: ${getUnit(1)};
-            ${SelectIcon} {
-                fill: ${({ selectTheme, theme }) => selectTheme.selectColor || theme.primarySwatch};
-            }
-            &.select__control--menu-is-open ${SelectIcon} {
-                transform: rotate(180deg);
-            }
-        }
-
-        &:hover {
-            border-color: ${({ selectTheme, theme }) => selectTheme.selectColor || theme.primarySwatch};
-            ${SelectIcon} {
-                fill: ${({ selectTheme, theme }) => selectTheme.selectColor || theme.primarySwatch};
-            }
-        }
+        ${({ selectTheme, theme }) => selectTheme.borderRadius || theme.borderRadius}
     }
 
-    .select__placeholder {
-        white-space: nowrap;
+    .ant-select-selection:hover {
+        border-color: ${({ selectTheme, theme }) => selectTheme.selectColor || theme.primarySwatch};
     }
-
-    .select__value-container {
-        min-width: ${getUnit(70)};
+    
+    .ant-select-focused .ant-select-selection, .ant-select-selection:focus, .ant-select-selection:active {
+        border-color: ${({ selectTheme, theme }) => selectTheme.selectColor || theme.primarySwatch};
+        box-shadow: none;
     }
-
-    .select__indicator {
-        padding: 0 ${getUnit(8)};
-
-        &-separator {
-            display: none;
-        }
-    }
-
-    .select__menu {
-        ${({ selectTheme, theme }) => selectTheme.borderRadius || theme.borderRadius};
-    }
-    .select__option {
-        &:hover {
-            background: ${({ selectTheme, theme }) => Color.setOpacity(selectTheme.selectColor || theme.primarySwatch, 0.65).toString()};
-        }
-
-        &--is-selected {
-            background: ${({ selectTheme, theme }) => selectTheme.selectColor || theme.primarySwatch};
-        }
-
-        &--is-focused {
-            background: ${({ selectTheme, theme }) => Color.setOpacity(selectTheme.selectColor || theme.primarySwatch, 0.8).toString()};
-        }
-    }
-
-    .select__desc {
-        line-height: ${({ selectTheme }) => getUnit(selectTheme.height)};
+    .ant-select-selection__placeholder {
+        color: inherit;
     }
 `
 
 interface IState {
     value: any
+    options: ISelectOptionsProps[]
+    loading: boolean
 }
 
 export default class AsyncSelect extends Component<ISelectProps, IState> {
@@ -132,73 +82,78 @@ export default class AsyncSelect extends Component<ISelectProps, IState> {
     }
 
     public static defaultProps: ISelectProps = {
-        options: [],
+        url: '',
         placeholder: '请选择数据',
         isSearchable: false,
         isMulti: false,
         isDisabled: false,
+        withCredentials: true,
     }
 
     public state: IState = {
-        value: undefined
+        value: undefined,
+        options: [],
+        loading: false,
     }
 
     public render(): JSX.Element {
-        const { className, options, placeholder, isSearchable, isMulti, isDisabled, theme, loadOptions, url } = this.props
+        const { className, placeholder, noOptionsMessage, isMulti, isDisabled, theme } = this.props
+        const { options, loading, value } = this.state
         return (
             <Consumer>
                 {
                     (val) => (
-                        <SelectView
-                            options={options}
-                            selectTheme={theme || val.theme.selectTheme}
-                            className={className}
-                            classNamePrefix="select"
-                            cacheOptions
-                            defaultOptions
-                            onChange={this.handleChange}
-                            isSearchable={isSearchable}
-                            loadOptions={loadOptions ? loadOptions : url ? this.getOptions : loadOptions}
-                            placeholder={placeholder}
-                            isMulti={isMulti}
-                            isDisabled={isDisabled}
-                            components={{
-                                IndicatorsContainer: () =>
-                                    <div className={getClassName(`${prefixClass}_icon flex_center`)} >
-                                        <SelectIcon
-                                            icon="ios-arrow-down"
-                                            theme={theme ? theme.iconTheme : val.theme.selectTheme.iconTheme}
-                                        />
-                                    </div>,
-                                NoOptionsMessage: this.handleMessage
-                            }}
-                        />)
-                }
+                        <Fragment>
+                            <GlobalSelectDropdown selectTheme={theme || val.theme.selectTheme} />
+                            <SelectView
+                                value={value}
+                                className={className}
+                                selectTheme={theme || val.theme.selectTheme}
+                                onChange={this.handleChange}
+                                onFocus={this.handleFocus}
+                                loading={loading}
+                                placeholder={placeholder}
+                                notFoundContent={<Empty description={noOptionsMessage} image={null} />}
+                            // suffixIcon={
+                            //     <SelectIcon
+                            //         icon="ios-arrow-down"
+                            //         theme={theme ? theme.iconTheme : val.theme.selectTheme.iconTheme}
+                            //     />
+                            // }
+                            // 
+
+                            >
+                                {
+                                    options.map((i) => {
+                                        return <SelectView.Option value={i.value} key={i.value} disabled={i.disabled}>{i.label}</SelectView.Option>
+                                    })
+                                }
+                            </SelectView>
+                        </Fragment>
+                    )}
             </Consumer>
 
         )
     }
 
-    private getOptions = () => {
-        const { url } = this.props
-        return Axios.post(url || '', {}, {
-            timeout: 25000,
-            withCredentials: true,
-        }).then((res) => {
-            return res.data.data
-        })
+    private handleFocus = () => {
+        const { url, withCredentials } = this.props
+        const { options } = this.state
+        if (url && !options.length) {
+            this.setState({
+                loading: true
+            })
+            Axios.post(url, {}, {
+                timeout: 25000,
+                withCredentials,
+            }).then(({ data }) => {
+                this.setState({
+                    loading: false,
+                    options: data.data
+                })
+            })
+        }
     }
-
-    // public UNSAFE_componentWillReceiveProps(nextProps: ISelectProps) {
-    //     const { value } = this.state
-    //     const { options } = this.props
-    //     if (nextProps.value !== value) {
-    //         const data = options.find((i) => i.value === nextProps.value)
-    //         this.setState({
-    //             value: data || null
-    //         })
-    //     }
-    // }
 
     private handleChange = (data: any) => {
         const { onChange } = this.props
@@ -206,13 +161,7 @@ export default class AsyncSelect extends Component<ISelectProps, IState> {
             value: data
         })
         if (isFunction(onChange)) {
-            onChange(data.value)
+            onChange(data)
         }
-    }
-    private handleMessage = () => {
-        const { noOptionsMessage } = this.props
-        return (isUndefined(noOptionsMessage) || isString(noOptionsMessage)) ?
-            <Empty description={noOptionsMessage} descClassName={getClassName(`${prefixClass}__desc`)} image={null} /> :
-            noOptionsMessage
     }
 }
