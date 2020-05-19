@@ -249,7 +249,7 @@ export default class Form extends Component<IFormProps, IState> {
                     ...newChild[index].props,
                     ...newProps,
                 }
-                newVals[field] = _porps.value ? _porps.value : newVals[field]
+                // newVals[field] = _porps.value ? _porps.value : newVals[field]
                 newChild[index].additional = item.additional
                 newChild[index].visible = isBool(item.visible) ? item.visible : true
                 newChild[index].extend = item.extend

@@ -69,7 +69,7 @@ class ImageModal extends PureComponent<IProps & IImageModalProps & DispatchProp,
                 })}
                 footer={
                     <div>
-                        <Button mold="primary" onClick={this.handleUpload}>上传文件</Button>
+                        <Button mold="primary" onClick={this.handleUpload}>上传图片</Button>
                     </div>
                 }
             >

@@ -211,6 +211,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         try {
             dispatch({ type: SET_SPINLOADING_DATA, data: true })
             const { data } = await http('/admin/admin_page/findOne', { id })
+            console.log(data)
             let status = false
             data.tableParams.forEach((i: any) => {
                 if (i.type === 'actions') {
@@ -762,142 +763,145 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
             props: {
                 value: [],
             },
-            render: (val: IFieldParams[]) => (
-                <div style={{ marginTop: val.length ? getUnit(8) : 0 }}>
-                    {
-                        val.map((i, index: number) => (
-                            <FieldBox key={index} style={{ marginBottom: getUnit(10) }}>
-                                <div className="flex">
-                                    <FieldLabel className="flex_center">显示类型</FieldLabel>
-                                    <Select
-                                        className="flex_1"
-                                        value={i.type}
-                                        options={this.tableFileOptions}
-                                        onChange={this.handelFileldSelectChange.bind(this, index, 'tableParams', 'type')}
-                                    />
-                                </div>
-                                <div className="flex" style={{ marginTop: getUnit(5) }}>
-                                    <FieldLabel className="flex_center">字段名</FieldLabel>
-                                    <Input
-                                        className="flex_1"
-                                        value={i.field}
-                                        placeholder="请输入表单字段"
-                                        onChange={this.handleFieldsChange.bind(this, index, 'tableParams', 'field')}
-                                    />
-                                </div>
-                                <div className="flex" style={{ marginTop: getUnit(5) }}>
-                                    <FieldLabel className="flex_center">文本内容</FieldLabel>
-                                    <Input
-                                        className="flex_1"
-                                        value={i.label}
-                                        placeholder="请输入表单文本"
-                                        onChange={this.handleFieldsChange.bind(this, index, 'tableParams', 'label')}
-                                    />
-                                </div>
-                                {
-                                    i.type === 'status' && (
-                                        <div className="flex" style={{ marginTop: getUnit(5) }}>
-                                            <FieldLabel className="flex_center">状态转换</FieldLabel>
-                                            <Input
-                                                className="flex_1"
-                                                value={i.convert}
-                                                placeholder="例: 1=>成功;2=>失败:red;"
-                                                onChange={this.handleFieldsChange.bind(this, index, 'tableParams', 'convert')}
-                                            />
-                                        </div>
-                                    )
-                                }
-                                <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFieldClose.bind(this, index, 'tableParams')} />
-                                {i.actions.length ? (
-                                    <Divider
-                                        borderType="dashed"
-                                        type="horizontal"
-                                        style={{
-                                            borderWidth: getUnit(2),
-                                            marginTop: getUnit(10),
-                                        }}
-                                    />
-                                ) : null}
-                                {
-                                    i.actions.map((v, k) => {
-                                        return (
-                                            <FieldBox key={k} style={{ marginTop: getUnit(10) }}>
-                                                <div className="flex">
-                                                    <FieldLabel className="flex_center">功能类型</FieldLabel>
-                                                    <Select
-                                                        className="flex_1"
-                                                        value={v.type}
-                                                        options={this.tableActionOptions}
-                                                        onChange={this.handelActionSelectChange.bind(this, index, k)}
-                                                    />
-                                                    <Button
-                                                        mold="primary"
-                                                        disabled={v.type !== 'edit'}
-                                                        onClick={this.handleActionsVisible.bind(this, index, k, 'data', v.data)}
-                                                    >
-                                                        设置编辑数据
-                                                    </Button>
-                                                </div>
-                                                <div className="flex" style={{ marginTop: getUnit(5) }}>
-                                                    <FieldLabel className="flex_center">功能名</FieldLabel>
-                                                    <Input
-                                                        className="flex_1"
-                                                        value={v.label}
-                                                        placeholder={v.type === 'status' ? '例：1=>使用:green;2=>禁用:red;' : '请输入功能名称'}
-                                                        onChange={this.handleActionFieldChange.bind(this, index, k, 'label')}
-                                                    />
-                                                </div>
-                                                <div className="flex" style={{ marginTop: getUnit(5) }}>
-                                                    <FieldLabel className="flex_center">{v.type === 'link' ? '跳转地址' : '请求地址'}</FieldLabel>
-                                                    <Input
-                                                        className="flex_1"
-                                                        value={v.url}
-                                                        placeholder={v.type === 'status' ? 'status/ok?a=b;status/no;' : '请输入请求地址'}
-                                                        onChange={this.handleActionFieldChange.bind(this, index, k, 'url')}
-                                                    />
-                                                </div>
-                                                {
-                                                    v.type === 'status' && (
-                                                        <div className="flex" style={{ marginTop: getUnit(5) }}>
-                                                            <FieldLabel className="flex_center">对应字段名</FieldLabel>
-                                                            <Input
-                                                                className="flex_1"
-                                                                value={v.field}
-                                                                placeholder="请输入字段名"
-                                                                onChange={this.handleActionFieldChange.bind(this, index, k, 'field')}
-                                                            />
-                                                        </div>
-                                                    )
-                                                }
-
-                                                <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleActionClose.bind(this, index, k)} />
-                                            </FieldBox>
+            render: (val: IFieldParams[]) => {
+                console.log(val)
+                return (
+                    <div style={{ marginTop: val.length ? getUnit(8) : 0 }}>
+                        {
+                            val.map((i, index: number) => (
+                                <FieldBox key={index} style={{ marginBottom: getUnit(10) }}>
+                                    <div className="flex">
+                                        <FieldLabel className="flex_center">显示类型</FieldLabel>
+                                        <Select
+                                            className="flex_1"
+                                            value={i.type}
+                                            options={this.tableFileOptions}
+                                            onChange={this.handelFileldSelectChange.bind(this, index, 'tableParams', 'type')}
+                                        />
+                                    </div>
+                                    <div className="flex" style={{ marginTop: getUnit(5) }}>
+                                        <FieldLabel className="flex_center">字段名</FieldLabel>
+                                        <Input
+                                            className="flex_1"
+                                            value={i.field}
+                                            placeholder="请输入表单字段"
+                                            onChange={this.handleFieldsChange.bind(this, index, 'tableParams', 'field')}
+                                        />
+                                    </div>
+                                    <div className="flex" style={{ marginTop: getUnit(5) }}>
+                                        <FieldLabel className="flex_center">文本内容</FieldLabel>
+                                        <Input
+                                            className="flex_1"
+                                            value={i.label}
+                                            placeholder="请输入表单文本"
+                                            onChange={this.handleFieldsChange.bind(this, index, 'tableParams', 'label')}
+                                        />
+                                    </div>
+                                    {
+                                        i.type === 'status' && (
+                                            <div className="flex" style={{ marginTop: getUnit(5) }}>
+                                                <FieldLabel className="flex_center">状态转换</FieldLabel>
+                                                <Input
+                                                    className="flex_1"
+                                                    value={i.convert}
+                                                    placeholder="例: 1=>成功;2=>失败:red;"
+                                                    onChange={this.handleFieldsChange.bind(this, index, 'tableParams', 'convert')}
+                                                />
+                                            </div>
                                         )
-                                    })
-                                }
-                                {i.type === 'actions' && (
-                                    <Button
-                                        mold="primary"
-                                        style={{ width: getUnit(160), marginTop: getUnit(10) }}
-                                        onClick={this.handleAddAction.bind(this, index)}
-                                    >
-                                        添加功能
-                                    </Button>
-                                )}
-                            </FieldBox>
-
-                        ))
-                    }
-                    <Button
-                        mold="primary"
-                        style={{ width: getUnit(160) }}
-                        onClick={this.handleAddField.bind(this, 'tableParams')}
-                    >
-                        添加字段
-                    </Button>
-                </div>
-            ),
-            visible: pageType === 'table',
+                                    }
+                                    <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFieldClose.bind(this, index, 'tableParams')} />
+                                    {i.actions.length ? (
+                                        <Divider
+                                            borderType="dashed"
+                                            type="horizontal"
+                                            style={{
+                                                borderWidth: getUnit(2),
+                                                marginTop: getUnit(10),
+                                            }}
+                                        />
+                                    ) : null}
+                                    {
+                                        i.actions.map((v, k) => {
+                                            return (
+                                                <FieldBox key={k} style={{ marginTop: getUnit(10) }}>
+                                                    <div className="flex">
+                                                        <FieldLabel className="flex_center">功能类型</FieldLabel>
+                                                        <Select
+                                                            className="flex_1"
+                                                            value={v.type}
+                                                            options={this.tableActionOptions}
+                                                            onChange={this.handelActionSelectChange.bind(this, index, k)}
+                                                        />
+                                                        <Button
+                                                            mold="primary"
+                                                            disabled={v.type !== 'edit'}
+                                                            onClick={this.handleActionsVisible.bind(this, index, k, 'data', v.data)}
+                                                        >
+                                                            设置编辑数据
+                                                        </Button>
+                                                    </div>
+                                                    <div className="flex" style={{ marginTop: getUnit(5) }}>
+                                                        <FieldLabel className="flex_center">功能名</FieldLabel>
+                                                        <Input
+                                                            className="flex_1"
+                                                            value={v.label}
+                                                            placeholder={v.type === 'status' ? '例：1=>使用:green;2=>禁用:red;' : '请输入功能名称'}
+                                                            onChange={this.handleActionFieldChange.bind(this, index, k, 'label')}
+                                                        />
+                                                    </div>
+                                                    <div className="flex" style={{ marginTop: getUnit(5) }}>
+                                                        <FieldLabel className="flex_center">{v.type === 'link' ? '跳转地址' : '请求地址'}</FieldLabel>
+                                                        <Input
+                                                            className="flex_1"
+                                                            value={v.url}
+                                                            placeholder={v.type === 'status' ? 'status/ok?a=b;status/no;' : '请输入请求地址'}
+                                                            onChange={this.handleActionFieldChange.bind(this, index, k, 'url')}
+                                                        />
+                                                    </div>
+                                                    {
+                                                        v.type === 'status' && (
+                                                            <div className="flex" style={{ marginTop: getUnit(5) }}>
+                                                                <FieldLabel className="flex_center">对应字段名</FieldLabel>
+                                                                <Input
+                                                                    className="flex_1"
+                                                                    value={v.field}
+                                                                    placeholder="请输入字段名"
+                                                                    onChange={this.handleActionFieldChange.bind(this, index, k, 'field')}
+                                                                />
+                                                            </div>
+                                                        )
+                                                    }
+    
+                                                    <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleActionClose.bind(this, index, k)} />
+                                                </FieldBox>
+                                            )
+                                        })
+                                    }
+                                    {i.type === 'actions' && (
+                                        <Button
+                                            mold="primary"
+                                            style={{ width: getUnit(160), marginTop: getUnit(10) }}
+                                            onClick={this.handleAddAction.bind(this, index)}
+                                        >
+                                            添加功能
+                                        </Button>
+                                    )}
+                                </FieldBox>
+    
+                            ))
+                        }
+                        <Button
+                            mold="primary"
+                            style={{ width: getUnit(160) }}
+                            onClick={this.handleAddField.bind(this, 'tableParams')}
+                        >
+                            添加字段
+                        </Button>
+                    </div>
+                )
+            },
+            // visible: pageType === 'table',
             field: 'tableParams'
         }, {
             component: 'Label',
