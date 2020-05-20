@@ -8,11 +8,14 @@ import Empty from '../Empty'
 import Icon from '../Icon'
 import styled, { createGlobalStyle, css } from 'styled-components'
 
+const { OptGroup, Option } = ReactSelect
+
 interface ISelectOptionsProps {
     value: string | number
     label: string
     disabled?: boolean
     color?: string
+    children?: ISelectOptionsProps[]
 }
 
 export interface ISelectProps extends SelectProps<any> {
@@ -76,6 +79,7 @@ const SelectView = styled.div<IStyleProps>`
         }
         .ant-select-selection-placeholder {
             opacity: 1;
+            color: ${({ selectTheme }) => Color.setOpacity(selectTheme.color, 0.65).toString()};
         }
     }
 `
@@ -105,8 +109,9 @@ export default class Select extends Component<ISelectProps, IState> {
 
     public render(): JSX.Element {
         const { className, options, noOptionsMessage, theme, suffixIcon } = this.props
-        const props = omit(this.props, ['className', 'onChange', 'notFoundContent', 'suffixIcon', 'onDropdownVisibleChange'])
+        const props = omit(this.props, ['className', 'value', 'onChange', 'options', 'notFoundContent', 'suffixIcon', 'onDropdownVisibleChange'])
         const { value, rotate } = this.state
+        console.log(value)
         return (
             <Consumer>
                 {
@@ -118,7 +123,7 @@ export default class Select extends Component<ISelectProps, IState> {
                             <GlobalSelectDropdown selectTheme={theme || val.theme.selectTheme} />
                             <ReactSelect
                                 {...props}
-                                value={value}
+                                value={value || undefined}
                                 onChange={this.handleChange}
                                 onDropdownVisibleChange={this.handleDropdownVisible}
                                 notFoundContent={<Empty description={noOptionsMessage} image={null} />}
@@ -135,7 +140,21 @@ export default class Select extends Component<ISelectProps, IState> {
                             >
                                 {
                                     options.map((i) => {
-                                        return <ReactSelect.Option value={i.value} key={i.value} disabled={i.disabled}>{i.label}</ReactSelect.Option>
+                                        if (i.children) {
+                                            return (
+                                                <OptGroup label={i.label} key={i.value}>
+                                                    {
+                                                        i.children.map((v) => {
+                                                            return (
+                                                                <Option value={v.value} key={v.value} disabled={v.disabled}>{v.label}</Option>
+                                                            )
+                                                        })
+                                                    }
+                                                </OptGroup>
+                                            )
+                                        } else {
+                                            return <Option value={i.value} key={i.value} disabled={i.disabled}>{i.label}</Option>
+                                        }
                                     })
                                 }
                             </ReactSelect>
