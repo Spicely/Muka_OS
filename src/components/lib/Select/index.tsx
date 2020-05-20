@@ -1,4 +1,4 @@
-import React, { Component, FocusEvent } from 'react'
+import React, { Component } from 'react'
 import { Select as ReactSelect } from 'antd'
 import { SelectProps } from 'antd/lib/select'
 import { isFunction, omit } from 'lodash'
@@ -48,6 +48,7 @@ const SelectView = styled.div<IStyleProps>`
         width: 100%;
         background: #fff;
         height: 100%;
+        color: ${({ selectTheme }) => selectTheme.color.toString()};
 
         .ant-select-selector {
             ${({ selectTheme, theme }) => selectTheme.borderRadius || theme.borderRadius}
@@ -69,7 +70,6 @@ const SelectView = styled.div<IStyleProps>`
             ${transition(0.5)}
         }
         .ant-select-single .ant-select-selector .ant-select-selection-item, .ant-select-single .ant-select-selector .ant-select-selection-placeholder {
-            color: ${({ theme }) => Color.setOpacity(theme.fontColor, 0.65).toString()};
             line-height: ${({ selectTheme }) => getUnit(selectTheme.height)};
             font-size: ${({ selectTheme, theme }) => getUnit(selectTheme.fontSize || theme.fontSize)};
             ${transition(0.5)}
@@ -86,6 +86,11 @@ interface IState {
 }
 
 export default class Select extends Component<ISelectProps, IState> {
+
+    constructor(props: ISelectProps) {
+        super(props)
+        this.state.value = this.props.value
+    }
 
     public static defaultProps: ISelectProps = {
         options: [],
