@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { isArray } from 'lodash'
 import styled from 'styled-components'
-import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd'
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 import { Button, Icon, Image, Input, Colors, } from 'components'
 import { baseUrl } from 'src/utils/axios'
 import { getRatioUnit, IconThemeData } from 'src/components/lib/utils'

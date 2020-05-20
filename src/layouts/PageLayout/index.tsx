@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom'
 import { connect, DispatchProp } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router'
 import { Tooltip, message } from 'antd'
-import { isNil } from 'lodash'
 import styled, { css } from 'styled-components'
 import { Icon, Input, Layout, Menu, NavBar, Image, Dialog, Form, Spin } from 'components'
 import { IInitState } from 'src/store/state'
@@ -15,7 +14,6 @@ import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import Color from 'src/components/lib/utils/Color'
 import { IconThemeData, MenuThemeData, ThemeData, transition, InputThemeData, NavBarThemeData, getUnit } from 'src/components/lib/utils'
 import { GET_LAYOUT_DATA, SET_COLLAPSED, SET_SOLO, SET_LOGIN } from 'src/store/action'
-import moment from 'moment'
 
 interface IPageLayout extends DispatchProp {
     solo: boolean
