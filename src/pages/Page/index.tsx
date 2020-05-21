@@ -143,6 +143,8 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
 
     private tableActionsFN: IFormFun[] = []
 
+    private tableParamsFN: IFormFun[] = []
+
     private tableFileOptions = [{
         label: '文本',
         value: 'text',
@@ -691,6 +693,52 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         return items
     }
 
+    private getTableParamItems = (index: number, fn: IFormFun) => {
+        this.tableParamsFN[index] = fn
+        const items: IFormItem[] = [{
+            component: 'Select',
+            props: {
+                options: this.tableFileOptions,
+            },
+            label: <FieldLabel className="flex_center">显示类型</FieldLabel>,
+            field: 'type',
+        }, {
+            component: 'Input',
+            props: {
+                placeholder: '请输入表单字段',
+            },
+            label: <FieldLabel className="flex_center">字段名</FieldLabel>,
+            field: 'field',
+        }, {
+            component: 'Input',
+            props: {
+                placeholder: '请输入表单文本',
+            },
+            label: <FieldLabel className="flex_center">文本内容</FieldLabel>,
+            field: 'label',
+        }, {
+            component: 'Input',
+            props: {
+                placeholder: '请输入表单文本',
+            },
+            label: <FieldLabel className="flex_center">文本内容</FieldLabel>,
+            field: 'label',
+        }, {
+            component: 'Button',
+            visible: (value: any) => value.type === 'actions',
+            props: {
+                children: '添加功能',
+                mold: 'primary',
+                style: {
+                    marginTop: getUnit(2),
+                    width: getUnit(120),
+                    flex: 'initial'
+                },
+            },
+        }]
+        return items
+    }
+
     private getItems = (fn: IFormFun) => {
         const { pageType } = this.state
         this.fn = fn
@@ -778,6 +826,14 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
             render: (val: IFieldParams[]) => (
                 <div style={{ marginTop: val.length ? getUnit(8) : 0 }}>
                     {
+                        val.map((i, index: number) => (
+                            <FieldBox key={index} style={{ marginBottom: getUnit(10) }}>
+                                <Form getItems={this.getTableParamItems.bind(this, index)} labelSpacing={0} />
+                                <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFieldClose.bind(this, index, 'tableParams')} />
+                            </FieldBox>
+                        ))
+                    }
+                    {/* {
                         val.map((i, index: number) => (
                             <FieldBox key={index} style={{ marginBottom: getUnit(10) }}>
                                 <div className="flex">
@@ -900,7 +956,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                             </FieldBox>
 
                         ))
-                    }
+                    } */}
                     <Button
                         mold="primary"
                         style={{ width: getUnit(160) }}
@@ -1220,6 +1276,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
             data[field].splice(index, 1)
             switch (field) {
                 case 'barActions': this.tableActionsFN.splice(index, 1)
+                case 'tableParams': this.tableParamsFN.splice(index, 1)
             }
             this.fn.setFieldValue({
                 [field]: [...data[field]]
@@ -1325,7 +1382,10 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                 const data = this.fn.getFieldValue()
                 console.log(data)
                 switch (data.pageType) {
-                    case 'table': data.barActions = this.tableActionsFN.map((i) => i.getFieldValue())
+                    case 'table': {
+                        data.barActions = this.tableActionsFN.map((i) => i.getFieldValue())
+                        data.tableParams = this.tableParamsFN.map((i) => i.getFieldValue())
+                    }
                 }
                 // if (!data.title) {
                 //     message.error('请输入标题')

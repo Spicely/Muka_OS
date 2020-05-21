@@ -37,7 +37,7 @@ export interface IFormItem {
     additional?: string | JSX.Element
     className?: string
     render?: (val: any) => JSX.Element
-    visible?: boolean
+    visible?: ((val: any) => boolean) | boolean
     extend?: string | JSX.Element | ((val: any) => JSX.Element)
 }
 
@@ -72,7 +72,7 @@ interface IFormChild {
     additional?: string | JSX.Element
     view: any
     render?: (val: any) => JSX.Element
-    visible: boolean
+    visible: ((val: any) => boolean) | boolean
     extend?: string | JSX.Element | ((val: any) => JSX.Element)
 }
 
@@ -284,12 +284,12 @@ export default class Form extends Component<IFormProps, IState> {
 
     public render(): JSX.Element {
         const { className, showType, style } = this.props
-        const { childs } = this.state
+        const { childs, vals } = this.state
         try {
             return (
                 <div className={getClassName(`l_form ${showType}`, className)} style={style}>
                     {childs.map((item: IFormChild, index: number) => {
-                        if (item.view && item.visible) {
+                        if (item.view && (isFunction(item.visible) ? item.visible(vals) : item.visible)) {
                             return this.setTypeCom(this.items[index].component, item.view, item.props, item.field, index, item.className, item.label, item.additional, item.render, item.extend)
                         }
                         return undefined
