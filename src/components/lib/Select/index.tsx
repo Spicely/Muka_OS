@@ -111,7 +111,6 @@ export default class Select extends Component<ISelectProps, IState> {
         const { className, options, noOptionsMessage, theme, suffixIcon } = this.props
         const props = omit(this.props, ['className', 'value', 'onChange', 'options', 'notFoundContent', 'suffixIcon', 'onDropdownVisibleChange'])
         const { value, rotate } = this.state
-        console.log(value)
         return (
             <Consumer>
                 {

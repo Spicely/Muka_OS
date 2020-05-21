@@ -82,7 +82,7 @@ const dialogTheme = new DialogThemeData({
 })
 
 const FieldBox = styled.div`
-    padding: ${getUnit(5)};
+    padding:  ${getUnit(5)} ${getUnit(10)};
     border: ${getUnit(1)} solid rgb(232,232,232);
     position: relative;
 `
@@ -102,6 +102,7 @@ const FiledClose = styled(Icon)`
 const FieldLabel = styled.div`
     border: ${getUnit(1)} solid rgb(232,232,232);
     width: ${getUnit(80)};
+    height: ${getUnit(32)};
     border-right: 0;
 `
 
@@ -139,6 +140,8 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
     private actionsFn: IFormFun | null = null
 
     private title = getTitle('/page')
+
+    private tableActionsFN: IFormFun[] = []
 
     private tableFileOptions = [{
         label: '文本',
@@ -211,7 +214,6 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         try {
             dispatch({ type: SET_SPINLOADING_DATA, data: true })
             const { data } = await http('/admin/admin_page/findOne', { id })
-            console.log(data)
             let status = false
             data.tableParams.forEach((i: any) => {
                 if (i.type === 'actions') {
@@ -223,6 +225,16 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                 }
             })
             this.fn && this.fn.setFieldValue(data)
+            switch (data.pageType) {
+                case 'table': {
+                    setTimeout(() => {
+                        this.tableActionsFN.forEach((i, index: number) => {
+                            i.setFieldValue(data.barActions[index])
+                        })
+                    }, 10)
+                }; break
+            }
+
             this.setState({
                 tableEdit: status,
                 pageType: data.pageType
@@ -651,6 +663,34 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         }
     }
 
+    private getBarItems = (index: number, fn: IFormFun) => {
+        this.tableActionsFN[index] = fn
+        const items: IFormItem[] = [{
+            component: 'Select',
+            props: {
+                options: this.tableBarOptions,
+            },
+            label: <FieldLabel className="flex_center">显示类型</FieldLabel>,
+            extend: (value: any) => (<Button mold="primary" disabled={value.type !== 'add'}>设置添加数据</Button>),
+            field: 'type',
+        }, {
+            component: 'Input',
+            props: {
+                placeholder: '请输入请求地址',
+            },
+            label: <FieldLabel className="flex_center">请求地址</FieldLabel>,
+            field: 'url',
+        }, {
+            component: 'Input',
+            props: {
+                placeholder: '请输入文本内容',
+            },
+            label: <FieldLabel className="flex_center">文本内容</FieldLabel>,
+            field: 'label',
+        }]
+        return items
+    }
+
     private getItems = (fn: IFormFun) => {
         const { pageType } = this.state
         this.fn = fn
@@ -714,37 +754,9 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                     {
                         val.map((i, index: number) => (
                             <FieldBox key={index} style={{ marginBottom: getUnit(10) }}>
-                                <div className="flex">
-                                    <FieldLabel className="flex_center">显示类型</FieldLabel>
-                                    <Select
-                                        className="flex_1"
-                                        value={i.type}
-                                        options={this.tableBarOptions}
-                                        onChange={this.handelFileldSelectChange.bind(this, index, 'barActions', 'type')}
-                                    />
-                                    <Button mold="primary" disabled={i.type !== 'add'} onClick={this.handleAddVisible.bind(this, index, 'barActions', i.data)}>设置添加数据</Button>
-                                </div>
-                                <div className="flex" style={{ marginTop: getUnit(5) }}>
-                                    <FieldLabel className="flex_center">请求地址</FieldLabel>
-                                    <Input
-                                        className="flex_1"
-                                        value={i.url}
-                                        placeholder="请输入请求地址"
-                                        onChange={this.handleFieldsChange.bind(this, index, 'barActions', 'url')}
-                                    />
-                                </div>
-                                <div className="flex" style={{ marginTop: getUnit(5) }}>
-                                    <FieldLabel className="flex_center">文本内容</FieldLabel>
-                                    <Input
-                                        className="flex_1"
-                                        value={i.label}
-                                        placeholder="请输入文本内容"
-                                        onChange={this.handleFieldsChange.bind(this, index, 'barActions', 'label')}
-                                    />
-                                </div>
+                                <Form getItems={this.getBarItems.bind(this, index)} labelSpacing={0} />
                                 <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFieldClose.bind(this, index, 'barActions')} />
                             </FieldBox>
-
                         ))
                     }
                     <Button
@@ -1127,11 +1139,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
     private handleAddBarActions = () => {
         if (this.fn) {
             const { barActions } = this.fn.getFieldValue()
-            barActions.push({
-                label: '',
-                url: '',
-                type: ''
-            })
+            barActions.push({})
             this.fn.setFieldValue({
                 barActions: [...barActions]
             })
@@ -1210,6 +1218,9 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         if (this.fn) {
             const data = this.fn.getFieldValue()
             data[field].splice(index, 1)
+            switch (field) {
+                case 'barActions': this.tableActionsFN.splice(index, 1)
+            }
             this.fn.setFieldValue({
                 [field]: [...data[field]]
             })
@@ -1312,19 +1323,23 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         try {
             if (this.fn) {
                 const data = this.fn.getFieldValue()
-                if (!data.title) {
-                    message.error('请输入标题')
-                    return
+                console.log(data)
+                switch (data.pageType) {
+                    case 'table': data.barActions = this.tableActionsFN.map((i) => i.getFieldValue())
                 }
-                if (!data.initUrl && data.pageType !== 'edit') {
-                    message.error('请输入页面初始化请求地址')
-                    return
-                }
-                dispatch({ type: SET_SPINLOADING_DATA, data: true })
-                await http('/admin/admin_page/create', data)
-                this.fn.cleanFieldValue()
-                dispatch({ type: SET_SPINLOADING_DATA, data: false })
-                message.success('创建成功')
+                // if (!data.title) {
+                //     message.error('请输入标题')
+                //     return
+                // }
+                // if (!data.initUrl && data.pageType !== 'edit') {
+                //     message.error('请输入页面初始化请求地址')
+                //     return
+                // }
+                // dispatch({ type: SET_SPINLOADING_DATA, data: true })
+                // await http('/admin/admin_page/create', data)
+                // this.fn.cleanFieldValue()
+                // dispatch({ type: SET_SPINLOADING_DATA, data: false })
+                // message.success('创建成功')
             }
         } catch (e) {
             dispatch({ type: SET_SPINLOADING_DATA, data: false })

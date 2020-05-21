@@ -505,16 +505,15 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                 const columns = tableParams.map((i) => {
                     switch (i.type) {
                         case 'img': {
-
                             return {
                                 title: i.label,
                                 dataIndex: i.field,
                                 key: i.field,
-                                render: (val: string) => {
+                                render: (val: string, data: any) => {
                                     return <Image
-                                        src={imgUrl + val}
+                                        src={imgUrl + get(data, i.field)}
                                         style={{ height: getUnit(60), maxWidth: getUnit(120) }}
-                                        onClick={this.handleImgVisible.bind(this, imgUrl + val)}
+                                        onClick={this.handleImgVisible.bind(this, imgUrl + get(data, i.field))}
                                     />
                                 }
                             }
@@ -646,7 +645,10 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                         default: return {
                             title: i.label,
                             dataIndex: i.field,
-                            key: i.field
+                            key: i.field,
+                            render: (val: any, data: any) => {
+                                return val || get(data, i.field)
+                            }
                         }
                     }
                 })

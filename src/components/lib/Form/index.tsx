@@ -38,7 +38,7 @@ export interface IFormItem {
     className?: string
     render?: (val: any) => JSX.Element
     visible?: boolean
-    extend?: string | JSX.Element
+    extend?: string | JSX.Element | ((val: any) => JSX.Element)
 }
 
 export interface IFormProps {
@@ -46,6 +46,7 @@ export interface IFormProps {
     showType?: 'column' | 'row'
     className?: string
     style?: CSSProperties
+    labelSpacing?: number
 }
 
 export interface IFormFun {
@@ -72,7 +73,7 @@ interface IFormChild {
     view: any
     render?: (val: any) => JSX.Element
     visible: boolean
-    extend?: string | JSX.Element
+    extend?: string | JSX.Element | ((val: any) => JSX.Element)
 }
 
 // tslint:disable-next-line: only-arrow-functions tslint:disable-next-line: no-shadowed-variable
@@ -107,12 +108,15 @@ interface IState {
 const prefixClass = 'l_form'
 
 const FormItem = styled.div`
-    min-height: ${getUnit(50)};
+    /* min-height: ${getUnit(50)}; */
 `
+interface FormItemLabelProps {
+    spacing?: number
+}
 
-const FormItemLabel = styled.div`
-    min-height: ${getUnit(50)};
-    margin-right: ${getUnit(8)};
+const FormItemLabel = styled.div<FormItemLabelProps>`
+    min-height: ${getUnit(40)};
+    margin-right: ${({ spacing }) => getUnit(spacing ?? 8)};
 `
 
 const ItemMarBot = styled.div`
@@ -374,8 +378,9 @@ export default class Form extends Component<IFormProps, IState> {
     }
 
     // tslint:disable-next-line: no-shadowed-variable
-    private setTypeCom(component: component, View: any, props: props, field: string | undefined, key: number | string, className?: string, label?: string | JSX.Element, additional?: string | JSX.Element, render?: (val: any) => JSX.Element, extend?: string | JSX.Element): JSX.Element | null {
+    private setTypeCom(component: component, View: any, props: props, field: string | undefined, key: number | string, className?: string, label?: string | JSX.Element, additional?: string | JSX.Element, render?: (val: any) => JSX.Element, extend?: ((val: any) => JSX.Element) | string | JSX.Element): JSX.Element | null {
         const { vals } = this.state
+        const { labelSpacing } = this.props
         /// 得到field
         field = field ? field : `${component}_${key}`
         props = props || {}
@@ -390,7 +395,7 @@ export default class Form extends Component<IFormProps, IState> {
                 return (
                     <FormItem className={`flex_justify ${className || ''}`} key={field}>
                         <div className="flex">
-                            {label && <FormItemLabel className="flex_justify">{label}</FormItemLabel>}
+                            {label && <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>}
                             <div className="flex_1 flex_justify">
                                 <View
                                     {...vProps}
@@ -414,7 +419,7 @@ export default class Form extends Component<IFormProps, IState> {
                 return (
                     <ItemMarBot className={className} key={field}>
                         <div className="flex" >
-                            {label && <FormItemLabel style={{ paddingTop: getRatioUnit(16) }}>{label}</FormItemLabel>}
+                            {label && <FormItemLabel spacing={labelSpacing} style={{ paddingTop: getUnit(16) }}>{label}</FormItemLabel>}
                             <div className="flex_1">
                                 <View
                                     {...vProps}
@@ -435,7 +440,7 @@ export default class Form extends Component<IFormProps, IState> {
                 const onChange: any = _porps.onChange || function (e: ChangeEvent<HTMLButtonElement>) { }
                 return (
                     <div className={getClassName(`${prefixClass}__list  flex`, className)} key={field}>
-                        {label && <FormItemLabel className="flex_justify">{label}</FormItemLabel>}
+                        {label && <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>}
                         <div className="flex_1 flex_justify">
                             <View
                                 {...vProps}
@@ -452,7 +457,7 @@ export default class Form extends Component<IFormProps, IState> {
                 return (
                     <div className={getClassName(`${prefixClass}__list`, className)} key={field}>
                         <div className="flex" >
-                            {label && <FormItemLabel style={{ paddingTop: getRatioUnit(16) }}>{label}</FormItemLabel>}
+                            {label && <FormItemLabel spacing={labelSpacing} style={{ paddingTop: getUnit(16) }}>{label}</FormItemLabel>}
                             <div className="flex_1">
                                 <View
                                     {...vProps}
@@ -472,7 +477,7 @@ export default class Form extends Component<IFormProps, IState> {
                 return (
                     <div className={getClassName(`${prefixClass}__list flex_justify`, className)} key={field}>
                         <div className="flex">
-                            {label && <FormItemLabel className="flex_justify">{label}</FormItemLabel>}
+                            {label && <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>}
                             <div className="flex_1 flex_justify">
                                 <View
                                     {...vProps}
@@ -491,7 +496,7 @@ export default class Form extends Component<IFormProps, IState> {
                 return (
                     <FormItem className={`flex_justify ${className || ''}`} key={field}>
                         <div className="flex">
-                            {label && <FormItemLabel className="flex_justify">{label}</FormItemLabel>}
+                            {label && <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>}
                             <View {...vProps} key={field} className={`flex_1 ${_porps.className || ''}`} />
                         </div>
                         {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
@@ -505,7 +510,7 @@ export default class Form extends Component<IFormProps, IState> {
                 return (
                     <ItemMarBot className={`flex_justify ${className || ''}`} key={field}>
                         <div className="flex">
-                            {label && <FormItemLabel style={{ paddingTop: getRatioUnit(16) }}>{label}</FormItemLabel>}
+                            {label && <FormItemLabel spacing={labelSpacing} style={{ paddingTop: getUnit(16) }}>{label}</FormItemLabel>}
                             <div className="flex_1">
                                 <View
                                     {...vProps}
@@ -526,7 +531,7 @@ export default class Form extends Component<IFormProps, IState> {
                 return (
                     <FormItem className={`flex_justify ${className || ''}`} key={field}>
                         <div className="flex">
-                            {label && <FormItemLabel className="flex_justify">{label}</FormItemLabel>}
+                            {label && <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>}
                             <div className="flex_1 flex_justify">
                                 <View
                                     {...vProps}
@@ -590,7 +595,7 @@ export default class Form extends Component<IFormProps, IState> {
                 return (
                     <FormItem className={`flex_justify ${className || ''}`} key={field}>
                         <div className="flex">
-                            {label && <FormItemLabel className="flex_justify">{label}</FormItemLabel>}
+                            {label && <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>}
                             <div className="flex_1">
                                 <View
                                     {...vProps}
@@ -608,7 +613,7 @@ export default class Form extends Component<IFormProps, IState> {
                 const _porps: any = props
                 return (
                     <FormItem className={`flex_justify ${className || ''}`} key={field}>
-                        {label && <FormItemLabel style={{ paddingTop: getRatioUnit(16) }}>{label}</FormItemLabel>}
+                        {label && <FormItemLabel spacing={labelSpacing} style={{ paddingTop: getUnit(16) }}>{label}</FormItemLabel>}
                         <div className="flex_1">
                             <View
                                 onLocationAddr={this.steArrVal.bind(this, field, _porps.onLocationAddr)}
@@ -625,7 +630,7 @@ export default class Form extends Component<IFormProps, IState> {
                 return (
                     <FormItem className={`flex_justify ${className || ''}`} key={field}>
                         <div className="flex">
-                            {label && <FormItemLabel className="flex_justify">{label}</FormItemLabel>}
+                            {label && <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>}
                             <div className="flex_1 flex">
                                 <View
                                     {...vProps}
@@ -647,7 +652,7 @@ export default class Form extends Component<IFormProps, IState> {
                 return (
                     <FormItem className={`flex_justify ${className || ''}`} key={field}>
                         <div className="flex">
-                            {label && <FormItemLabel className="flex_justify">{label}</FormItemLabel>}
+                            {label && <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>}
                             <div className="flex_1 flex">
                                 <View
                                     {...vProps}
@@ -670,7 +675,7 @@ export default class Form extends Component<IFormProps, IState> {
                 return (
                     <FormItem className={`flex_justify ${className || ''}`} key={field}>
                         <div className="flex">
-                            {label && <FormItemLabel className="flex_justify">{label}</FormItemLabel>}
+                            {label && <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>}
                             <div className="flex_1 flex_justify">
                                 <View
                                     {...vProps}
@@ -707,7 +712,7 @@ export default class Form extends Component<IFormProps, IState> {
                 return (
                     <FormItem className={`flex_justify ${className || ''}`} key={field}>
                         <div className="flex">
-                            {label && <FormItemLabel style={{ paddingTop: getRatioUnit(16) }}>{label}</FormItemLabel>}
+                            {label && <FormItemLabel spacing={labelSpacing} style={{ paddingTop: getUnit(16) }}>{label}</FormItemLabel>}
                             <div className="flex_1">
                                 {isFunction(render) ? render(vals[field]) : (
                                     <View
@@ -728,7 +733,7 @@ export default class Form extends Component<IFormProps, IState> {
                 return (
                     <FormItem className={`flex_justify ${className || ''}`} key={field}>
                         <div className="flex">
-                            {label && <FormItemLabel className="flex_justify">{label}</FormItemLabel>}
+                            {label && <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>}
                             <div className="flex_1 flex_justify">
                                 <View
                                     {...vProps}
@@ -748,7 +753,7 @@ export default class Form extends Component<IFormProps, IState> {
                 return (
                     <FormItem className={`flex_justify ${className || ''}`} key={field}>
                         <div className="flex">
-                            {label && <FormItemLabel className="flex_justify">{label}</FormItemLabel>}
+                            {label && <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>}
                             <div className="flex_1 flex_justify">
                                 <View
                                     {...vProps}
@@ -757,6 +762,7 @@ export default class Form extends Component<IFormProps, IState> {
                                     onChange={this.setRVal.bind(this, field, onChange)}
                                 />
                             </div>
+                            <div className="flex_center">{isFunction(extend) ? extend(vals): extend}</div>
                         </div>
                         {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
                     </FormItem>
@@ -769,7 +775,7 @@ export default class Form extends Component<IFormProps, IState> {
                 return (
                     <FormItem className={`flex_justify ${className || ''}`} key={field}>
                         <div className="flex">
-                            {label && <FormItemLabel className="flex_justify">{label}</FormItemLabel>}
+                            {label && <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>}
                             <div className="flex_1 flex_justify">
                                 <View
                                     {...vProps}
@@ -789,7 +795,7 @@ export default class Form extends Component<IFormProps, IState> {
                 return (
                     <FormItem className={`flex_justify ${className || ''}`} key={field}>
                         <div className="flex">
-                            {label && <FormItemLabel style={{ paddingTop: getRatioUnit(16) }}>{label}</FormItemLabel>}
+                            {label && <FormItemLabel spacing={labelSpacing} style={{ paddingTop: getUnit(16) }}>{label}</FormItemLabel>}
                             <div className="flex_1 flex_justify">
                                 <View
                                     {...vProps}
@@ -808,7 +814,7 @@ export default class Form extends Component<IFormProps, IState> {
                 return (
                     <FormItem className={`flex_justify ${className || ''}`} key={field}>
                         <div className="flex">
-                            {label && <FormItemLabel style={{ paddingTop: getRatioUnit(16) }}>{label}</FormItemLabel>}
+                            {label && <FormItemLabel spacing={labelSpacing} style={{ paddingTop: getUnit(10) }}>{label}</FormItemLabel>}
                             <div className="flex_1 flex_justify">
                                 {
                                     isFunction(render) ? render(vals[field]) : (
