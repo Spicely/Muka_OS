@@ -8,10 +8,11 @@ import { connect, DispatchProp } from 'react-redux'
 import { IFormItem, IFormFun } from 'src/components/lib/Form'
 import { GlobalView } from 'src/utils/node'
 import { IInitState, MukaOS } from 'src/store/state'
-import { NavBarThemeData, Color, getUnit, IconThemeData, DialogThemeData } from 'src/components/lib/utils'
+import { NavBarThemeData, Color, getUnit, DialogThemeData } from 'src/components/lib/utils'
 import { SET_SPINLOADING_DATA } from 'src/store/action'
 import { message } from 'antd'
 import { RouteComponentProps } from 'react-router-dom'
+import { selectTypeValueModal, FieldBox, iconTheme, FiledClose, tableFieldTypes, tableFileOptions, FieldLabel, ISelectType } from 'src/utils'
 
 interface IProps extends DispatchProp {
     region: MukaOS.Region[]
@@ -73,38 +74,9 @@ const FromLabel = styled.div`
     text-align-last: right;
 `
 
-const iconTheme = new IconThemeData({
-    size: 16
-})
-
 const dialogTheme = new DialogThemeData({
     height: 'auto'
 })
-
-const FieldBox = styled.div`
-    padding:  ${getUnit(5)} ${getUnit(10)};
-    border: ${getUnit(1)} solid rgb(232,232,232);
-    position: relative;
-`
-const FiledClose = styled(Icon)`
-    position: absolute;
-    right: ${getUnit(10)};
-    background: rgba(0,0,0,0.2);
-    border-radius: 50%;
-    right: ${getUnit(-4)};
-    top: ${getUnit(-4)};
-    cursor: pointer;
-    :hover {
-        background: rgba(0, 0, 0, 0.4);
-    }
-`
-
-const FieldLabel = styled.div`
-    border: ${getUnit(1)} solid rgb(232,232,232);
-    width: ${getUnit(80)};
-    height: ${getUnit(32)};
-    border-right: 0;
-`
 
 class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>, IState> {
 
@@ -144,60 +116,6 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
     private tableActionsFN: IFormFun[] = []
 
     private tableParamsFN: IFormFun[] = []
-
-    private tableFileOptions = [{
-        label: '文本',
-        value: 'text',
-    }, {
-        label: '图片',
-        value: 'img',
-    }, {
-        label: '时间',
-        value: 'date',
-    }, {
-        label: '状态',
-        value: 'status',
-    }, {
-        label: '操作',
-        value: 'actions',
-    }]
-
-    private tableActionOptions = [{
-        label: '编辑',
-        value: 'edit',
-    }, {
-        label: '删除',
-        value: 'del',
-    }, {
-        label: '路由',
-        value: 'link',
-    }, {
-        label: '状态',
-        value: 'status',
-    }]
-
-    private tableFieldTypes = [{
-        label: '文本',
-        value: 'Label'
-    }, {
-        label: '文本框',
-        value: 'Input'
-    }, {
-        label: '选项',
-        value: 'Select'
-    }, {
-        label: '多选框',
-        value: 'CheckBox',
-    }, {
-        label: '异步选项',
-        value: 'AsyncSelect'
-    }, {
-        label: '图片',
-        value: 'image'
-    }, {
-        label: '单选',
-        value: 'RadioGroup'
-    }]
 
     private tableBarOptions = [{
         label: '新增',
@@ -316,7 +234,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                                     <Select
                                         className="flex_1"
                                         value={i.type}
-                                        options={this.tableFieldTypes}
+                                        options={tableFieldTypes}
                                         onChange={this.handelActionsFieldSelectChange.bind(this, index, 'type')}
                                     />
                                     {
@@ -475,7 +393,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                                     <Select
                                         className="flex_1"
                                         value={i.type}
-                                        options={this.tableFieldTypes}
+                                        options={tableFieldTypes}
                                         onChange={this.handelTableDataSelectChange.bind(this, index, 'type')}
                                     />
                                     {
@@ -665,6 +583,10 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         }
     }
 
+    private handleActionParam = (type: ISelectType, fn: IFormFun) => {
+        selectTypeValueModal(type, [])
+    }
+
     private getBarItems = (index: number, fn: IFormFun) => {
         this.tableActionsFN[index] = fn
         const items: IFormItem[] = [{
@@ -673,7 +595,9 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                 options: this.tableBarOptions,
             },
             label: <FieldLabel className="flex_center">显示类型</FieldLabel>,
-            extend: (value: any) => (<Button mold="primary" disabled={value.type !== 'add'}>设置添加数据</Button>),
+            extend: (value: any) => (
+                <Button mold="primary" disabled={value.type !== 'add'} onClick={this.handleActionParam.bind(this, 'tableItems', fn)}>设置添加数据</Button>
+            ),
             field: 'type',
         }, {
             component: 'Input',
@@ -698,7 +622,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         const items: IFormItem[] = [{
             component: 'Select',
             props: {
-                options: this.tableFileOptions,
+                options: tableFileOptions,
             },
             label: <FieldLabel className="flex_center">显示类型</FieldLabel>,
             field: 'type',
@@ -719,10 +643,11 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         }, {
             component: 'Input',
             props: {
-                placeholder: '请输入表单文本',
+                placeholder: '例: 1=>成功;2=>失败:red;',
             },
-            label: <FieldLabel className="flex_center">文本内容</FieldLabel>,
-            field: 'label',
+            visible: (value: any) => value.type === 'status',
+            label: <FieldLabel className="flex_center">状态转换</FieldLabel>,
+            field: 'convert',
         }, {
             component: 'Button',
             visible: (value: any) => value.type === 'actions',

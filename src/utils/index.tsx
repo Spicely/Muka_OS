@@ -3,17 +3,22 @@ import { render } from 'react-dom'
 import { isFunction } from 'lodash'
 import { connect, Provider, DispatchProp } from 'react-redux'
 import styled from 'styled-components'
-import { Button, ThemeProvider, Upload, Dialog, TabBar, MobileLayout, Image, Empty } from 'components'
+import { Button, ThemeProvider, Upload, Dialog, TabBar, MobileLayout, Image, Empty, Form, Icon } from 'components'
 import { IActionsProps } from '../saga'
 import { IInitState, MukaOS } from 'src/store/state'
 import { IImages } from 'src/store/reducers/images'
 import { IDialogProps } from 'src/components/lib/Dialog'
 import { store } from 'src/store'
-import { SET_IMAGE_MODAL_VISIBLE, SET_IMAGES_DATA } from 'src/store/action'
-import { DialogThemeData, TabBarThemeData, getRatioUnit, getUnit } from 'src/components/lib/utils'
+import { SET_IMAGE_MODAL_VISIBLE, SET_IMAGES_DATA, SET_SELECT_MODAL_VISIBLE } from 'src/store/action'
+import { DialogThemeData, TabBarThemeData, getRatioUnit, getUnit, IconThemeData } from 'src/components/lib/utils'
 import { IUploadFileListProps } from 'src/components/lib/Upload/dragger'
 import { theme } from 'src/App'
 import http, { httpUtils, imgUrl, baseUrl } from './axios'
+import { IFormFun, IFormItem } from 'src/components/lib/Form'
+
+const dialogTheme = new DialogThemeData({
+    height: 'auto'
+})
 
 const ImageBox = styled.div`
     height: ${getUnit(200)};
@@ -256,6 +261,232 @@ export const uploadModal = (options?: IUploadModalProps) => {
                 {...options}
             />
         </ThemeProvider>
+    ),
+        dom
+    )
+}
+ 
+export const iconTheme = new IconThemeData({
+    size: 16
+})
+
+export const FieldBox = styled.div`
+    padding:  ${getUnit(5)} ${getUnit(10)};
+    border: ${getUnit(1)} solid rgb(232,232,232);
+    position: relative;
+`
+
+export const FiledClose = styled(Icon)`
+    position: absolute;
+    right: ${getUnit(10)};
+    background: rgba(0,0,0,0.2);
+    border-radius: 50%;
+    right: ${getUnit(-4)};
+    top: ${getUnit(-4)};
+    cursor: pointer;
+    :hover {
+        background: rgba(0, 0, 0, 0.4);
+    }
+`
+
+export const FieldLabel = styled.div`
+    border: ${getUnit(1)} solid rgb(232,232,232);
+    width: ${getUnit(80)};
+    height: ${getUnit(32)};
+    border-right: 0;
+`
+
+export const tableFieldTypes = [{
+    label: '文本',
+    value: 'Label'
+}, {
+    label: '文本框',
+    value: 'Input'
+}, {
+    label: '选项',
+    value: 'Select'
+}, {
+    label: '多选框',
+    value: 'CheckBox',
+}, {
+    label: '异步选项',
+    value: 'AsyncSelect'
+}, {
+    label: '图片',
+    value: 'image'
+}, {
+    label: '单选',
+    value: 'RadioGroup'
+}]
+
+export const tableActionOptions = [{
+    label: '编辑',
+    value: 'edit',
+}, {
+    label: '删除',
+    value: 'del',
+}, {
+    label: '路由',
+    value: 'link',
+}, {
+    label: '状态',
+    value: 'status',
+}]
+
+export const tableFileOptions = [{
+    label: '文本',
+    value: 'text',
+}, {
+    label: '图片',
+    value: 'img',
+}, {
+    label: '时间',
+    value: 'date',
+}, {
+    label: '状态',
+    value: 'status',
+}, {
+    label: '操作',
+    value: 'actions',
+}]
+
+export type ISelectType = 'tableItems'
+
+interface ISelectTypeProps {
+    selectModalVisible: boolean
+    type: ISelectType
+    data: any[]
+}
+
+interface ISelectTypeState {
+    visible: boolean
+}
+
+class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> {
+
+    private getParamItems = (index: number) => {
+        const { type } = this.props
+        switch(type){
+            case 'tableItems': {
+                const items: IFormItem[] = [{
+                    component: 'Select',
+                    props: {
+                        options: tableFieldTypes,
+                    },
+                    label: <FieldLabel className="flex_center">显示类型</FieldLabel>,
+                    extend: (value: any) => (
+                        <Button mold="primary" disabled={false} >设置添加数据</Button>
+                    ),
+                    field: 'type'
+                }, {
+                    component: 'Input',
+                    props: {
+                        placeholder: '请输入字段',
+                    },
+                    label: <FieldLabel className="flex_center">字段</FieldLabel>,
+                    field: 'field'
+                },{
+                    component: 'Input',
+                    props: {
+                        placeholder: '请输入文本内容',
+                    },
+                    label: <FieldLabel className="flex_center">文本内容</FieldLabel>,
+                    field: 'label'
+                }, {
+                    component: 'AsyncSelect',
+                    props: {
+                        placeholder: '请输入请求地址',
+                    },
+                    visible: (val: any) => val.type === 'AsyncSelect',
+                    label: <FieldLabel className="flex_center">请求地址</FieldLabel>,
+                    field: 'url'
+                }, {
+                    component: 'Input',
+                    props: {
+                        placeholder: '请输入文本框提示',
+                    },
+                    visible: (val: any) => val.type === 'Input',
+                    label: <FieldLabel className="flex_center">文本框提示</FieldLabel>,
+                    field: 'url'
+                }]
+                return items
+            }
+            default: return []
+        }
+    }
+
+    private getItems = (fn: IFormFun) => {
+        const { data } = this.props
+        const items: IFormItem[] = [{
+            component: 'Label',
+            props: {
+                value: [1,2]
+            },
+            render: (val: any[]) => (
+                <div style={{ marginTop: val.length ? getUnit(8) : 0 }}>
+                    {
+                        val.map((i, index: number) => (
+                            <FieldBox key={index} style={{ marginBottom: getUnit(10) }}>
+                                <Form getItems={this.getParamItems.bind(this, index)} labelSpacing={0} />
+                                <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFieldClose.bind(this, index)} />
+                            </FieldBox>
+                        ))
+                    }
+                </div>
+            ),
+            field: 'data'
+        }]
+        return items
+    }
+
+    private handleFieldClose = (index: number) => {
+
+    }
+
+    public render(): JSX.Element {
+        const { selectModalVisible } = this.props
+        return (
+            <Dialog
+                visible={selectModalVisible}
+                onClose={this.handleClose}
+                theme={dialogTheme}
+                footer={
+                    <div>
+                        <Button mold="primary">完成</Button>
+                    </div>
+                }
+            >
+                <Form getItems={this.getItems} />
+            </Dialog>
+        )
+    }
+
+    private handleClose = () => {
+        store.dispatch({ type: SET_SELECT_MODAL_VISIBLE, data: false })
+    }
+}
+
+const ConnectSelectModal = connect(
+    ({ selectModalVisible }: IInitState) => ({
+        selectModalVisible
+    })
+)(SelectTypeModal)
+
+
+export const selectTypeValueModal = (type: ISelectType, data: any[]) => {
+    let dom = document.querySelector('.select_type_modal')
+    if (!dom) {
+        dom = document.createElement('div')
+        dom.className = 'select_type_modal'
+        document.body.appendChild(dom)
+    }
+    store.dispatch({ type: SET_SELECT_MODAL_VISIBLE, data: true })
+    render((
+        <Provider store={store}>
+            <ThemeProvider theme={theme}>
+                <ConnectSelectModal type={type} data={data} />
+            </ThemeProvider>
+        </Provider>
     ),
         dom
     )

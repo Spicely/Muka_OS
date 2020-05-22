@@ -103,4 +103,5 @@ export interface IInitState {
     region: MukaOS.Region[]
     spinLoading: boolean
     carousel: MukaOS.Carousel
+    selectModalVisible: boolean
 }

@@ -23,6 +23,7 @@ import region from './region'
 import spinLoading from './spinLoading'
 import carousel from './carousel'
 import imageModalVisible from './imageModal/index'
+import selectModalVisible from './selectModal/index'
 
 export interface IConfig {
     amapKey: string
@@ -53,4 +54,5 @@ export default combineReducers({
     region,
     spinLoading,
     carousel,
+    selectModalVisible,
 })
