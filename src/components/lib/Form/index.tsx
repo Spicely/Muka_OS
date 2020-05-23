@@ -228,7 +228,7 @@ export default class Form extends Component<IFormProps, IState> {
                     additional: item.additional,
                     className: item.className,
                     render: item.render,
-                    visible: isBool(item.visible) ? item.visible : true,
+                    visible: isUndefined(item.visible) ? true : item.visible,
                     extend: item.extend
                 }
                 switch (item.component) {
@@ -255,8 +255,8 @@ export default class Form extends Component<IFormProps, IState> {
                 }
                 // newVals[field] = _porps.value ? _porps.value : newVals[field]
                 newChild[index].additional = item.additional
-                newChild[index].visible = isBool(item.visible) ? item.visible : true
-                newChild[index].extend = item.extend
+                newChild[index].visible = isUndefined(item.visible) ? true : item.visible,
+                    newChild[index].extend = item.extend
                 newChild[index].render = item.render
                 newChild[index].label = item.label
                 newChild[index].alias = item.alias
@@ -267,8 +267,8 @@ export default class Form extends Component<IFormProps, IState> {
                 }
                 newChild[index].field = item.field
                 newChild[index].additional = item.additional
-                newChild[index].visible = isBool(item.visible) ? item.visible : true
-                newChild[index].extend = item.extend
+                newChild[index].visible = isUndefined(item.visible) ? true : item.visible,
+                    newChild[index].extend = item.extend
                 newChild[index].render = item.render
                 newChild[index].label = item.label
                 newChild[index].alias = item.alias
@@ -405,7 +405,7 @@ export default class Form extends Component<IFormProps, IState> {
                                     key={field}
                                 />
                             </div>
-                            <div className="flex_center">{extend}</div>
+                            <div className="flex_center">{isFunction(extend) ? extend(vals) : extend}</div>
                         </div>
                         {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
                     </FormItem>
@@ -584,7 +584,7 @@ export default class Form extends Component<IFormProps, IState> {
                                 onChange={this.setRVal.bind(this, field, onChange)}
                             />
                         </div>
-                        {extend && <ItemExtend className="flex_justify">{extend}</ItemExtend>}
+                        <div className="flex_center">{isFunction(extend) ? extend(vals) : extend}</div>
                     </div>
                 )
             }
@@ -662,7 +662,7 @@ export default class Form extends Component<IFormProps, IState> {
                                     onChange={this.setTimePickerVal.bind(this, field, onChange)}
                                 />
                             </div>
-                            <div className="flex_center">{extend}</div>
+                            <div className="flex_center">{isFunction(extend) ? extend(vals) : extend}</div>
                         </div>
                         {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
                     </FormItem>
@@ -762,7 +762,7 @@ export default class Form extends Component<IFormProps, IState> {
                                     onChange={this.setRVal.bind(this, field, onChange)}
                                 />
                             </div>
-                            <div className="flex_center">{isFunction(extend) ? extend(vals): extend}</div>
+                            <div className="flex_center">{isFunction(extend) ? extend(vals) : extend}</div>
                         </div>
                         {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
                     </FormItem>

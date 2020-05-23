@@ -96,6 +96,15 @@ export default class Select extends Component<ISelectProps, IState> {
         this.state.value = this.props.value
     }
 
+    public static getDerivedStateFromProps = (props: ISelectProps, state: IState) => {
+        if(props.value !== state.value) {
+            return {
+                value: props.value
+            }
+        }
+        return null
+    }
+
     public static defaultProps: ISelectProps = {
         options: [],
         placeholder: '请选择数据',

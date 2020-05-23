@@ -265,7 +265,7 @@ export const uploadModal = (options?: IUploadModalProps) => {
         dom
     )
 }
- 
+
 export const iconTheme = new IconThemeData({
     size: 16
 })
@@ -350,7 +350,7 @@ export const tableFileOptions = [{
     value: 'actions',
 }]
 
-export type ISelectType = 'tableItems'
+export type ISelectType = 'tableItems' | 'tableAction'
 
 interface ISelectTypeProps {
     selectModalVisible: boolean
@@ -366,7 +366,7 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
 
     private getParamItems = (index: number) => {
         const { type } = this.props
-        switch(type){
+        switch (type) {
             case 'tableItems': {
                 const items: IFormItem[] = [{
                     component: 'Select',
@@ -385,7 +385,7 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
                     },
                     label: <FieldLabel className="flex_center">字段</FieldLabel>,
                     field: 'field'
-                },{
+                }, {
                     component: 'Input',
                     props: {
                         placeholder: '请输入文本内容',
@@ -420,7 +420,7 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
         const items: IFormItem[] = [{
             component: 'Label',
             props: {
-                value: [1,2]
+                value: data.length ? data : [{}]
             },
             render: (val: any[]) => (
                 <div style={{ marginTop: val.length ? getUnit(8) : 0 }}>

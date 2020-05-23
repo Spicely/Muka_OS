@@ -151,6 +151,9 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                         this.tableActionsFN.forEach((i, index: number) => {
                             i.setFieldValue(data.barActions[index])
                         })
+                        this.tableParamsFN.forEach((i, index: number) => {
+                            i.setFieldValue(data.tableParams[index])
+                        })
                     }, 10)
                 }; break
             }
@@ -625,6 +628,12 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                 options: tableFileOptions,
             },
             label: <FieldLabel className="flex_center">显示类型</FieldLabel>,
+            extend: (val: any) => {
+                if (val.type === 'actions') {
+                    return <Button mold="primary" style={{width: getUnit(120)}} onClick={this.handleActionParam.bind(this, 'tableAction', val.actions)}>添加功能</Button>
+                }
+                return <div/>
+            },
             field: 'type',
         }, {
             component: 'Input',
@@ -649,17 +658,11 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
             label: <FieldLabel className="flex_center">状态转换</FieldLabel>,
             field: 'convert',
         }, {
-            component: 'Button',
-            visible: (value: any) => value.type === 'actions',
+            component: 'NULL',
             props: {
-                children: '添加功能',
-                mold: 'primary',
-                style: {
-                    marginTop: getUnit(2),
-                    width: getUnit(120),
-                    flex: 'initial'
-                },
+                value: []
             },
+            field: 'actions'
         }]
         return items
     }
@@ -802,16 +805,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                                     )
                                 }
                                 <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFieldClose.bind(this, index, 'tableParams')} />
-                                {i.actions.length ? (
-                                    <Divider
-                                        borderType="dashed"
-                                        type="horizontal"
-                                        style={{
-                                            borderWidth: getUnit(2),
-                                            marginTop: getUnit(10),
-                                        }}
-                                    />
-                                ) : null}
+                                
                                 {
                                     i.actions.map((v, k) => {
                                         return (
