@@ -364,8 +364,11 @@ interface ISelectTypeState {
 
 class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> {
 
-    private getParamItems = (index: number) => {
+    private funs: IFormFun[] = []
+
+    private getParamItems = (index: number, fn: IFormFun) => {
         const { type } = this.props
+        this.funs[index] = fn
         switch (type) {
             case 'tableItems': {
                 const items: IFormItem[] = [{
@@ -411,6 +414,64 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
                 }]
                 return items
             }
+            case 'tableAction': {
+                const items: IFormItem[] = [{
+                    component: 'Select',
+                    props: {
+                        options: tableActionOptions,
+                    },
+                    extend: (val: any) => {
+                        if (val.type === 'edit') {
+                            return (
+                                <Button mold="primary">设置编辑数据</Button>
+                            )
+                        } else {
+                            return <div />
+                        }
+                    },
+                    label: <FieldLabel className="flex_center">功能类型</FieldLabel>,
+                    field: 'type'
+                }, {
+                    component: 'Input',
+                    props: {
+                        placeholder: '请输入字段名',
+                    },
+                    visible: (val: any) => val.type === 'status',
+                    label: <FieldLabel className="flex_center">对应字段名</FieldLabel>,
+                    field: 'field'
+                }, {
+                    component: 'Input',
+                    props: (val: any) => {
+                        if (val.type === 'status') {
+                            return {
+                                placeholder: '例：1=>使用:green;2=>禁用:red;',
+                            }
+                        } else {
+                            return {
+                                placeholder: '请输入请求地址',
+                            }
+                        }
+                    },
+                    label: <FieldLabel className="flex_center">功能名</FieldLabel>,
+                    field: 'label'
+                }, {
+                    component: 'Input',
+                    props: (val: any) => {
+                        if (val.type === 'link') {
+                            return {
+                                placeholder: '请输入跳转地址',
+                            }
+                        } else {
+                            return {
+                                placeholder: '请输入请求地址',
+                            }
+                        }
+                    },
+                    label: (val: any) => (<FieldLabel className="flex_center">{val.type === 'link' ? '跳转地址' : '请求地址'}</FieldLabel>),
+                    field: 'url'
+                }]
+                return items
+            }
             default: return []
         }
     }
@@ -439,8 +500,30 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
         return items
     }
 
+    public UNSAFE_componentWillReceiveProps(nextProps: ISelectTypeProps) {
+        const { selectModalVisible } = this.props
+        console.log(111)
+        if (nextProps.selectModalVisible && selectModalVisible != nextProps.selectModalVisible) {
+            setTimeout(() => {
+                const { data } = this.props
+                this.funs.forEach((i, index: number) => {
+                    i.setFieldValue(data[index])
+                })
+            }, 10)
+        }
+    }
+
     private handleFieldClose = (index: number) => {
 
+    }
+
+    public componentDidMount() {
+        setTimeout(() => {
+            const { data } = this.props
+            this.funs.forEach((i, index: number) => {
+                i.setFieldValue(data[index])
+            })
+        }, 10)
     }
 
     public render(): JSX.Element {
@@ -452,6 +535,7 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
                 theme={dialogTheme}
                 footer={
                     <div>
+                        <Button mold="primary" style={{marginRight: getUnit(15)}}>添加数据</Button>
                         <Button mold="primary">完成</Button>
                     </div>
                 }
@@ -463,6 +547,7 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
 
     private handleClose = () => {
         store.dispatch({ type: SET_SELECT_MODAL_VISIBLE, data: false })
+        this.funs = []
     }
 }
 

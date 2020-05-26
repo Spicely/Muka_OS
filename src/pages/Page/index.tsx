@@ -586,8 +586,8 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         }
     }
 
-    private handleActionParam = (type: ISelectType, fn: IFormFun) => {
-        selectTypeValueModal(type, [])
+    private handleActionParam = (type: ISelectType, data: any, fn: IFormFun) => {
+        selectTypeValueModal(type, data)
     }
 
     private getBarItems = (index: number, fn: IFormFun) => {
@@ -599,7 +599,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
             },
             label: <FieldLabel className="flex_center">显示类型</FieldLabel>,
             extend: (value: any) => (
-                <Button mold="primary" disabled={value.type !== 'add'} onClick={this.handleActionParam.bind(this, 'tableItems', fn)}>设置添加数据</Button>
+                <Button mold="primary" disabled={value.type !== 'add'} onClick={this.handleActionParam.bind(this, 'tableItems',[], fn)}>设置添加数据</Button>
             ),
             field: 'type',
         }, {
@@ -630,7 +630,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
             label: <FieldLabel className="flex_center">显示类型</FieldLabel>,
             extend: (val: any) => {
                 if (val.type === 'actions') {
-                    return <Button mold="primary" style={{width: getUnit(120)}} onClick={this.handleActionParam.bind(this, 'tableAction', val.actions)}>添加功能</Button>
+                    return <Button mold="primary" style={{width: getUnit(120)}} onClick={this.handleActionParam.bind(this, 'tableAction', val.actions, fn)}>添加功能</Button>
                 }
                 return <div/>
             },
