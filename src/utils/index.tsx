@@ -296,7 +296,7 @@ export const FieldLabel = styled.div`
     border-right: 0;
 `
 
-export const tableFieldTypes = [{
+export const editOptions = [{
     label: '文本',
     value: 'Label'
 }, {
@@ -374,7 +374,7 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
                 const items: IFormItem[] = [{
                     component: 'Select',
                     props: {
-                        options: tableFieldTypes,
+                        options: editOptions,
                     },
                     label: <FieldLabel className="flex_center">显示类型</FieldLabel>,
                     extend: (value: any) => (

@@ -291,6 +291,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             component: 'NULL',
             field: 'id'
         }];
+        console.log(data)
         data.forEach((i: any) => {
             switch (i.type) {
                 case 'Label': items.push({
@@ -575,7 +576,6 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                                                         return i
                                                                     }
                                                                 }).join('/')
-                                                                console.log(url)
                                                                 return (
                                                                     <Link key={index} to={url}>
                                                                         <Label>{k.label}</Label>

@@ -12,7 +12,7 @@ import { NavBarThemeData, Color, getUnit, DialogThemeData } from 'src/components
 import { SET_SPINLOADING_DATA } from 'src/store/action'
 import { message } from 'antd'
 import { RouteComponentProps } from 'react-router-dom'
-import { selectTypeValueModal, FieldBox, iconTheme, FiledClose, tableFieldTypes, tableFileOptions, FieldLabel, ISelectType } from 'src/utils'
+import { selectTypeValueModal, FieldBox, iconTheme, FiledClose, tableFileOptions, FieldLabel, ISelectType, editOptions } from 'src/utils'
 
 interface IProps extends DispatchProp {
     region: MukaOS.Region[]
@@ -117,6 +117,8 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
 
     private tableParamsFN: IFormFun[] = []
 
+    private editParamsFN: IFormFun[] = []
+
     private tableBarOptions = [{
         label: '新增',
         value: 'add'
@@ -155,7 +157,17 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                             i.setFieldValue(data.tableParams[index])
                         })
                     }, 10)
-                }; break
+                }; break;
+                case 'edit': {
+                    setTimeout(() => {
+                        this.tableActionsFN.forEach((i, index: number) => {
+                            i.setFieldValue(data.barActions[index])
+                        })
+                        this.editParamsFN.forEach((i, index: number) => {
+                            i.setFieldValue(data.editParams[index])
+                        })
+                    }, 10)
+                }; break;
             }
 
             this.setState({
@@ -181,8 +193,8 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                     right={
                         <Fragment>
                             {params.id ?
-                                (getJurisd(10) && <Button mold="primary" onClick={this.handleUpdatePage}>更新页面</Button>) :
-                                (getJurisd(11) && <Button mold="primary" onClick={this.handleAddPage}>新增页面</Button>)
+                                (getJurisd(10) && <Button mold="primary" onClick={this.handleAddOrUpdatePage}>更新页面</Button>) :
+                                (getJurisd(11) && <Button mold="primary" onClick={this.handleAddOrUpdatePage}>新增页面</Button>)
                             }
                         </Fragment>
                     }
@@ -237,7 +249,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                                     <Select
                                         className="flex_1"
                                         value={i.type}
-                                        options={tableFieldTypes}
+                                        options={editOptions}
                                         onChange={this.handelActionsFieldSelectChange.bind(this, index, 'type')}
                                     />
                                     {
@@ -396,7 +408,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                                     <Select
                                         className="flex_1"
                                         value={i.type}
-                                        options={tableFieldTypes}
+                                        options={editOptions}
                                         onChange={this.handelTableDataSelectChange.bind(this, index, 'type')}
                                     />
                                     {
@@ -599,7 +611,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
             },
             label: <FieldLabel className="flex_center">显示类型</FieldLabel>,
             extend: (value: any) => (
-                <Button mold="primary" disabled={value.type !== 'add'} onClick={this.handleActionParam.bind(this, 'tableItems',[], fn)}>设置添加数据</Button>
+                <Button mold="primary" disabled={value.type !== 'add'} onClick={this.handleActionParam.bind(this, 'tableItems', [], fn)}>设置添加数据</Button>
             ),
             field: 'type',
         }, {
@@ -620,32 +632,36 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         return items
     }
 
-    private getTableParamItems = (index: number, fn: IFormFun) => {
-        this.tableParamsFN[index] = fn
+    private getTableParamItems = (index: number, type: IPageType, fn: IFormFun) => {
+        if (type === 'table') {
+            this.tableParamsFN[index] = fn
+        } else {
+            this.editParamsFN[index] = fn
+        }
         const items: IFormItem[] = [{
             component: 'Select',
             props: {
-                options: tableFileOptions,
+                options: type === 'edit' ? editOptions : tableFileOptions,
             },
             label: <FieldLabel className="flex_center">显示类型</FieldLabel>,
             extend: (val: any) => {
                 if (val.type === 'actions') {
-                    return <Button mold="primary" style={{width: getUnit(120)}} onClick={this.handleActionParam.bind(this, 'tableAction', val.actions, fn)}>添加功能</Button>
+                    return <Button mold="primary" style={{ width: getUnit(120) }} onClick={this.handleActionParam.bind(this, 'tableAction', val.actions, fn)}>添加功能</Button>
                 }
-                return <div/>
+                return <div />
             },
             field: 'type',
         }, {
             component: 'Input',
             props: {
-                placeholder: '请输入表单字段',
+                placeholder: '请输入字段名',
             },
             label: <FieldLabel className="flex_center">字段名</FieldLabel>,
             field: 'field',
         }, {
             component: 'Input',
             props: {
-                placeholder: '请输入表单文本',
+                placeholder: '请输入文本内容',
             },
             label: <FieldLabel className="flex_center">文本内容</FieldLabel>,
             field: 'label',
@@ -756,126 +772,11 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                     {
                         val.map((i, index: number) => (
                             <FieldBox key={index} style={{ marginBottom: getUnit(10) }}>
-                                <Form getItems={this.getTableParamItems.bind(this, index)} labelSpacing={0} />
+                                <Form getItems={this.getTableParamItems.bind(this, index, 'table')} labelSpacing={0} />
                                 <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFieldClose.bind(this, index, 'tableParams')} />
                             </FieldBox>
                         ))
                     }
-                    {/* {
-                        val.map((i, index: number) => (
-                            <FieldBox key={index} style={{ marginBottom: getUnit(10) }}>
-                                <div className="flex">
-                                    <FieldLabel className="flex_center">显示类型</FieldLabel>
-                                    <Select
-                                        className="flex_1"
-                                        value={i.type}
-                                        options={this.tableFileOptions}
-                                        onChange={this.handelFileldSelectChange.bind(this, index, 'tableParams', 'type')}
-                                    />
-                                </div>
-                                <div className="flex" style={{ marginTop: getUnit(5) }}>
-                                    <FieldLabel className="flex_center">字段名</FieldLabel>
-                                    <Input
-                                        className="flex_1"
-                                        value={i.field}
-                                        placeholder="请输入表单字段"
-                                        onChange={this.handleFieldsChange.bind(this, index, 'tableParams', 'field')}
-                                    />
-                                </div>
-                                <div className="flex" style={{ marginTop: getUnit(5) }}>
-                                    <FieldLabel className="flex_center">文本内容</FieldLabel>
-                                    <Input
-                                        className="flex_1"
-                                        value={i.label}
-                                        placeholder="请输入表单文本"
-                                        onChange={this.handleFieldsChange.bind(this, index, 'tableParams', 'label')}
-                                    />
-                                </div>
-                                {
-                                    i.type === 'status' && (
-                                        <div className="flex" style={{ marginTop: getUnit(5) }}>
-                                            <FieldLabel className="flex_center">状态转换</FieldLabel>
-                                            <Input
-                                                className="flex_1"
-                                                value={i.convert}
-                                                placeholder="例: 1=>成功;2=>失败:red;"
-                                                onChange={this.handleFieldsChange.bind(this, index, 'tableParams', 'convert')}
-                                            />
-                                        </div>
-                                    )
-                                }
-                                <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFieldClose.bind(this, index, 'tableParams')} />
-                                
-                                {
-                                    i.actions.map((v, k) => {
-                                        return (
-                                            <FieldBox key={k} style={{ marginTop: getUnit(10) }}>
-                                                <div className="flex">
-                                                    <FieldLabel className="flex_center">功能类型</FieldLabel>
-                                                    <Select
-                                                        className="flex_1"
-                                                        value={v.type}
-                                                        options={this.tableActionOptions}
-                                                        onChange={this.handelActionSelectChange.bind(this, index, k)}
-                                                    />
-                                                    <Button
-                                                        mold="primary"
-                                                        disabled={v.type !== 'edit'}
-                                                        onClick={this.handleActionsVisible.bind(this, index, k, 'data', v.data)}
-                                                    >
-                                                        设置编辑数据
-                                                    </Button>
-                                                </div>
-                                                <div className="flex" style={{ marginTop: getUnit(5) }}>
-                                                    <FieldLabel className="flex_center">功能名</FieldLabel>
-                                                    <Input
-                                                        className="flex_1"
-                                                        value={v.label}
-                                                        placeholder={v.type === 'status' ? '例：1=>使用:green;2=>禁用:red;' : '请输入功能名称'}
-                                                        onChange={this.handleActionFieldChange.bind(this, index, k, 'label')}
-                                                    />
-                                                </div>
-                                                <div className="flex" style={{ marginTop: getUnit(5) }}>
-                                                    <FieldLabel className="flex_center">{v.type === 'link' ? '跳转地址' : '请求地址'}</FieldLabel>
-                                                    <Input
-                                                        className="flex_1"
-                                                        value={v.url}
-                                                        placeholder={v.type === 'status' ? 'status/ok?a=b;status/no;' : '请输入请求地址'}
-                                                        onChange={this.handleActionFieldChange.bind(this, index, k, 'url')}
-                                                    />
-                                                </div>
-                                                {
-                                                    v.type === 'status' && (
-                                                        <div className="flex" style={{ marginTop: getUnit(5) }}>
-                                                            <FieldLabel className="flex_center">对应字段名</FieldLabel>
-                                                            <Input
-                                                                className="flex_1"
-                                                                value={v.field}
-                                                                placeholder="请输入字段名"
-                                                                onChange={this.handleActionFieldChange.bind(this, index, k, 'field')}
-                                                            />
-                                                        </div>
-                                                    )
-                                                }
-
-                                                <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleActionClose.bind(this, index, k)} />
-                                            </FieldBox>
-                                        )
-                                    })
-                                }
-                                {i.type === 'actions' && (
-                                    <Button
-                                        mold="primary"
-                                        style={{ width: getUnit(160), marginTop: getUnit(10) }}
-                                        onClick={this.handleAddAction.bind(this, index)}
-                                    >
-                                        添加功能
-                                    </Button>
-                                )}
-                            </FieldBox>
-
-                        ))
-                    } */}
                     <Button
                         mold="primary"
                         style={{ width: getUnit(160) }}
@@ -933,6 +834,33 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
             ),
             visible: pageType === 'tabBar',
             field: 'tabSelects'
+        }, {
+            component: 'Label',
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>显示数据</FromLabel>,
+            props: {
+                value: [],
+            },
+            render: (val: IFieldParams[]) => (
+                <div style={{ marginTop: val.length ? getUnit(8) : 0 }}>
+                    {
+                        val.map((i, index: number) => (
+                            <FieldBox key={index} style={{ marginBottom: getUnit(10) }}>
+                                <Form getItems={this.getTableParamItems.bind(this, index, 'edit')} labelSpacing={0} />
+                                <FiledClose icon="ios-close" theme={iconTheme} onClick={this.handleFieldClose.bind(this, index, 'editParams')} />
+                            </FieldBox>
+                        ))
+                    }
+                    <Button
+                        mold="primary"
+                        style={{ width: getUnit(160) }}
+                        onClick={this.handleAddField.bind(this, 'editParams')}
+                    >
+                        添加选项
+                    </Button>
+                </div>
+            ),
+            visible: pageType === 'edit',
+            field: 'editParams'
         }]
         return items
     }
@@ -1194,8 +1122,9 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
             const data = this.fn.getFieldValue()
             data[field].splice(index, 1)
             switch (field) {
-                case 'barActions': this.tableActionsFN.splice(index, 1)
-                case 'tableParams': this.tableParamsFN.splice(index, 1)
+                case 'barActions': this.tableActionsFN.splice(index, 1); break
+                case 'tableParams': this.tableParamsFN.splice(index, 1); break
+                case 'editParams': this.editParamsFN.splice(index, 1); break
             }
             this.fn.setFieldValue({
                 [field]: [...data[field]]
@@ -1278,47 +1207,45 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         }
     }
 
-    private handleUpdatePage = async () => {
+    private handleAddOrUpdatePage = async () => {
         const { dispatch } = this.props
         try {
             if (this.fn) {
                 const data = this.fn.getFieldValue()
-                dispatch({ type: SET_SPINLOADING_DATA, data: true })
-                await http('/admin/admin_page/update', data)
-                dispatch({ type: SET_SPINLOADING_DATA, data: false })
-                message.success('更新成功')
-            }
-        } catch (e) {
-            dispatch({ type: SET_SPINLOADING_DATA, data: false })
-            httpUtils.verify(e)
-        }
-    }
-
-    private handleAddPage = async () => {
-        const { dispatch } = this.props
-        try {
-            if (this.fn) {
-                const data = this.fn.getFieldValue()
-                console.log(data)
+                data.barActions = this.tableActionsFN.map((i) => i.getFieldValue())
+                if (!data.title) {
+                    message.error('请输入标题')
+                    return
+                }
+                if (!data.initUrl && data.pageType !== 'edit') {
+                    message.error('请输入页面初始化请求地址')
+                    return
+                }
                 switch (data.pageType) {
                     case 'table': {
-                        data.barActions = this.tableActionsFN.map((i) => i.getFieldValue())
                         data.tableParams = this.tableParamsFN.map((i) => i.getFieldValue())
+                    }; break;
+                    case 'edit': {
+                        data.tabSelects = []
+                        data.tableParams = []
+                        data.editParams = this.editParamsFN.map((i) => i.getFieldValue())
+                    }; break;
+                    default: {
+                        data.editParams = []
+                        data.tableParams = []
                     }
                 }
-                // if (!data.title) {
-                //     message.error('请输入标题')
-                //     return
-                // }
-                // if (!data.initUrl && data.pageType !== 'edit') {
-                //     message.error('请输入页面初始化请求地址')
-                //     return
-                // }
-                // dispatch({ type: SET_SPINLOADING_DATA, data: true })
-                // await http('/admin/admin_page/create', data)
-                // this.fn.cleanFieldValue()
-                // dispatch({ type: SET_SPINLOADING_DATA, data: false })
-                // message.success('创建成功')
+                dispatch({ type: SET_SPINLOADING_DATA, data: true })
+                if (data.id) {
+                    await http('/admin/admin_page/update', data)
+                    message.success('更新成功')
+                } else {
+                    await http('/admin/admin_page/create', data)
+                    this.fn.cleanFieldValue()
+                    message.success('创建成功')
+                }
+                dispatch({ type: SET_SPINLOADING_DATA, data: false })
+
             }
         } catch (e) {
             dispatch({ type: SET_SPINLOADING_DATA, data: false })

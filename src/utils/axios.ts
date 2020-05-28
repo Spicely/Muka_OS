@@ -7,8 +7,8 @@ import { store } from 'src/store'
 interface IValue {
     [name: string]: any
 }
-export const baseUrl = 'https://api.muka.site'
-// export const baseUrl = 'http://api.muka.site'
+// export const baseUrl = 'https://api.muka.site'
+export const baseUrl = 'http://api.muka.site'
 export const imgUrl = 'https://img.muka.site'
 
 export interface IRresItem<T = any> {
