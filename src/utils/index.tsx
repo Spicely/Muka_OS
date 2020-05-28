@@ -213,7 +213,7 @@ class ImageUpload extends PureComponent<ImageUploadProps, ImageUploadState> {
             >
                 <UploadBox>
                     <Upload.Dragger
-                        action={baseUrl + '/upload'}
+                        action={baseUrl + '/upload/stream'}
                         name="file"
                         withCredentials
                         data={{ type: 1 }}
