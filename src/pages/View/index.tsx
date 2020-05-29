@@ -4,7 +4,7 @@ import { isNil, get } from 'lodash'
 import styled, { createGlobalStyle } from 'styled-components'
 import { parse } from 'query-string'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
-import { Button, Dialog, LabelHeader, Form, Tag, Table, Label, Image, Icon, TabBar } from 'components'
+import { Button, Dialog, LabelHeader, Form, Tag, Table, Label, Image, Icon, TabBar, Divider } from 'components'
 import http, { httpUtils, imgUrl, baseUrl } from 'src/utils/axios'
 import { connect, DispatchProp } from 'react-redux'
 import { IInitState, MukaOS, ITabelRes } from 'src/store/state'
@@ -175,7 +175,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
     }
 
     public render(): JSX.Element {
-        const { title, titleBar, pageType, imageVisible, imageUrl, editVisible, editDialogTitle, barActions } = this.state
+        const { title, titleBar, pageType, imageVisible, imageUrl, editVisible, editDialogTitle, barActions, editParams, editUrl } = this.state
         return (
             <GlobalView>
                 <Gstyle />
@@ -201,6 +201,11 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                                 )
                                             }
                                         })
+                                    }
+                                    {
+                                        (editParams.length && editUrl) ? (
+                                            <Button mold="primary" async onClick={this.handleEditComplete}>确认</Button>
+                                        ) : null
                                     }
                                 </div>
                             }
@@ -291,7 +296,6 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             component: 'NULL',
             field: 'id'
         }];
-        console.log(data)
         data.forEach((i: any) => {
             switch (i.type) {
                 case 'Label': items.push({
@@ -351,6 +355,14 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     alias: i.alias,
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 }); break;
+                case 'Divider': items.push({
+                    component: 'Label',
+                    render: () => (
+                        <div className="flex_justify" style={{ height: getUnit(30) }}>
+                            <Divider type="horizontal" borderType={i.borderType} />
+                        </div>
+                    )
+                }); break;
                 case 'AsyncSelect': items.push({
                     component: 'AsyncSelect',
                     field: i.field,
@@ -363,7 +375,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                 case 'RadioGroup': items.push({
                     component: 'RadioGroup',
                     props: {
-                        options: i.options,
+                        options: i.actions,
                         onChange: this.handleChange.bind(this, i.ref, fn, data)
                     },
                     field: i.field,
@@ -701,9 +713,6 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                 return (
                     <div>
                         <Form getItems={this.handleEditItems} style={{ width: getUnit(500) }} />
-                        <div style={{ marginLeft: getUnit(68) }}>
-                            {(editParams.length && editUrl) ? <Button mold="primary" theme={btnTheme} onClick={this.handleEditComplete}>确认</Button> : null}
-                        </div>
                     </div>
                 )
             }
@@ -811,7 +820,6 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             if (this.editFn) {
                 const { editParams, editUrl } = this.state
                 const params = this.editFn.getFieldValue()
-                console.log(params)
                 for (let i = 0; i < editParams.length; i++) {
                     if (editParams[i].type === 'upload') {
                         if (params[editParams[i].field][0].data) {

@@ -313,10 +313,16 @@ export const editOptions = [{
     value: 'AsyncSelect'
 }, {
     label: '图片',
-    value: 'image'
+    value: 'Image'
 }, {
     label: '单选',
     value: 'RadioGroup'
+}, {
+    label: '分割线',
+    value: 'Divider'
+}, {
+    label: '文件',
+    value: 'Upload'
 }]
 
 export const tableActionOptions = [{
@@ -350,21 +356,50 @@ export const tableFileOptions = [{
     value: 'actions',
 }]
 
-export type ISelectType = 'tableItems' | 'tableAction'
+export type ISelectType = 'tableItems' | 'tableAction' | 'options'
 
 interface ISelectTypeProps {
     selectModalVisible: boolean
     type: ISelectType
     data: any[]
+    success: (data: any[]) => void
 }
 
 interface ISelectTypeState {
     visible: boolean
+    hasContrast: boolean
 }
 
 class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> {
 
+    constructor(props: ISelectTypeProps) {
+        super(props)
+        this.state.visible = props.selectModalVisible
+    }
+
+    public static getDerivedStateFromProps(nextProps: ISelectTypeProps, state: ISelectTypeState) {
+        if (nextProps.selectModalVisible != state.visible) {
+            if (state.hasContrast) {
+                return {
+                    visible: nextProps.selectModalVisible
+                }
+            } else {
+                return {
+                    hasContrast: true
+                }
+            }
+        }
+        return null
+    }
+
     private funs: IFormFun[] = []
+
+    private fn?: IFormFun
+
+    public state: ISelectTypeState = {
+        visible: false,
+        hasContrast: true,
+    }
 
     private getParamItems = (index: number, fn: IFormFun) => {
         const { type } = this.props
@@ -472,12 +507,31 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
                 }]
                 return items
             }
+            case 'options': {
+                const items: IFormItem[] = [{
+                    component: 'Input',
+                    props: {
+                        placeholder: '请输入选项文字',
+                    },
+                    label: <FieldLabel className="flex_center">选项文字</FieldLabel>,
+                    field: 'label'
+                }, {
+                    component: 'Input',
+                    props: {
+                        placeholder: '请输入选项值',
+                    },
+                    label: <FieldLabel className="flex_center">选项值</FieldLabel>,
+                    field: 'value'
+                }]
+                return items
+            }
             default: return []
         }
     }
 
     private getItems = (fn: IFormFun) => {
         const { data } = this.props
+        this.fn = fn
         const items: IFormItem[] = [{
             component: 'Label',
             props: {
@@ -502,41 +556,73 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
 
     public UNSAFE_componentWillReceiveProps(nextProps: ISelectTypeProps) {
         const { selectModalVisible } = this.props
-        console.log(111)
         if (nextProps.selectModalVisible && selectModalVisible != nextProps.selectModalVisible) {
             setTimeout(() => {
                 const { data } = this.props
                 this.funs.forEach((i, index: number) => {
-                    i.setFieldValue(data[index])
+                    i.setFieldValue(data[index] || {})
                 })
             }, 10)
         }
     }
 
     private handleFieldClose = (index: number) => {
+        if (this.fn) {
+            const { data } = this.fn.getFieldValue()
+            data.splice(index, 1)
+            this.fn.setFieldValue(data)
+        }
+    }
 
+    private handleFieldAdd = () => {
+        if (this.fn) {
+            const { data } = this.fn.getFieldValue()
+            data.push({})
+            this.fn.setFieldValue(data)
+        }
+    }
+
+    private handleSuccess = () => {
+        const { success } = this.props
+        
+        const data = this.funs.map((i) => {
+            const v = i.getFieldValue()
+            if (v.value === 'true') {
+                v.value = true
+            } else if (v.value === 'false') {
+                v.value = false
+            } else if (!isNaN(Number(v.value))) {
+                v.value = Number(v.value)
+            }
+            return v
+        })
+        success(data)
+        this.setState({
+            visible: false,
+            hasContrast: false
+        })
     }
 
     public componentDidMount() {
         setTimeout(() => {
             const { data } = this.props
             this.funs.forEach((i, index: number) => {
-                i.setFieldValue(data[index])
+                i.setFieldValue(data[index] || {})
             })
         }, 10)
     }
 
     public render(): JSX.Element {
-        const { selectModalVisible } = this.props
+        const { visible } = this.state
         return (
             <Dialog
-                visible={selectModalVisible}
+                visible={visible}
                 onClose={this.handleClose}
                 theme={dialogTheme}
                 footer={
                     <div>
-                        <Button mold="primary" style={{marginRight: getUnit(15)}}>添加数据</Button>
-                        <Button mold="primary">完成</Button>
+                        <Button mold="primary" style={{ marginRight: getUnit(15) }} onClick={this.handleFieldAdd}>添加数据</Button>
+                        <Button mold="primary" onClick={this.handleSuccess}>完成</Button>
                     </div>
                 }
             >
@@ -546,30 +632,25 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
     }
 
     private handleClose = () => {
-        store.dispatch({ type: SET_SELECT_MODAL_VISIBLE, data: false })
+        this.setState({
+            visible: false,
+            hasContrast: false
+        })
         this.funs = []
     }
 }
 
-const ConnectSelectModal = connect(
-    ({ selectModalVisible }: IInitState) => ({
-        selectModalVisible
-    })
-)(SelectTypeModal)
-
-
-export const selectTypeValueModal = (type: ISelectType, data: any[]) => {
+export const selectTypeValueModal = (type: ISelectType, data: any[], success: (data: any) => void) => {
     let dom = document.querySelector('.select_type_modal')
     if (!dom) {
         dom = document.createElement('div')
         dom.className = 'select_type_modal'
         document.body.appendChild(dom)
     }
-    store.dispatch({ type: SET_SELECT_MODAL_VISIBLE, data: true })
     render((
         <Provider store={store}>
             <ThemeProvider theme={theme}>
-                <ConnectSelectModal type={type} data={data} />
+                <SelectTypeModal type={type} data={data} selectModalVisible={true} success={success} />
             </ThemeProvider>
         </Provider>
     ),

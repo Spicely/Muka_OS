@@ -47,6 +47,7 @@ export interface IFormProps {
     className?: string
     style?: CSSProperties
     labelSpacing?: number
+    getHideFieldValue?: boolean
 }
 
 export interface IFormFun {
@@ -133,7 +134,8 @@ export default class Form extends Component<IFormProps, IState> {
         getItems: function (exFun: IFormFun) {
             return []
         },
-        showType: 'column'
+        showType: 'column',
+        getHideFieldValue: false
     }
 
     public state: any = {}
@@ -730,7 +732,7 @@ export default class Form extends Component<IFormProps, IState> {
                     <FormItem className={`flex_justify ${className || ''}`} key={field}>
                         <div className="flex">
                             {label ? (isFunction(label) ? label(vals) : <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>) : null}
-                            <div className="flex_1 flex_justify">
+                            <div className="flex_1 flex_justify l_form_item">
                                 <View
                                     {...vProps}
                                     value={vals[field]}
@@ -968,28 +970,51 @@ export default class Form extends Component<IFormProps, IState> {
     }
 
     private getFieldValue(params?: string[]): IValue {
-        const { childs } = this.state
+        const { getHideFieldValue } = this.props
+        const { childs, vals } = this.state
         const val: IValue = {}
         childs.forEach((item: IFormChild, index: number) => {
-            if (params) {
-                params.forEach((i: string) => {
-                    if (item.field === i) {
-                        const ev = item.alias?.indexOf('.')
-                        if (ev) {
-                            val[i] = ev === -1 ? this.getComVal(item, i) : get(this.getComVal(item, i), item.alias?.substr(ev + 1) || i)
-                        } else {
-                            val[i] = this.getComVal(item, i)
+            if (getHideFieldValue) {
+                if (params) {
+                    params.forEach((i: string) => {
+                        if (item.field === i) {
+                            const ev = item.alias?.indexOf('.')
+                            if (ev) {
+                                val[i] = ev === -1 ? this.getComVal(item, i) : get(this.getComVal(item, i), item.alias?.substr(ev + 1) || i)
+                            } else {
+                                val[i] = this.getComVal(item, i)
+                            }
                         }
-                    }
-                })
-            } else {
-                const ev = item.alias?.indexOf('.')
-                if (ev) {
-                    val[item.field] = ev === -1 ? this.getComVal(item, item.field) : get(this.getComVal(item, item.field), item.alias?.substr(ev + 1) || item.field)
+                    })
                 } else {
-                    val[item.field] = this.getComVal(item, item.field)
-                }
+                    const ev = item.alias?.indexOf('.')
+                    if (ev) {
+                        val[item.field] = ev === -1 ? this.getComVal(item, item.field) : get(this.getComVal(item, item.field), item.alias?.substr(ev + 1) || item.field)
+                    } else {
+                        val[item.field] = this.getComVal(item, item.field)
+                    }
 
+                }
+            } else if (isFunction(item.visible) ? item.visible(vals) : item.visible) {
+                if (params) {
+                    params.forEach((i: string) => {
+                        if (item.field === i) {
+                            const ev = item.alias?.indexOf('.')
+                            if (ev) {
+                                val[i] = ev === -1 ? this.getComVal(item, i) : get(this.getComVal(item, i), item.alias?.substr(ev + 1) || i)
+                            } else {
+                                val[i] = this.getComVal(item, i)
+                            }
+                        }
+                    })
+                } else {
+                    const ev = item.alias?.indexOf('.')
+                    if (ev) {
+                        val[item.field] = ev === -1 ? this.getComVal(item, item.field) : get(this.getComVal(item, item.field), item.alias?.substr(ev + 1) || item.field)
+                    } else {
+                        val[item.field] = this.getComVal(item, item.field)
+                    }
+                }
             }
         })
         return val

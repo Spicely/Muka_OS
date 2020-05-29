@@ -598,8 +598,19 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         }
     }
 
-    private handleActionParam = (type: ISelectType, data: any, fn: IFormFun) => {
-        selectTypeValueModal(type, data)
+    private handleActionParam = (type: ISelectType, data: any, index: number) => {
+        selectTypeValueModal(type, data, (val) => {
+            if (this.fn) {
+                const { pageType } = this.fn.getFieldValue()
+                switch (pageType) {
+                    case 'edit': {
+                        const fieldValue = this.editParamsFN[index].getFieldValue()
+                        fieldValue.actions = val
+                        this.editParamsFN[index].setFieldValue(fieldValue)
+                    }; break;
+                }
+            }
+        })
     }
 
     private getBarItems = (index: number, fn: IFormFun) => {
@@ -611,7 +622,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
             },
             label: <FieldLabel className="flex_center">显示类型</FieldLabel>,
             extend: (value: any) => (
-                <Button mold="primary" disabled={value.type !== 'add'} onClick={this.handleActionParam.bind(this, 'tableItems', [], fn)}>设置添加数据</Button>
+                <Button mold="primary" disabled={value.type !== 'add'} onClick={this.handleActionParam.bind(this, 'tableItems', [], index)}>设置添加数据</Button>
             ),
             field: 'type',
         }, {
@@ -645,10 +656,18 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
             },
             label: <FieldLabel className="flex_center">显示类型</FieldLabel>,
             extend: (val: any) => {
-                if (val.type === 'actions') {
-                    return <Button mold="primary" style={{ width: getUnit(120) }} onClick={this.handleActionParam.bind(this, 'tableAction', val.actions, fn)}>添加功能</Button>
+                switch (val.type) {
+                    case 'actions': return (
+                        <Button mold="primary" style={{ width: getUnit(120) }} onClick={this.handleActionParam.bind(this, 'tableAction', val.actions, index)}>添加功能</Button>
+                    )
+                    case 'Select': return (
+                        <Button mold="primary" style={{ width: getUnit(120) }} onClick={this.handleActionParam.bind(this, 'options', val.actions, index)}>添加选项</Button>
+                    )
+                    case 'RadioGroup': return (
+                        <Button mold="primary" style={{ width: getUnit(120) }} onClick={this.handleActionParam.bind(this, 'options', val.actions, index)}>添加选项</Button>
+                    )
+                    default: return <div />
                 }
-                return <div />
             },
             field: 'type',
         }, {
@@ -656,13 +675,31 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
             props: {
                 placeholder: '请输入字段名',
             },
+            visible: (value: any) => value.type !== 'Divider',
             label: <FieldLabel className="flex_center">字段名</FieldLabel>,
             field: 'field',
+        }, {
+            component: 'RadioGroup',
+            className: 'form_item',
+            props: {
+                options: [{
+                    label: '实线',
+                    value: 'solid'
+                }, {
+                    label: '虚线',
+                    value: 'dashed'
+                }],
+                value: 'solid'
+            },
+            visible: (value: any) => value.type === 'Divider',
+            label: <FieldLabel className="flex_center">类型</FieldLabel>,
+            field: 'borderType',
         }, {
             component: 'Input',
             props: {
                 placeholder: '请输入文本内容',
             },
+            visible: (value: any) => value.type !== 'Divider',
             label: <FieldLabel className="flex_center">文本内容</FieldLabel>,
             field: 'label',
         }, {
@@ -703,6 +740,14 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                 placeholder: '请输入初始化数据地址'
             },
             field: 'initUrl'
+        }, {
+            component: 'Input',
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>更新地址</FromLabel>,
+            props: {
+                placeholder: '请输入更新数据地址'
+            },
+            visible: (val) => val.pageType === 'edit',
+            field: 'editUrl'
         }, {
             component: 'RadioGroup',
             label: <FromLabel>标题栏</FromLabel>,
