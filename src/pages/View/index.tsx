@@ -61,8 +61,8 @@ const uploadIconTheme = new IconThemeData({
 })
 
 const uploadTheme = new UploadThemeData({
-    itemHeight: 200,
-    itemWidth: 375
+    itemHeight: 100,
+    itemWidth: 100
 })
 
 const btnTheme = new ButtonThemeData({
@@ -327,10 +327,11 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     props: {
                         maxLength: 1,
                         theme: uploadTheme,
-                        action: imgUrl + '/upload/index',
+                        action: baseUrl + '/upload/index',
                         name: 'file',
                         baseUrl: imgUrl,
                         withCredentials: true,
+                        fileTypes: ['.apk'],
                         itemStyle: i.style || {}
                     },
                     field: i.field,
