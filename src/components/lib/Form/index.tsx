@@ -120,8 +120,8 @@ const FormItemLabel = styled.div<FormItemLabelProps>`
     margin-right: ${({ spacing }) => getUnit(spacing ?? 8)};
 `
 
-const ItemMarBot = styled.div`
-    margin-bottom: ${getUnit(10)};
+const ItemMar = styled.div`
+    margin-top: ${getUnit(10)};
 `
 
 const itemInputTheme = new InputThemeData({
@@ -415,7 +415,7 @@ export default class Form extends Component<IFormProps, IState> {
                 // tslint:disable-next-line: only-arrow-functions
                 const onChange: any = _porps.onChange || function (e: ChangeEvent<HTMLButtonElement>) { }
                 return (
-                    <ItemMarBot className={className} key={field}>
+                    <ItemMar className={className} key={field}>
                         <div className="flex" >
                             {label ? (isFunction(label) ? label(vals) : <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>) : null}
                             <div className="flex_1">
@@ -428,7 +428,7 @@ export default class Form extends Component<IFormProps, IState> {
                             </div>
                         </div>
                         {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
-                    </ItemMarBot>
+                    </ItemMar>
                 )
             }
             case 'Colors': {
@@ -506,7 +506,7 @@ export default class Form extends Component<IFormProps, IState> {
                 const _porps: any = props
                 const onChange: any = _porps.onChange
                 return (
-                    <ItemMarBot className={`flex_justify ${className || ''}`} key={field}>
+                    <ItemMar className={`flex_justify ${className || ''}`} key={field}>
                         <div className="flex">
                             {label ? (isFunction(label) ? label(vals) : <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>) : null}
                             <div className="flex_1">
@@ -519,7 +519,7 @@ export default class Form extends Component<IFormProps, IState> {
                             </div>
                         </div>
                         {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
-                    </ItemMarBot>
+                    </ItemMar>
                 )
             }
             case 'CheckBox': {
@@ -708,7 +708,7 @@ export default class Form extends Component<IFormProps, IState> {
                 const vProps = omit(props, ['fileList', 'onChange'])
                 const _porps: any = props
                 return (
-                    <FormItem className={`flex_justify ${className || ''}`} key={field}>
+                    <ItemMar className={`flex_justify ${className || ''}`} key={field}>
                         <div className="flex">
                             {label ? (isFunction(label) ? label(vals) : <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>) : null}
                             <div className="flex_1">
@@ -721,7 +721,7 @@ export default class Form extends Component<IFormProps, IState> {
                                 )}
                             </div>
                         </div>
-                    </FormItem>
+                    </ItemMar>
                 )
             }
             case 'RadioGroup': {

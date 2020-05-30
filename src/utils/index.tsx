@@ -303,6 +303,9 @@ export const editOptions = [{
     label: '文本框',
     value: 'Input'
 }, {
+    label: '文本域',
+    value: 'Textarea'
+}, {
     label: '选项',
     value: 'Select'
 }, {
@@ -323,6 +326,9 @@ export const editOptions = [{
 }, {
     label: '文件',
     value: 'Upload'
+}, {
+    label: '富文本',
+    value: 'Editor'
 }]
 
 export const tableActionOptions = [{

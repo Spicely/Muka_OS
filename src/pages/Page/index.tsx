@@ -702,6 +702,14 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
             visible: (value: any) => value.type !== 'Divider',
             label: <FieldLabel className="flex_center">文本内容</FieldLabel>,
             field: 'label',
+        },{
+            component: 'Input',
+            props: {
+                placeholder: '使用默认提示则不填',
+            },
+            visible: (value: any) => value.type === 'Input',
+            label: <FieldLabel className="flex_center">提示信息</FieldLabel>,
+            field: 'placeholder',
         }, {
             component: 'Input',
             props: {

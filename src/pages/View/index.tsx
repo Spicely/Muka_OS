@@ -327,9 +327,12 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     props: {
                         maxLength: 1,
                         theme: uploadTheme,
-                        action: baseUrl + '/upload/index',
+                        action: baseUrl + '/upload/stream',
                         name: 'file',
                         baseUrl: imgUrl,
+                        params: {
+                            type: '3'
+                        },
                         withCredentials: true,
                         fileTypes: ['.apk'],
                         itemStyle: i.style || {}
@@ -822,7 +825,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                 const { editParams, editUrl } = this.state
                 const params = this.editFn.getFieldValue()
                 for (let i = 0; i < editParams.length; i++) {
-                    if (editParams[i].type === 'upload') {
+                    if (editParams[i].type === 'Upload') {
                         if (params[editParams[i].field][0].data) {
                             params[editParams[i].field] = params[editParams[i].field][0].data.data.url
                         } else {
