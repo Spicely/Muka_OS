@@ -194,7 +194,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                                     <ActionButton
                                                         mold="primary"
                                                         key={index}
-                                                        onClick={this.handleAddItem.bind(this, i.label, i.url, i.data)}
+                                                        onClick={this.handleAddItem.bind(this, i.label, i.url, i.actions)}
                                                     >
                                                         {i.label}
                                                     </ActionButton>

@@ -34,7 +34,7 @@ export interface IBarActions {
     type: string
     label: string
     url: string
-    data: IFieldTableEdits[]
+    actions: IFieldTableEdits[]
 }
 
 export interface IFieldParams {
@@ -113,7 +113,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
 
     private title = getTitle('/page')
 
-    private tableActionsFN: IFormFun[] = []
+    private barActionsFN: IFormFun[] = []
 
     private tableParamsFN: IFormFun[] = []
 
@@ -150,7 +150,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
             switch (data.pageType) {
                 case 'table': {
                     setTimeout(() => {
-                        this.tableActionsFN.forEach((i, index: number) => {
+                        this.barActionsFN.forEach((i, index: number) => {
                             i.setFieldValue(data.barActions[index])
                         })
                         this.tableParamsFN.forEach((i, index: number) => {
@@ -160,7 +160,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                 }; break;
                 case 'edit': {
                     setTimeout(() => {
-                        this.tableActionsFN.forEach((i, index: number) => {
+                        this.barActionsFN.forEach((i, index: number) => {
                             i.setFieldValue(data.barActions[index])
                         })
                         this.editParamsFN.forEach((i, index: number) => {
@@ -288,7 +288,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                                             <Input
                                                 className="flex_1"
                                                 value={i.placeholder}
-                                                placeholder="请输入文本框提示"
+                                                placeholder="请输入文本框提示（使用默认则不填写）"
                                                 onChange={this.handleActionsFieldChange.bind(this, index, 'placeholder')}
                                             />
                                         </div>
@@ -458,7 +458,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                                             <Input
                                                 className="flex_1"
                                                 value={i.placeholder}
-                                                placeholder="请输入文本框提示"
+                                                placeholder="请输入文本框提示（使用默认则不填写）"
                                                 onChange={this.handleTableDataChange.bind(this, index, 'placeholder')}
                                             />
                                         </div>
@@ -608,13 +608,22 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                         fieldValue.actions = val
                         this.editParamsFN[index].setFieldValue(fieldValue)
                     }; break;
+                    case 'table': {
+                        switch (type) {
+                            case 'barAction': {
+                                const fieldValue = this.barActionsFN[index].getFieldValue()
+                                fieldValue.actions = val
+                                this.barActionsFN[index].setFieldValue(fieldValue);
+                            }; break;
+                        }
+                    }; break;
                 }
             }
         })
     }
 
     private getBarItems = (index: number, fn: IFormFun) => {
-        this.tableActionsFN[index] = fn
+        this.barActionsFN[index] = fn
         const items: IFormItem[] = [{
             component: 'Select',
             props: {
@@ -622,7 +631,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
             },
             label: <FieldLabel className="flex_center">显示类型</FieldLabel>,
             extend: (value: any) => (
-                <Button mold="primary" disabled={value.type !== 'add'} onClick={this.handleActionParam.bind(this, 'tableItems', [], index)}>设置添加数据</Button>
+                <Button mold="primary" disabled={value.type !== 'add'} onClick={this.handleActionParam.bind(this, 'barAction', value.actions, index)}>设置添加数据</Button>
             ),
             field: 'type',
         }, {
@@ -639,6 +648,12 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
             },
             label: <FieldLabel className="flex_center">文本内容</FieldLabel>,
             field: 'label',
+        }, {
+            component: 'NULL',
+            props: {
+                value: []
+            },
+            field: 'actions',
         }]
         return items
     }
@@ -702,7 +717,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
             visible: (value: any) => value.type !== 'Divider',
             label: <FieldLabel className="flex_center">文本内容</FieldLabel>,
             field: 'label',
-        },{
+        }, {
             component: 'Input',
             props: {
                 placeholder: '使用默认提示则不填',
@@ -1175,7 +1190,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
             const data = this.fn.getFieldValue()
             data[field].splice(index, 1)
             switch (field) {
-                case 'barActions': this.tableActionsFN.splice(index, 1); break
+                case 'barActions': this.barActionsFN.splice(index, 1); break
                 case 'tableParams': this.tableParamsFN.splice(index, 1); break
                 case 'editParams': this.editParamsFN.splice(index, 1); break
             }
@@ -1265,7 +1280,7 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
         try {
             if (this.fn) {
                 const data = this.fn.getFieldValue()
-                data.barActions = this.tableActionsFN.map((i) => i.getFieldValue())
+                data.barActions = this.barActionsFN.map((i) => i.getFieldValue())
                 if (!data.title) {
                     message.error('请输入标题')
                     return
