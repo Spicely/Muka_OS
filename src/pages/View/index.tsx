@@ -37,7 +37,7 @@ const UploadBox = styled.div`
     border: ${getUnit(1)} dashed rgb(217,217,217);
     border-radius: 0;
     cursor: pointer;
-    margin-bottom: ${getUnit(10)};
+    margin: ${getUnit(10)} 0;
     vertical-align: middle;
     position: relative;
     transition: all 0.3s;
@@ -245,12 +245,18 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
     }
 
     private handleDialogOk = async () => {
-        const { dispatch } = this.props
         const { pageData, barActionData } = this.state
         try {
             if (this.fn) {
                 const value = this.fn.getFieldValue()
                 for (let i = 0; i < barActionData.length; i++) {
+                    /// 把数据转成number
+                    if (barActionData[i].type === 'Input' && value[barActionData[i].field]) {
+                        const val = Number(value[barActionData[i].field])
+                        if (!isNaN(val)) {
+                            value[barActionData[i].field] = val
+                        }
+                    }
                     if (barActionData[i].type === 'upload') {
                         value[barActionData[i].field] = value[barActionData[i].field][0].data.data.url
                     }
@@ -271,7 +277,6 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                 this.fn.cleanFieldValue()
             }
         } catch (e) {
-            dispatch({ type: SET_SPINLOADING_DATA, data: false })
             httpUtils.verify(e)
         }
     }
@@ -312,7 +317,8 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                         return (
                             <UploadBox
                                 className="flex_center"
-                                onClick={this.handleImageView.bind(this, i.field)}
+                                style={i.crop ? { width: getUnit(Number(i.width) / 3), height: getUnit(Number(i.height) / 3) } : {}}
+                                onClick={this.handleImageView.bind(this, i.field, i.crop || false, { width: Number(i.width), height: Number(i.height) })}
                             >
                                 {val ? <Image src={imgUrl + val.preview} style={{ width: '100%' }} /> : <UoloadIcon icon="ios-add" theme={uploadIconTheme} />}
                             </UploadBox>
@@ -440,11 +446,13 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         }
     }
 
-    private handleImageView = (field: string) => {
+    private handleImageView = (field: string, crop: boolean, cropSize: any) => {
         this.field = field
         imageModal({
             onSelect: this.handleSelect,
-            multiple: false
+            multiple: false,
+            crop,
+            cropSize: crop ? cropSize : undefined,
         })
     }
 
@@ -506,7 +514,11 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
 
     private getTableUrlData = async (url: string) => {
         try {
-            const { data } = await http(url)
+            const { pageData } = this.state
+            const { data } = await http(url, {
+                skip: pageData.skip,
+                page: pageData.page
+            })
             this.setState({
                 pageData: data
             })
@@ -812,10 +824,10 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             this.setState({
                 pageData: data
             })
-            dispatch({ type: SET_SPINLOADING_DATA, data: false })
         } catch (e) {
-            dispatch({ type: SET_SPINLOADING_DATA, data: false })
             httpUtils.verify(e)
+        } finally {
+            dispatch({ type: SET_SPINLOADING_DATA, data: false })
         }
     }
 

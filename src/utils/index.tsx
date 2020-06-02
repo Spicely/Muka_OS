@@ -10,11 +10,13 @@ import { IImages } from 'src/store/reducers/images'
 import { IDialogProps } from 'src/components/lib/Dialog'
 import { store } from 'src/store'
 import { SET_IMAGE_MODAL_VISIBLE, SET_IMAGES_DATA, SET_SELECT_MODAL_VISIBLE } from 'src/store/action'
-import { DialogThemeData, TabBarThemeData, getRatioUnit, getUnit, IconThemeData } from 'src/components/lib/utils'
+import { DialogThemeData, TabBarThemeData, getRatioUnit, getUnit, IconThemeData, UploadThemeData } from 'src/components/lib/utils'
 import { IUploadFileListProps } from 'src/components/lib/Upload/dragger'
 import { theme } from 'src/App'
 import http, { httpUtils, imgUrl, baseUrl } from './axios'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
+import { GlobalForm } from './node'
+import { IFile } from 'src/components/lib/Upload'
 
 const dialogTheme = new DialogThemeData({
     height: 'auto'
@@ -36,6 +38,11 @@ export interface IConnectProps {
 interface IImageModalProps {
     onSelect?: (data: MukaOS.IImageParams) => void
     multiple?: boolean
+    crop: boolean
+    cropSize?: {
+        width: number,
+        height: number,
+    }
 }
 
 interface IProps extends IDialogProps {
@@ -47,10 +54,16 @@ interface IState {
     activeNum: number
 }
 
+const uploadTheme = new UploadThemeData({
+    itemWidth: 200,
+    itemHeight: 200
+})
+
 class ImageModal extends PureComponent<IProps & IImageModalProps & DispatchProp, IState> {
 
     public static defaultProps: IImageModalProps = {
-        multiple: false
+        multiple: false,
+        crop: false,
     }
 
     private type: 'private' | 'public' = 'public'
@@ -60,7 +73,7 @@ class ImageModal extends PureComponent<IProps & IImageModalProps & DispatchProp,
     }
 
     public render(): JSX.Element {
-        const { images, imageModalVisible } = this.props
+        const { images, imageModalVisible, crop, cropSize } = this.props
         const { activeNum } = this.state
         return (
             <Dialog
@@ -72,23 +85,41 @@ class ImageModal extends PureComponent<IProps & IImageModalProps & DispatchProp,
                     width: '80%',
                     height: '80%'
                 })}
-                footer={
-                    <div>
-                        <Button mold="primary" onClick={this.handleUpload}>上传图片</Button>
-                    </div>
-                }
+                footer={null}
             >
                 <TabBar
                     theme={new TabBarThemeData({ height: '100%' })}
                     onChange={this.handleTabChange}
                     selected={activeNum}
                 >
-                    <TabBar.Item title="共享库">
+                    <TabBar.Item title="共享图库">
                         <div style={{ color: 'red' }}>sss</div>
                     </TabBar.Item>
                     <TabBar.Item title="私人图库">
                         <MobileLayout>
-                            {
+                            <Upload
+                                crop={crop}
+                                withCredentials
+                                hasClear={false}
+                                action={baseUrl + '/upload/stream'}
+                                name="file"
+                                params={{ type: 1 }}
+                                theme={uploadTheme}
+                                fileList={images.private.map((i) => {
+                                    return {
+                                        url: imgUrl + i.preview
+                                    }
+                                })}
+                                onItemClick={this.handleItemClick.bind(this, 'private')}
+                                // onUploadSuccess={uploadSuccess}
+                                // onUploadError={uploadError}
+                                cropProps={{
+                                    cropShape: 'rect',
+                                    cropSize,
+                                    showGrid: true,
+                                }}
+                            />
+                            {/* {
                                 images.private.map((i, index: number) => {
                                     return (
                                         <ImageBox key={index} onClick={this.handleImage.bind(this, i)}>
@@ -98,7 +129,7 @@ class ImageModal extends PureComponent<IProps & IImageModalProps & DispatchProp,
                                         </ImageBox>
                                     )
                                 })
-                            }
+                            } */}
                             {
                                 !images.private.length ? <div className="flex_center" style={{ height: '100%' }}><Empty /></div> : null
                             }
@@ -113,6 +144,16 @@ class ImageModal extends PureComponent<IProps & IImageModalProps & DispatchProp,
         const { onSelect, multiple, dispatch } = this.props
         if (isFunction(onSelect) && !multiple) {
             onSelect(img)
+            dispatch({ type: SET_IMAGE_MODAL_VISIBLE, data: false })
+        }
+    }
+
+    private handleItemClick = (type: 'private', file: IFile, index: number) => {
+        const { onSelect, dispatch, images } = this.props
+        if (isFunction(onSelect)) {
+            switch (type) {
+                default: onSelect(images.private[index])
+            }
             dispatch({ type: SET_IMAGE_MODAL_VISIBLE, data: false })
         }
     }
@@ -188,6 +229,8 @@ interface ImageUploadState {
     visible: boolean
 }
 
+const renderTypes = ['Input', 'Select', 'Upload', 'Image']
+
 class ImageUpload extends PureComponent<ImageUploadProps, ImageUploadState> {
     constructor(props: ImageUploadProps) {
         super(props)
@@ -212,7 +255,24 @@ class ImageUpload extends PureComponent<ImageUploadProps, ImageUploadState> {
                 })}
             >
                 <UploadBox>
-                    <Upload.Dragger
+                    <Upload
+                        crop
+                        action={baseUrl + '/upload/stream'}
+                        name="file"
+                        withCredentials
+                        params={{ type: 1 }}
+                        // onUploadSuccess={uploadSuccess}
+                        // onUploadError={uploadError}
+                        cropProps={{
+                            cropShape: 'rect',
+                            cropSize: {
+                                width: 1440,
+                                height: 423,
+                            },
+                            showGrid: true,
+                        }}
+                    />
+                    {/* <Upload.Dragger
                         action={baseUrl + '/upload/stream'}
                         name="file"
                         withCredentials
@@ -220,7 +280,7 @@ class ImageUpload extends PureComponent<ImageUploadProps, ImageUploadState> {
                         maxLength={1}
                         onUploadSuccess={uploadSuccess}
                         onUploadError={uploadError}
-                    />
+                    /> */}
                 </UploadBox>
             </Dialog>
         )
@@ -427,6 +487,62 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
                     },
                     label: <FieldLabel className="flex_center">文本内容</FieldLabel>,
                     field: 'label'
+                }, {
+                    component: 'Input',
+                    props: {
+                        placeholder: '请输入别名',
+                    },
+                    label: <FieldLabel className="flex_center">别名</FieldLabel>,
+                    visible: (val: any) => val.type === 'Image',
+                    field: 'alias'
+                }, {
+                    component: 'RadioGroup',
+                    className: 'form_item',
+                    props: {
+                        options: [{
+                            label: '是',
+                            value: true
+                        }, {
+                            label: '否',
+                            value: false
+                        }],
+                        value: false
+                    },
+                    visible: (val: any) => val.type === 'Image',
+                    label: <FieldLabel className="flex_center">裁切</FieldLabel>,
+                    field: 'crop'
+                }, {
+                    component: 'Input',
+                    props: {
+                        placeholder: '请输入宽度',
+                    },
+                    visible: (val: any) => val.crop,
+                    label: <FieldLabel className="flex_center">宽度</FieldLabel>,
+                    field: 'width'
+                }, {
+                    component: 'Input',
+                    props: {
+                        placeholder: '请输入高度',
+                    },
+                    visible: (val: any) => val.crop,
+                    label: <FieldLabel className="flex_center">高度</FieldLabel>,
+                    field: 'height'
+                }, {
+                    component: 'RadioGroup',
+                    className: 'form_item',
+                    props: {
+                        options: [{
+                            label: '必填',
+                            value: true
+                        }, {
+                            label: '选填',
+                            value: false
+                        }],
+                        value: false
+                    },
+                    visible: (value: any) => renderTypes.includes(value.type),
+                    label: <FieldLabel className="flex_center">必填</FieldLabel>,
+                    field: 'require'
                 }, {
                     component: 'AsyncSelect',
                     props: {
@@ -644,7 +760,9 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
                     </div>
                 }
             >
-                <Form getItems={this.getItems} />
+                <GlobalForm >
+                    <Form getItems={this.getItems} />
+                </GlobalForm>
             </Dialog>
         )
     }

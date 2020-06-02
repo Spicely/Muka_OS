@@ -2,6 +2,7 @@ import React, { Component, ChangeEvent, CSSProperties } from 'react'
 import Cropper from 'react-easy-crop'
 import axios from 'axios'
 import { isFunction, isString, isObject } from 'lodash'
+import { extname } from 'path'
 import styled, { css } from 'styled-components'
 import CropImage from './cropImage'
 import Dragger from './dragger'
@@ -110,11 +111,11 @@ interface ICrop {
     y: number
 }
 
-interface IFile {
+export interface IFile {
     url: string | ArrayBuffer | null
     file?: File
     xhr?: any
-    info: {
+    info?: {
         progress: number,
         status: 'uploading' | 'done' | 'error'
     },
@@ -127,6 +128,7 @@ export interface IUploadProps {
     icon?: iconType | JSX.Element
     iconStyle?: IIconStyle
     multiple?: boolean
+    hasClear?: boolean
     onChange?: (files: IFile[]) => void
     crop?: boolean
     cropProps?: ICropProps
@@ -142,6 +144,7 @@ export interface IUploadProps {
     params?: IValue
     withCredentials?: boolean
     onFileTypeError?: () => void
+    onItemClick?:(val: IFile, index: number) => void
     onUploadSuccess?: (val: IFile, data: any, files: IFile[]) => void
     onUploadError?: (val: IFile, data: any, files: IFile[]) => void
     onBeforeUpload?: (file: File) => (boolean | object | Promise<object | boolean>)
@@ -156,7 +159,7 @@ interface IState {
     visible: boolean
 }
 
-const imgTypes = ['image/png', 'image/jpeg']
+const imgTypes = ['image/png', 'image/jpeg', '.jpg', '.png']
 
 export default class Upload extends Component<IUploadProps, IState> {
 
@@ -167,6 +170,7 @@ export default class Upload extends Component<IUploadProps, IState> {
             color: '#bcbcbc'
         },
         fileTypes: [],
+        hasClear: true,
         onBeforeUpload: () => true
     }
 
@@ -215,7 +219,7 @@ export default class Upload extends Component<IUploadProps, IState> {
     private fileNode: any = null
 
     public render(): JSX.Element {
-        const { className, multiple, crop, cropProps, disabled, itemStyle, theme, fileTypes } = this.props
+        const { className, multiple, crop, cropProps, disabled, itemStyle, theme, fileTypes, hasClear, onItemClick } = this.props
         const { files, image, cropXY, aspect, zoom, visible } = this.state
         return (
             <Consumer>
@@ -238,24 +242,25 @@ export default class Upload extends Component<IUploadProps, IState> {
                                             disabled={disabled || false}
                                             key={`$picker_${index}`}
                                             style={itemStyle}
+                                            onClick={onItemClick?.bind(this, i, index)}
                                         >
                                             <UploadItemBox
                                                 className="flex_center mk_picker_img"
                                             >
                                                 {
-                                                    imgTypes.includes(i.file?.type || '') ? <UploadImage src={i.url} /> : <Icon icon="md-filing" theme={iconFillTheme} />
+                                                    imgTypes.includes(i.file?.type || extname(i.url?.toString() || '')) ? <UploadImage src={i.url} /> : <Icon icon="md-filing" theme={iconFillTheme} />
                                                 }
 
                                             </UploadItemBox>
                                             {
-                                                !disabled && (
+                                                !disabled ? hasClear && (
                                                     <UploadCloseIcon
                                                         uploadTheme={theme || val.theme.uploadTheme}
                                                         icon="md-close-circle"
                                                         onClick={this.handleFileRemove.bind(this, index)}
                                                         theme={iconTheme}
                                                     />
-                                                )
+                                                ) : null
                                             }
                                         </UploadItem>
                                     )

@@ -28,6 +28,9 @@ export const GlobalView = styled.div<IGlobalViewProps>`
         if (!notColor) return css`background: #fff; padding: ${getUnit(20)} ${getUnit(30)};`
     }}
     min-height: 100%;
+`
+
+export const GlobalForm = styled.div`
     .form_item {
         .l_form_item {
             >div {
