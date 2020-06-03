@@ -615,6 +615,11 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                                 fieldValue.actions = val
                                 this.barActionsFN[index].setFieldValue(fieldValue);
                             }; break;
+                            case 'tableAction': {
+                                const fieldValue = this.tableParamsFN[index].getFieldValue()
+                                fieldValue.actions = val
+                                this.tableParamsFN[index].setFieldValue(fieldValue);
+                            }
                         }
                     }; break;
                 }

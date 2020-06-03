@@ -398,6 +398,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     alias: i.alias,
                     props: {
                         placeholder: i.placeholder || `请输入${i.label}`,
+                        showTime: true,
                     },
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 })

@@ -578,7 +578,7 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
                     extend: (val: any) => {
                         if (val.type === 'edit') {
                             return (
-                                <Button mold="primary">设置编辑数据</Button>
+                                <Button mold="primary" onClick={this.handleShowDialog.bind(this, 'barAction', val.options, index, 'data')}>设置编辑数据</Button>
                             )
                         } else {
                             return <div />
@@ -594,6 +594,13 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
                     visible: (val: any) => val.type === 'status',
                     label: <FieldLabel className="flex_center">对应字段名</FieldLabel>,
                     field: 'field'
+                }, {
+                    component: 'NULL',
+                    props: {
+                        value: []
+                    },
+                    visible: (val: any) => val.type === 'edit',
+                    field: 'data',
                 }, {
                     component: 'Input',
                     props: (val: any) => {
@@ -695,7 +702,11 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
     private handleShowDialog(type: ISelectType, val: any[], index: number, key: string) {
         selectTypeValueModal(type, val, (data: any) => {
             const params = this.funs[index].getFieldValue()
-            params.options = data
+            switch (key) {
+                case 'options': params.options = data; break;
+                case 'data': params.data = data; break;
+                default: params.actions = data
+            }
             this.funs[index].setFieldValue(params)
         }, key)
     }
