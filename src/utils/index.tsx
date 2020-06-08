@@ -452,6 +452,24 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
         hasContrast: true,
     }
 
+    public static getDerivedStateFromProps(nextProps: ISelectTypeProps, state: ISelectTypeState) {
+        if (nextProps.selectModalVisible !== state.visible) {
+            if (nextProps.selectModalVisible != state.visible) {
+                if (state.hasContrast) {
+                    return {
+                        visible: nextProps.selectModalVisible
+                    }
+                } else {
+                    return {
+                        hasContrast: true
+                    }
+                }
+            }
+            return null
+        }
+        return null
+    }
+
     private getParamItems = (index: number, fn: IFormFun) => {
         const { type } = this.props
         this.funs[index] = fn
@@ -544,7 +562,7 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
                     label: <FieldLabel className="flex_center">必填</FieldLabel>,
                     field: 'require'
                 }, {
-                    component: 'AsyncSelect',
+                    component: 'Input',
                     props: {
                         placeholder: '请输入请求地址',
                     },
@@ -681,15 +699,9 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
         return items
     }
 
-    public UNSAFE_componentWillReceiveProps(nextProps: ISelectTypeProps) {
-        const { selectModalVisible } = this.props
-        const { visible } = this.state
-        if (nextProps.selectModalVisible && selectModalVisible != nextProps.selectModalVisible) {
-            if (nextProps.selectModalVisible != visible) {
-                this.setState({
-                    visible: nextProps.selectModalVisible
-                })
-            }
+    public componentDidUpdate() {
+        const { hasContrast } = this.state
+        if (hasContrast) {
             setTimeout(() => {
                 const { data } = this.props
                 this.funs.forEach((i, index: number) => {
