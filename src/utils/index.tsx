@@ -229,7 +229,7 @@ interface ImageUploadState {
     visible: boolean
 }
 
-const renderTypes = ['Input', 'Select', 'Upload', 'Image']
+const renderTypes = ['Input', 'Select', 'Upload', 'Image', 'Images']
 
 class ImageUpload extends PureComponent<ImageUploadProps, ImageUploadState> {
     constructor(props: ImageUploadProps) {
@@ -378,6 +378,9 @@ export const editOptions = [{
     label: '图片',
     value: 'Image'
 }, {
+    label: '图片列表',
+    value: 'Images'
+}, {
     label: '单选',
     value: 'RadioGroup'
 }, {
@@ -511,8 +514,16 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
                         placeholder: '请输入别名',
                     },
                     label: <FieldLabel className="flex_center">别名</FieldLabel>,
-                    visible: (val: any) => val.type === 'Image',
+                    visible: (val: any) => (val.type === 'Image' || val.type === 'Images'),
                     field: 'alias'
+                },{
+                    component: 'Input',
+                    props: {
+                        placeholder: '请输入图片数量(不限制不填)',
+                    },
+                    label: <FieldLabel className="flex_center">图片数量</FieldLabel>,
+                    visible: (val: any) => val.type === 'Images',
+                    field: 'number'
                 }, {
                     component: 'RadioGroup',
                     className: 'form_item',
@@ -526,7 +537,7 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
                         }],
                         value: false
                     },
-                    visible: (val: any) => val.type === 'Image',
+                    visible: (val: any) => (val.type === 'Image' || val.type === 'Images'),
                     label: <FieldLabel className="flex_center">裁切</FieldLabel>,
                     field: 'crop'
                 }, {
@@ -596,7 +607,7 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
                     extend: (val: any) => {
                         if (val.type === 'edit') {
                             return (
-                                <Button mold="primary" onClick={this.handleShowDialog.bind(this, 'barAction', val.options, index, 'data')}>设置编辑数据</Button>
+                                <Button mold="primary" onClick={this.handleShowDialog.bind(this, 'barAction', val.data, index, 'data')}>设置编辑数据</Button>
                             )
                         } else {
                             return <div />
@@ -700,15 +711,12 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
     }
 
     public componentDidUpdate() {
-        const { hasContrast } = this.state
-        if (hasContrast) {
-            setTimeout(() => {
-                const { data } = this.props
-                this.funs.forEach((i, index: number) => {
-                    i.setFieldValue(data[index] || {})
-                })
-            }, 10)
-        }
+        setTimeout(() => {
+            const { data } = this.props
+            this.funs.forEach((i, index: number) => {
+                i.setFieldValue(data[index] || {})
+            })
+        }, 10)
     }
 
     private handleShowDialog(type: ISelectType, val: any[], index: number, key: string) {
@@ -741,7 +749,6 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
 
     private handleSuccess = () => {
         const { success } = this.props
-
         const data = this.funs.map((i) => {
             const v = i.getFieldValue()
             if (v.value === 'true') {

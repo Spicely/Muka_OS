@@ -328,6 +328,42 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     alias: i.alias,
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
                 }); break;
+                case 'Images': items.push({
+                    component: 'Label',
+                    props: {
+                        value: []
+                    },
+                    render: (val: MukaOS.IImageParams[]) => {
+                        return (
+                            <div className="flex">
+                                {
+                                    val.map((item, index: number) => (
+                                        <UploadBox
+                                            key={index}
+                                            className="flex_center"
+                                            style={i.crop ? { width: getUnit(Number(i.width) / 3), height: getUnit(Number(i.height) / 3), marginRight: getUnit(4) } : { marginRight: getUnit(4) }}
+                                            onClick={this.handleImageView.bind(this, i.field, i.crop || false, { width: Number(i.width), height: Number(i.height) })}
+                                        >
+                                            <Image src={imgUrl + item.preview} style={{ width: '100%' }} />
+                                        </UploadBox>
+                                    ))
+                                }
+                                {(!i.number || val.length < i.number) && (
+                                    <UploadBox
+                                        className="flex_center"
+                                        style={i.crop ? { width: getUnit(Number(i.width) / 3), height: getUnit(Number(i.height) / 3) } : {}}
+                                        onClick={this.handleImagesView.bind(this, i.field, i.crop || false, { width: Number(i.width), height: Number(i.height) })}
+                                    >
+                                        <UoloadIcon icon="ios-add" theme={uploadIconTheme} />
+                                    </UploadBox>
+                                )}
+                            </div>
+                        )
+                    },
+                    field: i.field,
+                    alias: i.alias,
+                    label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
+                }); break;
                 case 'Upload': items.push({
                     component: 'Upload',
                     props: {
@@ -447,6 +483,16 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         }
     }
 
+    private handleImagesView = (field: string, crop: boolean, cropSize: any) => {
+        this.field = field
+        imageModal({
+            onSelect: this.handleSelectItems,
+            multiple: false,
+            crop,
+            cropSize: crop ? cropSize : undefined,
+        })
+    }
+
     private handleImageView = (field: string, crop: boolean, cropSize: any) => {
         this.field = field
         imageModal({
@@ -455,6 +501,30 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
             crop,
             cropSize: crop ? cropSize : undefined,
         })
+    }
+
+    private handleSelectItems = (data: MukaOS.IImageParams) => {
+        const { pageType } = this.state
+        switch (pageType) {
+            case 'edit': {
+                if (this.editFn) {
+                    const val = this.editFn.getFieldValue([this.field])
+                    val[this.field].push(data)
+                    this.editFn.setFieldValue({
+                        [this.field]: val[this.field]
+                    })
+                }
+            }; break;
+            case 'table': {
+                if (this.fn) {
+                    const val = this.fn.getFieldValue([this.field])
+                    val[this.field].push(data)
+                    this.fn.setFieldValue({
+                        [this.field]: val[this.field]
+                    })
+                }
+            }; break;
+        }
     }
 
     private handleSelect = (data: MukaOS.IImageParams) => {
