@@ -1,10 +1,10 @@
 import React, { Component, Fragment } from 'react'
 import { Modal, message } from 'antd'
-import { isNil, get } from 'lodash'
+import { isNil, get, isString } from 'lodash'
 import styled, { createGlobalStyle } from 'styled-components'
 import { parse } from 'query-string'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
-import { Button, Dialog, LabelHeader, Form, Tag, Table, Label, Image, Icon, TabBar, Divider } from 'components'
+import { Button, Dialog, LabelHeader, Form, Tag, Table, Label, Image, Icon, TabBar, Divider, Notice, Alert } from 'components'
 import http, { httpUtils, imgUrl, baseUrl } from 'src/utils/axios'
 import { connect, DispatchProp } from 'react-redux'
 import { IInitState, MukaOS, ITabelRes } from 'src/store/state'
@@ -16,6 +16,7 @@ import { SET_SPINLOADING_DATA } from 'src/store/action'
 import { RouteComponentProps, Link } from 'react-router-dom'
 import { IPageType, IFieldParams, IFieldTableEdits, IBarActions } from '../Page'
 import { imageModal } from 'src/utils'
+import { retry } from 'redux-saga/effects'
 
 const FromLabel = styled.div`
     width: ${getUnit(60)};
@@ -118,6 +119,8 @@ interface IState {
     imageVisible: boolean
     imageUrl: string
     editUrl: string
+    alertInfo: string
+    alertType: 'success' | 'warning' | 'error'
     barActions: IBarActions[]
     barActionData: IFieldTableEdits[]
     tabSelects: IFieldParams[]
@@ -166,6 +169,8 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
         editVisible: false,
         imageVisible: false,
         imageUrl: '',
+        alertInfo: '',
+        alertType: 'success',
         editDialogTitle: '',
         barActionData: [],
         tabSelects: []
@@ -192,7 +197,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
     }
 
     public render(): JSX.Element {
-        const { title, titleBar, pageType, imageVisible, imageUrl, editVisible, editDialogTitle, barActions, editParams, editUrl } = this.state
+        const { title, titleBar, pageType, imageVisible, imageUrl, editVisible, editDialogTitle, barActions, editParams, editUrl, alertInfo, alertType } = this.state
         return (
             <GlobalView>
                 <Gstyle />
@@ -229,6 +234,17 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                         />
                     )
                 }
+                {
+                    alertInfo && (
+                        <Alert
+                            title={alertInfo}
+                            type={alertType}
+                            inheritColor
+                            style={{marginBottom: getUnit(15)}}
+                        />
+                    )
+                }
+
                 {this.getPageTypeNode(pageType)}
                 <AntModel
                     visible={imageVisible}
@@ -334,7 +350,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                         return (
                             <UploadBox
                                 className="flex_center"
-                                style={i.crop ? { width: getUnit(Number(i.width) / 3), height: getUnit(Number(i.height) / 3) } : {}}
+                                style={i.crop ? { width: getUnit(Number(i.width) / 5), height: getUnit(Number(i.height) / 5) } : {}}
                                 onClick={this.handleImageView.bind(this, i.field, i.crop || false, { width: Number(i.width), height: Number(i.height) })}
                             >
                                 {val ? <Image src={imgUrl + val.preview} style={{ width: '100%' }} /> : <UoloadIcon icon="ios-add" theme={uploadIconTheme} />}
@@ -358,7 +374,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                         <UploadBox
                                             key={index}
                                             className="flex_center"
-                                            style={i.crop ? { width: getUnit(Number(i.width) / 3), height: getUnit(Number(i.height) / 3), marginRight: getUnit(4) } : { marginRight: getUnit(4) }}
+                                            style={i.crop ? { width: getUnit(Number(i.width) / 5), height: getUnit(Number(i.height) / 5), marginRight: getUnit(4) } : { marginRight: getUnit(4) }}
                                             onClick={this.handleImageView.bind(this, i.field, i.crop || false, { width: Number(i.width), height: Number(i.height) })}
                                         >
                                             <Image src={imgUrl + item.preview} style={{ width: '100%' }} />
@@ -369,7 +385,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                 {(!i.number || val.length < i.number) && (
                                     <UploadBox
                                         className="flex_center"
-                                        style={i.crop ? { width: getUnit(Number(i.width) / 3), height: getUnit(Number(i.height) / 3) } : {}}
+                                        style={i.crop ? { width: getUnit(Number(i.width) / 5), height: getUnit(Number(i.height) / 5) } : {}}
                                         onClick={this.handleImagesView.bind(this, i.field, i.crop || false, { width: Number(i.width), height: Number(i.height) })}
                                     >
                                         <UoloadIcon icon="ios-add" theme={uploadIconTheme} />
@@ -432,7 +448,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     field: i.field,
                     props: {
                         url: (i.url.includes('http://') || i.url.includes('https://')) ? i.url : baseUrl + i.url,
-                        multiple : !!i.multiple,
+                        multiple: !!i.multiple,
                     },
                     alias: i.alias,
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
@@ -750,6 +766,38 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                                                         return false
                                                                     }
                                                                 })
+                                                                if (k.other) {
+                                                                    const factor = k.factor?.split(';')
+                                                                    const status = factor?.every((w) => {
+                                                                        const eq = w.split('=>')
+                                                                        return data[eq[0]] == eq[1]
+                                                                    })
+                                                                    if (convert.length && status) {
+                                                                        const u = convert[0].u.split('?')
+                                                                        const params: any = parse(u[1])
+                                                                        // 尝试转换数据
+                                                                        Object.keys(params).forEach((i) => {
+                                                                            if (params[i] === 'true' || params[i] === 'false') {
+                                                                                params[i] = params[i] === 'true' ? true : false
+                                                                            } else {
+                                                                                if (isString(params[i]) && isNaN(Number(params[i]))) {
+                                                                                    params[i] = Number(params[i])
+                                                                                }
+                                                                            }
+                                                                        })
+                                                                        return (
+                                                                            <Label
+                                                                                color={convert[0].c || 'green'}
+                                                                                key={index}
+                                                                                onClick={this.handleInUrl.bind(this, u[0], { id: data.id, ...params })}
+                                                                            >
+                                                                                {convert[0].v}
+                                                                            </Label>
+                                                                        )
+                                                                    } else {
+                                                                        return <Fragment key={index} />
+                                                                    }
+                                                                }
                                                                 if (convert.length) {
                                                                     const u = convert[0].u.split('?')
                                                                     const params = parse(u[1])
@@ -763,7 +811,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                                                         </Label>
                                                                     )
                                                                 } else {
-                                                                    return <Fragment />
+                                                                    return <Fragment key={index} />
                                                                 }
                                                             }
                                                             default: return (

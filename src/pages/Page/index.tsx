@@ -28,6 +28,8 @@ interface IFieldActions {
     url: string
     field: string
     data?: IFieldTableEdits[]
+    other?: boolean
+    factor?: string
 }
 
 export interface IBarActions {
@@ -44,6 +46,8 @@ export interface IFieldParams {
     actions: IFieldActions[]
     convert: string
     data?: any[]
+    other?: boolean
+    factor?: string
 }
 
 
@@ -808,6 +812,31 @@ class AdminPage extends Component<IProps & RouteComponentProps<{ id?: string }>,
                 onChange: this.handleTypeChange
             },
             field: 'pageType'
+        }, {
+            component: 'Input',
+            label: <FromLabel>页面提示</FromLabel>,
+            props: {
+                placeholder: '页面提示提示内容(不填写不显示)'
+            },
+            field: 'alertInfo'
+        }, {
+            component: 'RadioGroup',
+            label: <FromLabel>提示类型</FromLabel>,
+            props: {
+                options: [{
+                    label: '默认',
+                    value: 'success',
+                }, {
+                    label: '警告',
+                    value: 'warning',
+                }, {
+                    label: '醒目',
+                    value: 'error',
+                }],
+                value: 'success'
+            },
+            visible: (val) => val.alertInfo !== '',
+            field: 'alertType'
         }, {
             component: 'Label',
             label: <FromLabel>标题栏按钮</FromLabel>,

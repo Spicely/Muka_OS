@@ -676,6 +676,30 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
                     },
                     label: (val: any) => (<FieldLabel className="flex_center">{val.type === 'link' ? '跳转地址' : '请求地址'}</FieldLabel>),
                     field: 'url'
+                }, {
+                    component: 'RadioGroup',
+                    className: 'form_item',
+                    props: {
+                        options: [{
+                            label: '是',
+                            value: true
+                        }, {
+                            label: '否',
+                            value: false
+                        }],
+                        value: false
+                    },
+                    visible: (val: any) => val.type === 'status',
+                    label: <FieldLabel className="flex_center">其他条件</FieldLabel>,
+                    field: 'other'
+                }, {
+                    component: 'Input',
+                    props: {
+                        placeholder: '例：1=>使用:green;2=>禁用:red;',
+                    },
+                    visible: (val: any) => val.other,
+                    label: <FieldLabel className="flex_center">前置条件</FieldLabel>,
+                    field: 'factor'
                 }]
                 return items
             }
