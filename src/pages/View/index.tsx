@@ -31,6 +31,18 @@ const ActionButton = styled(Button)`
 
 const UoloadIcon = styled(Icon)``
 
+const CloseIcon = styled(Icon)`
+    position: absolute;
+    z-index: 1;
+    right: 0;
+    top: 0;
+    background: ${Color.fromRGBO(0, 0, 0, 0.5).toString()};
+    border-radius: 50%;
+    :hover {
+        background: ${Color.fromRGBO(0, 0, 0, 0.8).toString()};
+    }
+`
+
 const UploadBox = styled.div`
     height: ${getUnit(200)};
     width: ${getUnit(375)};
@@ -41,7 +53,7 @@ const UploadBox = styled.div`
     vertical-align: middle;
     position: relative;
     transition: all 0.3s;
-    overflow: hidden;
+    /* overflow: hidden; */
     :hover {
         border-color: ${({ theme }) => theme.primarySwatch};
         ${UoloadIcon} {
@@ -57,6 +69,11 @@ const dialogTheme = new DialogThemeData({
 
 const uploadIconTheme = new IconThemeData({
     size: 34,
+    color: Color.fromRGB(217, 217, 217)
+})
+
+const closeIconTheme = new IconThemeData({
+    size: 13,
     color: Color.fromRGB(217, 217, 217)
 })
 
@@ -345,6 +362,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                             onClick={this.handleImageView.bind(this, i.field, i.crop || false, { width: Number(i.width), height: Number(i.height) })}
                                         >
                                             <Image src={imgUrl + item.preview} style={{ width: '100%' }} />
+                                            <CloseIcon icon="ios-close" theme={closeIconTheme} onClick={this.handleCloseItem.bind(this, i.field, index)} />
                                         </UploadBox>
                                     ))
                                 }
@@ -413,7 +431,8 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                     component: 'AsyncSelect',
                     field: i.field,
                     props: {
-                        url: (i.url.includes('http://') || i.url.includes('https://')) ? i.url : baseUrl + i.url
+                        url: (i.url.includes('http://') || i.url.includes('https://')) ? i.url : baseUrl + i.url,
+                        multiple : !!i.multiple,
                     },
                     alias: i.alias,
                     label: <FromLabel>{i.require && <span style={{ color: 'red' }}>*</span>}{i.label}</FromLabel>
@@ -481,6 +500,31 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                 }
             }
         }
+    }
+
+    private handleCloseItem(field: string, index: number, e: any) {
+        const { pageType } = this.state
+        switch (pageType) {
+            case 'edit': {
+                if (this.editFn) {
+                    const val = this.editFn.getFieldValue([this.field])
+                    val[this.field].splice(index, 1)
+                    this.editFn.setFieldValue({
+                        [this.field]: val[this.field]
+                    })
+                }
+            }; break;
+            case 'table': {
+                if (this.fn) {
+                    const val = this.fn.getFieldValue([this.field])
+                    val[this.field].splice(index, 1)
+                    this.fn.setFieldValue({
+                        [this.field]: val[this.field]
+                    })
+                }
+            }; break;
+        }
+        e.stopPropagation();
     }
 
     private handleImagesView = (field: string, crop: boolean, cropSize: any) => {

@@ -229,7 +229,7 @@ interface ImageUploadState {
     visible: boolean
 }
 
-const renderTypes = ['Input', 'Select', 'Upload', 'Image', 'Images']
+const renderTypes = ['Input', 'Select', 'Upload', 'Image', 'Images', 'AsyncSelect']
 
 class ImageUpload extends PureComponent<ImageUploadProps, ImageUploadState> {
     constructor(props: ImageUploadProps) {
@@ -516,7 +516,7 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
                     label: <FieldLabel className="flex_center">别名</FieldLabel>,
                     visible: (val: any) => (val.type === 'Image' || val.type === 'Images'),
                     field: 'alias'
-                },{
+                }, {
                     component: 'Input',
                     props: {
                         placeholder: '请输入图片数量(不限制不填)',
@@ -557,6 +557,30 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
                     label: <FieldLabel className="flex_center">高度</FieldLabel>,
                     field: 'height'
                 }, {
+                    component: 'Input',
+                    props: {
+                        placeholder: '请输入请求地址',
+                    },
+                    visible: (val: any) => val.type === 'AsyncSelect',
+                    label: <FieldLabel className="flex_center">请求地址</FieldLabel>,
+                    field: 'url'
+                }, {
+                    component: 'RadioGroup',
+                    className: 'form_item',
+                    props: {
+                        options: [{
+                            label: '多个',
+                            value: true
+                        }, {
+                            label: '单个',
+                            value: false
+                        }],
+                        value: false
+                    },
+                    visible: (val: any) => val.type === 'AsyncSelect',
+                    label: <FieldLabel className="flex_center">多选</FieldLabel>,
+                    field: 'multiple'
+                }, {
                     component: 'RadioGroup',
                     className: 'form_item',
                     props: {
@@ -572,14 +596,6 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
                     visible: (value: any) => renderTypes.includes(value.type),
                     label: <FieldLabel className="flex_center">必填</FieldLabel>,
                     field: 'require'
-                }, {
-                    component: 'Input',
-                    props: {
-                        placeholder: '请输入请求地址',
-                    },
-                    visible: (val: any) => val.type === 'AsyncSelect',
-                    label: <FieldLabel className="flex_center">请求地址</FieldLabel>,
-                    field: 'url'
                 }, {
                     component: 'Input',
                     props: {

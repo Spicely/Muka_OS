@@ -47,6 +47,10 @@ const SelectIcon = styled(Icon) <{ iconRotate: boolean }>`
 
 const SelectView = styled.div<IStyleProps>`
     height: ${({ selectTheme }) => getUnit(selectTheme.height)};
+    .ant-select-focused.ant-select-multiple .ant-select-selector {
+        box-shadow: none;
+        border-color: ${({ selectTheme, theme }) => selectTheme.selectColor || theme.primarySwatch};
+    }
     .ant-select {
         width: 100%;
         background: #fff;
@@ -56,6 +60,7 @@ const SelectView = styled.div<IStyleProps>`
         .ant-select-selector {
             ${({ selectTheme, theme }) => selectTheme.borderRadius || theme.borderRadius}
             ${({ selectTheme }) => selectTheme.border.toString()}
+            outline: none;
             ${transition(0.5)}
         }
        

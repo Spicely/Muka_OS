@@ -18,8 +18,8 @@ export interface ISelectProps {
     onChange?: (value: string | number) => void
     placeholder?: string
     isSearchable?: boolean
-    isMulti?: boolean
-    isDisabled?: boolean
+    multiple?: boolean
+    disabled?: boolean
     url: string
     noOptionsMessage?: string | JSX.Element
     theme?: SelectThemeData
@@ -38,8 +38,8 @@ export default class AsyncSelect extends Component<ISelectProps, IState> {
         url: '',
         placeholder: '请选择数据',
         isSearchable: false,
-        isMulti: false,
-        isDisabled: false,
+        multiple: false,
+        disabled: false,
         withCredentials: true,
     }
 
@@ -50,7 +50,7 @@ export default class AsyncSelect extends Component<ISelectProps, IState> {
     }
 
     public render(): JSX.Element {
-        const { className, placeholder, noOptionsMessage, isMulti, isDisabled, theme } = this.props
+        const { className, placeholder, noOptionsMessage, multiple, disabled, theme } = this.props
         const { options, loading, value } = this.state
         return (
             <Consumer>
@@ -61,6 +61,8 @@ export default class AsyncSelect extends Component<ISelectProps, IState> {
                             value={value}
                             className={className}
                             theme={theme}
+                            mode={multiple ? 'multiple' : undefined}
+                            disabled={disabled}
                             onChange={this.handleChange}
                             onFocus={this.handleFocus}
                             loading={loading}
