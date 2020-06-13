@@ -4,6 +4,7 @@ import Radio from '../Radio'
 import { RadioThemeData, ThemeData } from '../utils'
 import { Consumer } from '../ThemeProvider'
 import { iconType } from '../Icon'
+import { isFunction } from 'src/muka'
 
 interface ICheckBoxOptionsProps {
     label: string | JSX.Element
@@ -21,6 +22,7 @@ export interface ICheckBoxProps {
     icon?: iconType
     value?: typeItem[]
     theme?: RadioThemeData
+    onChange?: (value: (string | number | boolean)[]) => void
 }
 
 interface IState {
@@ -74,7 +76,7 @@ export default class CheckBox extends Component<ICheckBoxProps, IState> {
                                             theme={theme || data.theme.radioTheme}
                                             icon={item.icon || icon}
                                             onChange={this.handleChange.bind(this, item.value)}
-                                            style={{marginRight: `${10 * ThemeData.ratio + ThemeData.unit}`}}
+                                            style={{ marginRight: `${10 * ThemeData.ratio + ThemeData.unit}` }}
                                         >
                                             {item.label}
                                         </Radio>
@@ -91,15 +93,22 @@ export default class CheckBox extends Component<ICheckBoxProps, IState> {
 
     private handleChange = (val: string | number | boolean) => {
         const { value } = this.state
+        const { onChange } = this.props
         if (value.includes(val) && val) {
             const index = value.indexOf(val)
             value.splice(index, 1)
+            if (isFunction(onChange)) {
+                onChange(value)
+            }
             this.setState({
                 value
             })
             return
         }
         if (!value.includes(val) && val) {
+            if (isFunction(onChange)) {
+                onChange(value)
+            }
             value.push(val)
         }
         this.setState({
