@@ -109,7 +109,7 @@ interface IState {
 const prefixClass = 'l_form'
 
 const FormItem = styled.div`
-    /* min-height: ${getUnit(50)}; */
+    min-height: ${getUnit(45)};
 `
 interface FormItemLabelProps {
     spacing?: number

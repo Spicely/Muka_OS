@@ -800,7 +800,17 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                                                 }
                                                                 if (convert.length) {
                                                                     const u = convert[0].u.split('?')
-                                                                    const params = parse(u[1])
+                                                                    const params: any = parse(u[1])
+                                                                    // 尝试转换数据
+                                                                    Object.keys(params).forEach((i) => {
+                                                                        if (params[i] === 'true' || params[i] === 'false') {
+                                                                            params[i] = params[i] === 'true' ? true : false
+                                                                        } else {
+                                                                            if (isString(params[i]) && isNaN(Number(params[i]))) {
+                                                                                params[i] = Number(params[i])
+                                                                            }
+                                                                        }
+                                                                    })
                                                                     return (
                                                                         <Label
                                                                             color={convert[0].c || 'green'}

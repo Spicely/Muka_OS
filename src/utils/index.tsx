@@ -655,7 +655,7 @@ class SelectTypeModal extends PureComponent<ISelectTypeProps, ISelectTypeState> 
                             }
                         } else {
                             return {
-                                placeholder: '请输入请求地址',
+                                placeholder: '请输入功能名称',
                             }
                         }
                     },
