@@ -21,6 +21,7 @@ interface ISelectOptionsProps {
 export interface ISelectProps extends SelectProps<any> {
     className?: string
     options: ISelectOptionsProps[]
+    multiple?: boolean
     noOptionsMessage?: string | JSX.Element
     theme?: SelectThemeData
 }
@@ -122,8 +123,8 @@ export default class Select extends Component<ISelectProps, IState> {
     }
 
     public render(): JSX.Element {
-        const { className, options, noOptionsMessage, theme, suffixIcon } = this.props
-        const props = omit(this.props, ['className', 'value', 'onChange', 'options', 'notFoundContent', 'suffixIcon', 'onDropdownVisibleChange'])
+        const { className, options, noOptionsMessage, theme, suffixIcon, multiple } = this.props
+        const props = omit(this.props, ['className', 'value', 'onChange', 'options', 'notFoundContent', 'suffixIcon', 'onDropdownVisibleChange', 'multiple'])
         const { value, rotate } = this.state
         return (
             <Consumer>
@@ -137,6 +138,7 @@ export default class Select extends Component<ISelectProps, IState> {
                             <ReactSelect
                                 {...props}
                                 value={value || undefined}
+                                mode={multiple ? 'multiple' : undefined}
                                 onChange={this.handleChange}
                                 onDropdownVisibleChange={this.handleDropdownVisible}
                                 notFoundContent={<Empty description={noOptionsMessage} image={null} />}
