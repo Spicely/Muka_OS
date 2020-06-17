@@ -137,7 +137,7 @@ export default class Select extends Component<ISelectProps, IState> {
                             <GlobalSelectDropdown selectTheme={theme || val.theme.selectTheme} />
                             <ReactSelect
                                 {...props}
-                                value={value || undefined}
+                                value={value ?? undefined}
                                 mode={multiple ? 'multiple' : undefined}
                                 onChange={this.handleChange}
                                 onDropdownVisibleChange={this.handleDropdownVisible}

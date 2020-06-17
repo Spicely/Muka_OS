@@ -175,7 +175,7 @@ export default class Form extends Component<IFormProps, IState> {
                 case 'Upload': vals[field] = _porps.value ? _porps.value : []; break
                 case 'Carousel': vals[field] = _porps.value || []; break
                 case 'Map': vals[field] = _porps.value || {}; break
-                default: vals[field] = _porps.value || ''
+                default: vals[field] = _porps.value ?? ''
             }
 
             childs.push({
@@ -240,7 +240,7 @@ export default class Form extends Component<IFormProps, IState> {
                     case 'CheckBox': newVals[field] = _porps.value || []; break
                     case 'RangePicker': newVals[field] = _porps.value || []; break
                     case 'Map': newVals[field] = _porps.value || {}; break
-                    default: newVals[field] = _porps.value || ''
+                    default: newVals[field] = _porps.value ?? ''
                 }
                 return
             }
