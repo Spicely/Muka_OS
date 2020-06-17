@@ -1027,18 +1027,18 @@ export default class Form extends Component<IFormProps, IState> {
             // tslint:disable-next-line: no-shadowed-variable
             const props: any = item.props || {}
             switch (item.component) {
-                case 'Radio': vals[field] = props.value; break
+                case 'Radio': vals[field] = props.value ? props.value : []; break
                 case 'Upload': vals[field] = props.value ? props.value : []; break
-                case 'CheckBox': vals[field] = []; break
-                case 'RangePicker': vals[field] = []; break
-                case 'Carousel': vals[field] = []; break
+                case 'CheckBox': vals[field] = props.value ? props.value : []; break
+                case 'RangePicker': vals[field] = props.value ? props.value : []; break
+                case 'Carousel': vals[field] = props.value ? props.value : []; break
                 default: {
                     if (isArray(props.value)) {
-                        vals[field] = []
+                        vals[field] = props.value ?? []
                     } else if (isBool(props.value)) {
-                        vals[field] = false
+                        vals[field] = props.value ?? false
                     } else {
-                        vals[field] = ''
+                        vals[field] = props.value ?? ''
                     }
                 }
             }
