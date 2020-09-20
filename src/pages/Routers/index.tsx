@@ -13,13 +13,13 @@ import { IInitState } from 'src/store/state'
 import { IJurisd } from 'src/store/reducers/jurisd'
 import { IIcons } from 'src/store/reducers/icons'
 import { NavBarThemeData, Color, getUnit, DialogThemeData } from 'src/components/lib/utils'
-import { SET_ROUTERS_DATA, GET_ROUTER } from 'src/store/action'
-import { IRouters } from 'src/store/reducers/routers'
+import { SET_ROUTERS_DATA, GET_ROUTER, SET_SPINLOADING_DATA } from 'src/store/action'
+import { IRouter } from 'src/store/reducers/router'
 
 const { confirm } = Modal
 
 interface IProps extends DispatchProp {
-    routers: IRouters[]
+    routers: IRouter[]
     lastIds: string[]
     jurisd: IJurisd[]
     icons: IIcons[]
@@ -55,8 +55,6 @@ class Routers extends Component<IProps, IState> {
 
     private fn: IFormFun | null = null
 
-    private title = getTitle('/system/router')
-
     private columns: ITableColumns<any>[] = [{
         title: '路由名称',
         dataIndex: 'name',
@@ -76,10 +74,10 @@ class Routers extends Component<IProps, IState> {
     }, {
         title: '操作',
         key: 'action',
-        render: (val: any, data: IRouters) => {
+        render: (val: any, data: IRouter) => {
             const { jurisd } = this.props
             const { lastIds } = this.state
-            const ids: string[] = []
+            const ids: number[] = []
             ids.push(data.id)
             if (data.children) {
                 data.children.forEach((i) => {
@@ -99,6 +97,7 @@ class Routers extends Component<IProps, IState> {
                     {!data.status && find(jurisd, { type: 6 }) ? <Label onClick={this.handleSetStatus.bind(this, ids, true)} color="green">启用</Label> : null}
                 </div>
             )
+            return <div />
         }
     }]
 
@@ -107,9 +106,17 @@ class Routers extends Component<IProps, IState> {
         this.initIds()
     }
 
-    private getData() {
+    private async getData() {
         const { dispatch } = this.props
-        dispatch({ type: GET_ROUTER })
+        try {
+            dispatch({ type: SET_SPINLOADING_DATA, data: true })
+            const { data } = await http('/admin/router/get')
+            dispatch({ type: SET_SPINLOADING_DATA, data: false })
+            dispatch({ type: SET_ROUTERS_DATA, data: data })
+        } catch (e) {
+            dispatch({ type: SET_SPINLOADING_DATA, data: false })
+            httpUtils.verify(e)
+        }
     }
 
     public render(): JSX.Element {
@@ -120,7 +127,7 @@ class Routers extends Component<IProps, IState> {
                 <LayoutNavBar
                     left={null}
                     theme={new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255) })}
-                    title={<LabelHeader title={this.title} line="vertical" />}
+                    title={<LabelHeader title="路由设置" line="vertical" />}
                     right={<Button mold="primary" onClick={this.setClassifyVisble}>添加路由</Button>}
                 />
                 <Table
@@ -128,6 +135,7 @@ class Routers extends Component<IProps, IState> {
                     columns={this.columns}
                     dataSource={routers}
                     rowKey={(data: any) => data.id}
+                    expandedRowKeys={routers.map(item => item.id)}
                 />
                 <Dialog
                     visible={classifyVisible}
@@ -143,7 +151,7 @@ class Routers extends Component<IProps, IState> {
         )
     }
 
-    private handleAddChildRouter = (parentId: string) => {
+    private handleAddChildRouter = (parentId: number) => {
         this.setState({
             classifyVisible: true,
             dialogName: '创建子路由'
@@ -199,7 +207,7 @@ class Routers extends Component<IProps, IState> {
             label: <FromLabel>权重</FromLabel>,
             props: {
                 placeholder: '数值越高显示越前',
-                value: 0,
+                value: 1,
                 type: 'number'
             },
             field: 'sort'
@@ -271,7 +279,7 @@ class Routers extends Component<IProps, IState> {
         }
     }
 
-    private handleSetStatus = async (ids: string[], status: boolean) => {
+    private handleSetStatus = async (ids: number[], status: boolean) => {
         try {
             if (ids.length > 1) {
                 confirm({
@@ -329,16 +337,16 @@ class Routers extends Component<IProps, IState> {
         })
     }
 
-    private handleEdit = (data: IRouters) => {
+    private handleEdit = (data: IRouter) => {
         this.setState({
             classifyVisible: true,
             dialogName: '修改路由'
         }, () => {
-            this.initIds(data.id)
+            // this.initIds(data.id)
             setTimeout(() => {
                 this.fn && this.fn.setFieldValue({
                     ...data,
-                    icon: data.icon ? data.icon.id : null,
+                    // icon: data.icon ? data.icon.id : null,
                 })
             }, 10)
         })
@@ -347,27 +355,20 @@ class Routers extends Component<IProps, IState> {
     private initIds = (id?: string) => {
         const { routers } = this.props
         const lastIds: string[] = []
-        const parents: { label: string, value: string }[] = []
+        const parents: { label: string, value: string, children?: any[] }[] = []
         routers.forEach((i: any) => {
             if (i.id !== id) {
                 parents.push({
                     label: i.name,
-                    value: i.id
-                })
-            }
-            if (i.children) {
-                i.children.forEach((z: any) => {
-                    if (z.id !== id) {
-                        parents.push({
-                            label: z.name,
-                            value: z.id
-                        })
-                    }
-                    if (z.children) {
-                        z.children.forEach((v: any) => {
-                            lastIds.push(v.id)
-                        })
-                    }
+                    value: i.id,
+                    children: i.children?.map((z: any) => {
+                        if (z.id !== id) {
+                            return {
+                                label: z.name,
+                                value: z.id
+                            }
+                        }
+                    })
                 })
             }
         })

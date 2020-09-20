@@ -8,17 +8,17 @@ interface IValue {
     [name: string]: any
 }
 // export const baseUrl = 'https://api.muka.site'
-export const baseUrl = 'http://api.muka.site'
+export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://192.168.0.103:8080/': 'http://api.muka.site'
 export const imgUrl = 'https://img.muka.site'
 
 export interface IRresItem<T = any> {
     msg: string
-    status: number
+    code: number
     data: T
 }
 export interface IRresItems<T = any> {
     msg: string
-    status: number
+    code: number
     data: Array<T>
 }
 
@@ -62,7 +62,7 @@ export const deviaDecrypt = (data: string) => {
 instance.interceptors.response.use(async function (res: any) {
     // const devia = deviaDecrypt(res.data.devia)
     // res.data = JSON.parse(decrypt(res.data.value, res.data.secret, devia))
-    if (res.status === 200 && res.data.status === 200) {
+    if (res.status === 200 && res.data.code === 200) {
         return res.data
     } else {
         return Promise.reject(res.data)
@@ -85,11 +85,12 @@ export default http
 
 export class httpUtils {
     public static verify(data: IRresItem | IRresItems, callback?: (data: any) => void) {
-        if (data.status === 203) {
+        console.log(data)
+        if (data.code === 203) {
             message.error(data.msg || '登录失效,请重新登录')
             return
         }
-        if (data.status !== 200) {
+        if (data.code !== 200) {
             message.error(data.msg || '网络连接失败')
             return
         }
@@ -100,18 +101,18 @@ export class httpUtils {
 export const getTitle = (field: string) => {
     const data = store.getState()
     let title = ''
-    data.router.forEach((i: any) => {
-        if (i.item.field === field) {
-            title = i.item.label
-        }
-        if (i.extend) {
-            i.extend.forEach((v: any) => {
-                if (v.field === field) {
-                    title = v.label
-                }
-            })
-        }
-    })
+    // data.router.forEach((i: any) => {
+    //     if (i.item.field === field) {
+    //         title = i.item.label
+    //     }
+    //     if (i.extend) {
+    //         i.extend.forEach((v: any) => {
+    //             if (v.field === field) {
+    //                 title = v.label
+    //             }
+    //         })
+    //     }
+    // })
     document.title = title
     return title
 }

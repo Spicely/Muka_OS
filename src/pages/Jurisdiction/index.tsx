@@ -1,13 +1,9 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
-import { find } from 'lodash'
-import { message, Tree } from 'antd'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
-import { union, pullAll } from 'lodash'
-import { Button, Dialog, LabelHeader, Tag, Form, Table, Label } from 'components'
-import http, { httpUtils, getTitle } from 'src/utils/axios'
+import { Button, LabelHeader, Tag, Form, Table, Label, Dialog, Tree } from 'components'
+import http, {  getTitle } from 'src/utils/axios'
 import { IJurisd } from 'src/store/reducers/jurisd'
-import { IRouters } from 'src/store/reducers/routers'
 import { IJurisdiction } from 'src/store/reducers/jurisdiction'
 import { connect, DispatchProp } from 'react-redux'
 import { IInitState } from 'src/store/state'
@@ -17,6 +13,9 @@ import { GlobalView } from 'src/utils/node'
 import { Color, NavBarThemeData, getUnit, DialogThemeData } from 'src/components/lib/utils'
 import { SET_JURISDICTION_DATA, GET_JURISDICTION } from 'src/store/action'
 import { IJurisdictionOptions } from 'src/store/reducers/jurisdictionOptions'
+import { IRouter } from 'src/store/reducers/router'
+import { message } from 'antd'
+import { union } from 'lodash'
 
 const { TreeNode } = Tree
 
@@ -30,7 +29,7 @@ interface IProps extends DispatchProp {
     jurisdiction: any[]
     jurisdictionOptions: IJurisdictionOptions[]
     jurisd: IJurisd[]
-    routers: IRouters[]
+    routers: IRouter[]
 }
 
 interface IState {

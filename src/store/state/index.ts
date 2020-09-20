@@ -1,4 +1,3 @@
-import { IRouters } from '../reducers/routers'
 import { IMember } from '../action/member'
 import { IJurisd } from '../reducers/jurisd'
 import { IJurisdiction } from '../reducers/jurisdiction'
@@ -78,7 +77,7 @@ export interface ITabelRes<T = any> {
 }
 
 export interface IInitState {
-    routers: IRouters[]
+    routers: IRouter[]
     collapsed: boolean
     member: IMember[]
     jurisd: IJurisd[]

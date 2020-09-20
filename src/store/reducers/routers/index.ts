@@ -1,23 +1,8 @@
 import { SET_ROUTERS_DATA } from '../../action'
+import { IRouter } from '../router'
 import { AnyAction } from 'redux'
 
-export interface IRouters {
-    id: string
-    name: string
-    path: string
-    status: boolean
-    parent: string | null
-    children?: any[]
-    type: 'path' | 'query' | 'url'
-    sort: number
-    icon: {
-        id: string
-        type: 'icon' | 'image'
-        name: string
-    }
-}
-
-const initData: IRouters[] = []
+const initData: IRouter[] = []
 
 export default function routers(state = initData, action: AnyAction) {
     switch (action.type) {

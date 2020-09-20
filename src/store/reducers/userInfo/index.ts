@@ -1,31 +1,30 @@
 import { SET_USERINFO_DATA } from '../../action'
+import { IRouter } from '../router'
 import { AnyAction } from 'redux'
 
 export interface IUserInfo {
-    id: string
-    userName: string
-    jurisdiction: string | null
-    avatar: string
-    createdAt: number
-    status: boolean
-    endTime: number
-    smsNum: number
+    authority?: {
+        children?: IRouter[]
+        created_at: string
+        id: number
+        name: string
+        type: number
+        updated_at: string
+    },
+    avatar?: string,
+    created_at?: string,
+    id?: number
+    status?: true,
+    type?: number
+    updated_at?: string,
+    userName?: string
 }
 
 export interface IUserInfoProps {
     userInfo: IUserInfo
 }
 
-const initData: IUserInfo = {
-    id: '',
-    userName: '',
-    jurisdiction: null,
-    avatar: '',
-    createdAt: 0,
-    status: true,
-    endTime: 0,
-    smsNum: 0
-}
+const initData: IUserInfo = {}
 
 export default function userInfo(state = initData, action: AnyAction) {
     switch (action.type) {

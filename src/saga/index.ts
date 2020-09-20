@@ -34,12 +34,12 @@ export function* layoutAsync() {
 }
 
 export function* watchIncrementAsync() {
-    yield takeEvery(GET_LAYOUT_DATA, layoutAsync)
-    yield takeEvery(GET_ROUTER, routersAsync)
-    yield takeEvery(GET_JURISDICTION, jurisdictionAsync)
-    yield takeEvery(GET_USERLIST, userListAsync)
-    yield takeEvery(GET_REGION, regionAsync)
-    yield takeEvery(GET_CAROUSEL, carouselAsync)
+    // yield takeEvery(GET_LAYOUT_DATA, layoutAsync)
+    // yield takeEvery(GET_ROUTER, routersAsync)
+    // yield takeEvery(GET_JURISDICTION, jurisdictionAsync)
+    // yield takeEvery(GET_USERLIST, userListAsync)
+    // yield takeEvery(GET_REGION, regionAsync)
+    // yield takeEvery(GET_CAROUSEL, carouselAsync)
 }
 
 export default function* rootSaga() {

@@ -167,29 +167,45 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
     public render(): JSX.Element {
         const { children, navBar, collapsed, title, router, userInfo, solo, spinLoading } = this.props
         const { visible, selected, extendSelected } = this.state
-        const items: any[] = router
+        const items: any[] = router.map((i) => {
+            return {
+                item: {
+                    field: i.path,
+                    label: i.name,
+                    icon: null,
+                },
+                field: i.path,
+                icon: null
+            }
+        })
         let extendRoute = []
         let typeSeletct = ''
         if (selected) {
             let data: any
             for (let i = 0; i < router.length; i++) {
-                if (router[i].item.field === selected) {
-                    data = router[i]
+                if (router[i].path === selected) {
+                    data = router[i].children
+                    typeSeletct = router[i].path
                     break
-                }
-                for (let v = 0; v < router[i].extend.length; v++) {
-                    if (router[i].extend[v].field === selected) {
-                        data = router[i]
-                        typeSeletct = router[i].item.field
-                        break
-                    }
                 }
             }
             if (data) {
-                extendRoute = data.extend || []
+                extendRoute = (data || []).map((i: any) => {
+                    return {
+                        label: i.name,
+                        field: i.path,
+                        chirdren: i.children?.map((v: any) => {
+                            return {
+                                field: v.path,
+                                label: v.name,
+                                icon: null,
+                            }
+                        }),
+                        icon: null
+                    }
+                })
             }
         }
-
         const menuOptions = {
             selected: typeSeletct || selected,
             fontColor: Color.fromRGB(255, 255, 255),
@@ -329,7 +345,7 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                                                         </Menu.Item>
                                                     )
                                                 })
-                                            }
+                                            } *
                                         </Menu>
                                     </LayoutAniMenu>
                                     <LayoutSolo
@@ -372,47 +388,24 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
     }
 
     private handleChange = (field: any) => {
-        const { history, router } = this.props
-        let type: string = ''
-        let childType: string = ''
-        let selected = ''
+        const { history,router } = this.props
+        let selected = '/'
         let initSelectd = ''
         for (let i = 0; i < router.length; i++) {
-            if (router[i].item.field === field) {
+            if (router[i].path === field) {
                 selected = field
-                type = router[i].item.type
-                if (router[i].extend.length) {
-                    initSelectd = router[i].extend[0].field
-                    childType = router[i].extend[0].type
+                if (router[i].children) {
+                    initSelectd = (router[i].children || [])[0].path
                 }
                 break
             }
-            if (!type) {
-                for (let v = 0; v < router[i].extend.length; v++) {
-                    if (router[i].extend[v].field === field) {
-                        selected = router[i].item.field
-                        type = router[i].extend[v].type
-                        break
-                    }
-                }
-            }
-            if (type) break
         }
-        if (type === 'path') {
-            const arr = field.split('/')
-            this.setState({
-                selected: arr.length === 2 ? field : `/${arr[1]}`,
-                extendSelected: initSelectd || field
-            })
-            const url = initSelectd ? childType === 'path' ? initSelectd : `/view/${initSelectd}` : field
-            history.push(url)
-        } else if (type === 'query') {
-            this.setState({
-                selected,
-                extendSelected: field
-            })
-            history.push(`/view/${field}`)
-        }
+        const arr = field.split('/')
+        this.setState({
+            selected: arr.length === 2 ? field : `/${arr[1]}`,
+            extendSelected: initSelectd || field
+        })
+        history.push(initSelectd || field)
     }
 
     public UNSAFE_componentWillReceiveProps(nextProps: IPageLayout) {
@@ -424,18 +417,17 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
     }
 
     private getData = async () => {
-        const { dispatch, isLogin, history } = this.props
+        const {  isLogin, history } = this.props
         if (!isLogin) {
             history.replace('/login')
             return
         }
         const arr = history.location.pathname.split('/')
-        const selected = arr.length === 2 ? history.location.pathname : arr.includes('view') ? arr[2] : `/${arr[1]}`
+        const selected = arr.length === 2 ? history.location.pathname : `/${arr[1]}`
         this.setState({
             selected,
             extendSelected: arr.includes('view') ? arr[2] : history.location.pathname
         })
-        dispatch({ type: GET_LAYOUT_DATA })
     }
 
     private getItems = (fn: IFormFun): IFormItem[] => {

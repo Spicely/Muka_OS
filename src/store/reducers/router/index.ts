@@ -2,19 +2,16 @@ import { SET_ROUTER_DATA } from '../../action'
 import { AnyAction } from 'redux'
 
 export interface IRouter {
-    item: {
-        field: string
-        icon?: { createdAt: number, updatedAt: number, id: string, name: string, type: 'icon' | 'img' }
-        label: string
-        type:  'path' | 'query' | 'url'
-    },
-    extend: {
-        field: string
-        icon?: { createdAt: number, updatedAt: number, id: string, name: string, type: 'icon' | 'img' }
-        id: string
-        label: string
-        type:  'path' | 'query' | 'url'
-    }[]
+    children?: IRouter[]
+    created_at: string
+    id: number
+    name: string
+    path: string
+    status: boolean
+    router_id: number
+    sort: number
+    type: string
+    updated_at: string
 }
 
 

@@ -18,9 +18,6 @@ export interface IRoutes {
 }
 
 export const routes: IRoutes[] = [{
-    component: import('../pages/Routers'),
-    path: '/system/router'
-}, {
     component: import('../pages/Icon'),
     path: '/system/icon'
 }, {
@@ -30,8 +27,11 @@ export const routes: IRoutes[] = [{
     component: import('../pages/Jurisdiction'),
     path: '/system/jurisd'
 }, {
+    component: import('../pages/Routers'),
+    path: '/setting/router'
+}, {
     component: import('../pages/Setting'),
-    path: '/system/config'
+    path: '/setting/config'
 }, {
     component: import('../pages/Setting'),
     path: '/system'
