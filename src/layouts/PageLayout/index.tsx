@@ -13,7 +13,7 @@ import http, { imgUrl, httpUtils } from 'src/utils/axios'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import Color from 'src/components/lib/utils/Color'
 import { IconThemeData, MenuThemeData, ThemeData, transition, InputThemeData, NavBarThemeData, getUnit } from 'src/components/lib/utils'
-import { GET_LAYOUT_DATA, SET_COLLAPSED, SET_SOLO, SET_LOGIN } from 'src/store/action'
+import { GET_LAYOUT_DATA, SET_COLLAPSED, SET_SOLO, SET_LOGIN, SET_ICONS_DATA } from 'src/store/action'
 
 interface IPageLayout extends DispatchProp {
     solo: boolean
@@ -172,10 +172,10 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                 item: {
                     field: i.path,
                     label: i.name,
-                    icon: null,
+                    icon: i.icon,
                 },
                 field: i.path,
-                icon: null
+                icon: i.icon,
             }
         })
         let extendRoute = []
@@ -345,7 +345,7 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                                                         </Menu.Item>
                                                     )
                                                 })
-                                            } *
+                                            }
                                         </Menu>
                                     </LayoutAniMenu>
                                     <LayoutSolo
@@ -388,7 +388,7 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
     }
 
     private handleChange = (field: any) => {
-        const { history,router } = this.props
+        const { history, router } = this.props
         let selected = '/'
         let initSelectd = ''
         for (let i = 0; i < router.length; i++) {
@@ -417,7 +417,7 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
     }
 
     private getData = async () => {
-        const {  isLogin, history } = this.props
+        const { isLogin, history } = this.props
         if (!isLogin) {
             history.replace('/login')
             return
@@ -428,6 +428,13 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
             selected,
             extendSelected: arr.includes('view') ? arr[2] : history.location.pathname
         })
+        const { dispatch } = this.props
+        try {
+            const { data } = await http('/admin/icon/get')
+            dispatch({ type: SET_ICONS_DATA, data: data })
+        } catch (e) {
+            httpUtils.verify(e)
+        }
     }
 
     private getItems = (fn: IFormFun): IFormItem[] => {

@@ -4,7 +4,7 @@ import { AnyAction } from 'redux'
 export interface IIcons {
     type: 'icon' | 'image'
     name: string
-    id: string
+    id: number
 }
 
 

@@ -228,7 +228,7 @@ class Routers extends Component<IProps, IState> {
                         value: i.id,
                         label: (
                             <div className="flex">
-                                <div >
+                                <div className="flex_center" style={{marginRight: getUnit(5)}}>
                                     {i.type === 'icon' ? <Icon icon={name} /> : null}
                                     {i.type === 'image' ? <Image src={imgUrl + name} /> : null}
                                 </div>
@@ -346,7 +346,7 @@ class Routers extends Component<IProps, IState> {
             setTimeout(() => {
                 this.fn && this.fn.setFieldValue({
                     ...data,
-                    // icon: data.icon ? data.icon.id : null,
+                    icon: data.icon ? data.icon.id : null,
                 })
             }, 10)
         })

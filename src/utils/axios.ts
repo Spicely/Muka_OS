@@ -8,7 +8,7 @@ interface IValue {
     [name: string]: any
 }
 // export const baseUrl = 'https://api.muka.site'
-export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://192.168.0.103:8080/': 'http://api.muka.site'
+export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://192.168.1.134:8080/': 'http://api.muka.site'
 export const imgUrl = 'https://img.muka.site'
 
 export interface IRresItem<T = any> {
@@ -85,8 +85,7 @@ export default http
 
 export class httpUtils {
     public static verify(data: IRresItem | IRresItems, callback?: (data: any) => void) {
-        console.log(data)
-        if (data.code === 203) {
+        if (data.code === 400) {
             message.error(data.msg || '登录失效,请重新登录')
             return
         }

@@ -1,5 +1,6 @@
 import { SET_ROUTER_DATA } from '../../action'
 import { AnyAction } from 'redux'
+import { IIcons } from '../icons'
 
 export interface IRouter {
     children?: IRouter[]
@@ -12,6 +13,7 @@ export interface IRouter {
     sort: number
     type: string
     updated_at: string
+    icon?: IIcons
 }
 
 
