@@ -37,8 +37,6 @@ export default class Setting extends Component<IProps, IState> {
 
     private payFn?: IFormFun
 
-    private title = getTitle('/system')
-
     public state: IState = {
         data: {
             name: '',
@@ -55,7 +53,7 @@ export default class Setting extends Component<IProps, IState> {
                 <LayoutNavBar
                     left={null}
                     theme={new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255) })}
-                    title={<LabelHeader title={this.title} line="vertical" />}
+                    title={<LabelHeader title="系统参数" line="vertical" />}
                 />
                 <TabBar
                     theme={tabBarTheme}

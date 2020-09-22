@@ -4,7 +4,7 @@ import { message, Modal } from 'antd'
 import styled from 'styled-components'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
 import { Button, Dialog, LabelHeader, Form, Table, Label, Icon, Image, Tag } from 'components'
-import http, { imgUrl, httpUtils, getTitle } from '../../utils/axios'
+import http, { imgUrl, httpUtils } from '../../utils/axios'
 import { connect, DispatchProp } from 'react-redux'
 import { IFormItem, IFormFun } from 'src/components/lib/Form'
 import { ITableColumns } from 'src/components/lib/Table'
@@ -13,7 +13,7 @@ import { IInitState } from 'src/store/state'
 import { IJurisd } from 'src/store/reducers/jurisd'
 import { IIcons } from 'src/store/reducers/icons'
 import { NavBarThemeData, Color, getUnit, DialogThemeData } from 'src/components/lib/utils'
-import { SET_ROUTERS_DATA, GET_ROUTER, SET_SPINLOADING_DATA } from 'src/store/action'
+import { SET_ROUTERS_DATA, SET_SPINLOADING_DATA } from 'src/store/action'
 import { IRouter } from 'src/store/reducers/router'
 
 const { confirm } = Modal
@@ -29,7 +29,7 @@ interface IState {
     classifyVisible: boolean
     dialogName: string
     lastIds: string[]
-    parents: { label: string, value: string }[]
+    parents: { label: string, value: any }[]
 }
 
 const FromLabel = styled.div`
@@ -97,7 +97,6 @@ class Routers extends Component<IProps, IState> {
                     {!data.status && find(jurisd, { type: 6 }) ? <Label onClick={this.handleSetStatus.bind(this, ids, true)} color="green">启用</Label> : null}
                 </div>
             )
-            return <div />
         }
     }]
 
@@ -179,9 +178,6 @@ class Routers extends Component<IProps, IState> {
                     label: '内部地址',
                     value: 'path'
                 }, {
-                    label: '自定义页面',
-                    value: 'query'
-                }, {
                     label: '外部地址',
                     value: 'url'
                 }],
@@ -217,7 +213,7 @@ class Routers extends Component<IProps, IState> {
             props: {
                 options: parents
             },
-            field: 'parent'
+            field: 'router_id'
         }, {
             component: 'Select',
             label: <FromLabel>路由图标</FromLabel>,
@@ -228,7 +224,7 @@ class Routers extends Component<IProps, IState> {
                         value: i.id,
                         label: (
                             <div className="flex">
-                                <div className="flex_center" style={{marginRight: getUnit(5)}}>
+                                <div className="flex_center" style={{ marginRight: getUnit(5) }}>
                                     {i.type === 'icon' ? <Icon icon={name} /> : null}
                                     {i.type === 'image' ? <Image src={imgUrl + name} /> : null}
                                 </div>
@@ -238,7 +234,7 @@ class Routers extends Component<IProps, IState> {
                     }
                 })
             },
-            field: 'icon'
+            field: 'icon_id'
         }]
         return items
     }
@@ -256,6 +252,8 @@ class Routers extends Component<IProps, IState> {
                     message.error('请输入路由地址')
                     return
                 }
+                if (!router.id) delete router.id
+                if (!router.router_id) delete router.router_id
                 let url = '/admin/router/create'
                 if (router.id) {
                     url = '/admin/router/update'
@@ -355,7 +353,7 @@ class Routers extends Component<IProps, IState> {
     private initIds = (id?: string) => {
         const { routers } = this.props
         const lastIds: string[] = []
-        const parents: { label: string, value: string, children?: any[] }[] = []
+        const parents: { label: string, value: any, children?: any[] }[] = []
         routers.forEach((i: any) => {
             if (i.id !== id) {
                 parents.push({

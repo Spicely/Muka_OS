@@ -43,17 +43,15 @@ class RouterIcons extends Component<IProps, IState> {
 
     private fn: IFormFun | null = null
 
-    private title = getTitle('/system/icon')
-
     public render(): JSX.Element {
-        const { icons, jurisd } = this.props
+        const { icons } = this.props
         const { classifyVisible, dialogName } = this.state
         return (
             <GlobalView>
                 <LayoutNavBar
                     left={null}
                     theme={new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255) })}
-                    title={<LabelHeader title={this.title} line="vertical" />}
+                    title={<LabelHeader title="图标设置" line="vertical" />}
                     right={<Button mold="primary" onClick={this.setClassifyVisble}>添加图标</Button>}
                 />
                 <BoxLine>
@@ -62,7 +60,7 @@ class RouterIcons extends Component<IProps, IState> {
                             const name: any = data.name
                             return (
                                 <CopyToClipboard text={data.name} key={data.id} onCopy={this.showMsgCopy}>
-                                    <Tooltip placement="left" title={data.name} >
+                                    <Tooltip placement="left" title={`${data.alias} ${data.name}`} >
                                         <IconItems className="flex_center" >
                                             <Icon icon={name} />
                                         </IconItems>

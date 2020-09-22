@@ -13,7 +13,7 @@ import http, { imgUrl, httpUtils } from 'src/utils/axios'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import Color from 'src/components/lib/utils/Color'
 import { IconThemeData, MenuThemeData, ThemeData, transition, InputThemeData, NavBarThemeData, getUnit } from 'src/components/lib/utils'
-import { GET_LAYOUT_DATA, SET_COLLAPSED, SET_SOLO, SET_LOGIN, SET_ICONS_DATA } from 'src/store/action'
+import { GET_LAYOUT_DATA, SET_COLLAPSED, SET_SOLO, SET_LOGIN, SET_ICONS_DATA, SET_ROUTER_DATA } from 'src/store/action'
 
 interface IPageLayout extends DispatchProp {
     solo: boolean
@@ -431,7 +431,9 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
         const { dispatch } = this.props
         try {
             const { data } = await http('/admin/icon/get')
+            const res = await http('/admin/router/user')
             dispatch({ type: SET_ICONS_DATA, data: data })
+            dispatch({ type: SET_ROUTER_DATA, data: res.data || [] })
         } catch (e) {
             httpUtils.verify(e)
         }

@@ -18,9 +18,6 @@ export interface IRoutes {
 }
 
 export const routes: IRoutes[] = [{
-    component: import('../pages/Icon'),
-    path: '/system/icon'
-}, {
     component: import('../pages/ShopList'),
     path: '/ShopList'
 }, {
@@ -35,6 +32,9 @@ export const routes: IRoutes[] = [{
 }, {
     component: import('../pages/Setting'),
     path: '/system'
+}, {
+    component: import('../pages/Icon'),
+    path: '/setting/icon'
 }, {
     component: import('../pages/Page'),
     path: '/page/view/:id?'
