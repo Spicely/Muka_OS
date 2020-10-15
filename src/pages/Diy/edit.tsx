@@ -3,7 +3,7 @@ import { RouteComponentProps } from 'react-router-dom'
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd'
 import { Modal } from 'antd'
 import { assign, cloneDeep } from 'lodash'
-import { LayoutNavBar, LayoutActions } from 'src/layouts/PageLayout'
+import { LayoutNavBar, LayoutActions, LayoutLeft } from 'src/layouts/PageLayout'
 import { omit, isArray, isString } from 'muka'
 import { IInitState } from 'src/store/state'
 import { Alert, BoxLine, Button, Carousel, Dialog, Drag, Icon, Image, Label, LabelHeader, NavBar, TabBar, Form, Pagination, ScrollView, SearchBar, Upload, Notice } from 'components'
@@ -17,10 +17,9 @@ import { IComponentData } from 'src/store/reducers/componentData'
 import styled, { css, createGlobalStyle } from 'styled-components'
 import EditComponent from './editComponent'
 import componentViewData from './componentData'
-import { SET_COMPONENT_DATA } from 'src/store/action'
+import { SET_COMPONENT_DATA, SET_SPINLOADING_DATA } from 'src/store/action'
 import { uploadModal } from 'src/utils'
 import Axios from 'axios'
-import comData from './data'
 
 const { confirm } = Modal
 
@@ -185,6 +184,9 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                     theme={new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255) })}
                     title={<LabelHeader title={this.title} line="vertical" />}
                 />
+                <LayoutLeft>
+                    {this.getActionsView()}
+                </LayoutLeft>
                 <LayoutActions>
                     {this.getActionsView()}
                 </LayoutActions>
@@ -485,8 +487,19 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
     }
 
     private getData = async () => {
-        const data = await Axios.get('http://192.168.1.6:3007/o/common/pic-host')
-        this.baseUrl = data.data.data
+        const { dispatch } = this.props
+        try {
+            dispatch({ type: SET_SPINLOADING_DATA, data: true })
+            const data = await Axios.get('http://192.168.1.196:8800/set/admin/diy-menu', {
+                headers: {
+                    'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xOTIuMTY4LjEuMTk2Ojg4MDBcL3NldFwvYWRtaW5cL2xvZ2luIiwiaWF0IjoxNjAyNzMzMTg5LCJleHAiOjE2MDMzMzc5ODksIm5iZiI6MTYwMjczMzE4OSwianRpIjoiUWUzZEdBRUNxMWZOb0E0TSIsInN1YiI6MSwicHJ2IjoiZGY4ODNkYjk3YmQwNWVmOGZmODUwODJkNjg2YzQ1ZTgzMmU1OTNhOSJ9.ydNik3-OYZspzKc6fXUhFlhS1hy3axCcf8vjDCHHW4o'
+                }
+            })
+            dispatch({ type: SET_SPINLOADING_DATA, data: true })
+        } catch (e) {
+            dispatch({ type: SET_SPINLOADING_DATA, data: true })
+            httpUtils.verify(e)
+        }
     }
 
     private handleDragEnter = () => {

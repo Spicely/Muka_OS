@@ -89,7 +89,7 @@ export class httpUtils {
             message.error(data.msg || '登录失效,请重新登录')
             return
         }
-        if (data.code !== 200) {
+        if (data.code !== 200 ) {
             message.error(data.msg || '网络连接失败')
             return
         }

@@ -294,6 +294,8 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                         className="flex flex_1"
                         style={{ overflow: 'hidden' }}
                     >
+                        
+                        <div id="pgae_view_left"></div>
                         {
                             extendRoute.length ? (
                                 <LayoutMenu>
@@ -595,6 +597,31 @@ export class LayoutActions extends Component<any, any> {
 
     public componentDidMount() {
         const dom = document.getElementById('actions_view')
+        this.setState({
+            node: dom
+        })
+    }
+
+    public render() {
+        const { node } = this.state
+        if (node) {
+            return createPortal(
+                this.props.children,
+                node
+            )
+        }
+        return null
+    }
+}
+
+export class LayoutLeft extends Component<any, any> {
+
+    public state: any = {
+        node: null
+    }
+
+    public componentDidMount() {
+        const dom = document.getElementById('pgae_view_left')
         this.setState({
             node: dom
         })
