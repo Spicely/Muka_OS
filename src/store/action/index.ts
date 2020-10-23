@@ -52,3 +52,9 @@ export const SET_CAROUSEL_DATA = 'SET_CAROUSEL_DATA'
 
 // 设置页面显示
 export const SET_SELECT_MODAL_VISIBLE = 'SET_SELECT_MODAL_VISIBLE'
+
+// 设置自定义组件数据
+export const SET_DIY_COM_DATA = 'SET_DIY_COM_DATA'
+
+// 设置商品组件弹窗
+export const SET_GOODS_MODAL_VISIBLE = 'SET_GOODS_MODAL_VISIBLE'

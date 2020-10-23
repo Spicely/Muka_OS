@@ -2,15 +2,15 @@ import { SET_COMPONENT_DATA } from '../../action'
 import { AnyAction } from 'redux'
 
 export interface IComponentData {
-    name: string
-    introduce: string
+    title: string
+    path: string
     pageColor: string
     pagePorps: any[]
 }
 
 const initData: IComponentData = {
-    name: '',
-    introduce: '',
+    title: '',
+    path: '',
     pageColor: '',
     pagePorps: []
 }

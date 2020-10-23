@@ -1,30 +1,32 @@
 import React, { Component, ChangeEvent } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd'
-import { Modal } from 'antd'
-import { assign, cloneDeep } from 'lodash'
+import { Modal, message } from 'antd'
+import { assign, cloneDeep, set, get, isNil } from 'lodash'
 import { LayoutNavBar, LayoutActions, LayoutLeft } from 'src/layouts/PageLayout'
 import { omit, isArray, isString } from 'muka'
-import { IInitState } from 'src/store/state'
-import { Alert, BoxLine, Button, Carousel, Dialog, Drag, Icon, Image, Label, LabelHeader, NavBar, TabBar, Form, Pagination, ScrollView, SearchBar, Upload, Notice } from 'components'
+import { IInitState, MukaOS, DiyComItem } from 'src/store/state'
+import { Alert, BoxLine, Button, Carousel, Dialog, Drag, Icon, Image, Label, LabelHeader, NavBar, TabBar, Form, Pagination, ScrollView, SearchBar, Upload, Notice, Input, Select } from 'components'
 import http, { IRresItems, IRresItem, baseUrl, httpUtils, getTitle } from 'src/utils/axios'
 import { connect, DispatchProp } from 'react-redux'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { ColorResult } from 'react-color'
 import { GlobalView } from 'src/utils/node'
-import { NavBarThemeData, Color, getRatioUnit, Border, BorderStyle, TabBarThemeData, CarouselThemeData, ButtonThemeData } from 'src/components/lib/utils'
+import { NavBarThemeData, Color, getUnit, Border, BorderStyle, TabBarThemeData, CarouselThemeData, ButtonThemeData, transition, IconThemeData } from 'src/components/lib/utils'
 import { IComponentData } from 'src/store/reducers/componentData'
 import styled, { css, createGlobalStyle } from 'styled-components'
 import EditComponent from './editComponent'
 import componentViewData from './componentData'
-import { SET_COMPONENT_DATA, SET_SPINLOADING_DATA } from 'src/store/action'
-import { uploadModal } from 'src/utils'
-import Axios from 'axios'
+import { SET_COMPONENT_DATA, SET_SPINLOADING_DATA, SET_DIY_COM_DATA } from 'src/store/action'
+import { uploadModal, selectTypeValueModal, imageModal, goodsModal, shopModal } from 'src/utils'
+
+const defImg = require('../../assets/1.jpg')
 
 const { confirm } = Modal
 
 interface IProps extends DispatchProp {
     componentData: IComponentData
+    diyCom: MukaOS.DiyCom[]
 }
 
 interface ITabBarValue {
@@ -39,7 +41,7 @@ interface IComponents {
     edit: boolean
 }
 
-type IComponentType = 'TabBar' | 'NavBar' | 'Carousel' | 'SearchBar' | 'Notice' | ''
+type IComponentType = 'TabBar' | 'NavBar' | 'Carousel' | 'SearchBar' | 'Notice' | 'GoodsList' | ''
 
 type typeList = 'LForm' | 'Carousel'
 
@@ -67,7 +69,7 @@ const GlobalDiyStyle = createGlobalStyle`
             right: 0;
             height: 100%;
             top: 0;
-            width: ${getRatioUnit(1)};
+            width: ${getUnit(1)};
             background: ${Color.fromRGB(230, 230, 230).toString()};
             position: absolute;
         }
@@ -79,55 +81,131 @@ const TplPhone = styled.div`
     ${() => css`${Border.all({ width: 1, style: BorderStyle.solid, color: Color.fromRGB(220, 220, 220) }).toString()}`};
     cursor: move;
     transition: transform .5s 0.1s;
-    border-radius: ${getRatioUnit(15)};
-    height: ${getRatioUnit(550)};
-    width: ${getRatioUnit(310)};
-    padding: 0 ${getRatioUnit(5)} ${getRatioUnit(5)} ${getRatioUnit(5)};
+    border-radius: ${getUnit(15)};
+    height: ${getUnit(550)};
+    width: ${getUnit(310)};
+    padding: 0 ${getUnit(5)} ${getUnit(5)} ${getUnit(5)};
     overflow: hidden;
 `
 
 const TplTit = styled.div`
-    height: ${getRatioUnit(24)};
+    height: ${getUnit(24)};
     text-align: center;
     span {
         display: inline-block;
-        margin-top: ${getRatioUnit(12)};
+        margin-top: ${getUnit(12)};
         background: #cfcfcf;
     }
 `
 
 const TplTitCri = styled.span`
-    width: ${getRatioUnit(4)};
-    height: ${getRatioUnit(4)};
+    width: ${getUnit(4)};
+    height: ${getUnit(4)};
     border-radius: 100%;
-    margin-right: ${getRatioUnit(10)};
+    margin-right: ${getUnit(10)};
 `
 
 const TplTitLon = styled.span`
-    width: ${getRatioUnit(48)};
-    height: ${getRatioUnit(4)};
-    border-radius: ${getRatioUnit(7)};
+    width: ${getUnit(48)};
+    height: ${getUnit(4)};
+    border-radius: ${getUnit(7)};
 `
 
 const TplScrollView = styled(Drag.Box)`
    ${() => css`${Border.all({ width: 1, style: BorderStyle.solid, color: Color.fromRGB(220, 220, 220) }).toString()}`};
-    border-radius: ${getRatioUnit(5)};
+    border-radius: ${getUnit(5)};
     overflow: auto;
 `
 
 const EditBtn = styled(Button) <any>`
-    margin-right: ${getRatioUnit(5)};
-    margin-top: ${getRatioUnit(6)};
+    margin-right: ${getUnit(5)};
+    margin-top: ${getUnit(6)};
     :nth-of-type(4n) {
         margin-right: 0
     }
 `
 
-const reorder = (list: IComponents[], startIndex: number, endIndex: number) => {
+const ComponentPropsVIew = styled.div`
+    width: ${getUnit(360)};
+    background: #fff;
+    height: 100%;
+    padding: ${getUnit(10)};
+`
+
+const ComponentLabel = styled.div`
+    width: ${getUnit(70)};
+`
+
+const ItemBoxView = styled.div`
+    border: ${getUnit(1)} dotted #ccc;
+    padding: ${getUnit(10)};
+    margin-bottom: ${getUnit(10)};
+    cursor: pointer;
+    position: relative;
+`
+
+const CloseIcon = styled(Icon)`
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translate(50%, -50%);
+`
+
+const ItemImgBox = styled.div`
+    width: ${getUnit(80)};
+    height: ${getUnit(80)};
+    border: ${getUnit(1)} dotted #ccc;
+    margin-right: ${getUnit(10)};
+    overflow:hidden;
+`
+
+interface IGoodsViewProps {
+    lineNum: number
+}
+
+const GoodsView = styled.div<IGoodsViewProps>`
+    display: inline-block;
+    margin-top: ${getUnit(5)};
+    ${({ lineNum }) => {
+        if (lineNum === 1) {
+            return css`
+                width: 100%;
+                margin-top: ${getUnit(8)};
+                &:nth-child(even) {
+                    margin-right: ${getUnit(0)};
+                }
+            `
+        }
+        if (lineNum === 2) {
+            return css`
+                width: ${`calc(50% - ${getUnit(2)})`};
+                margin-right: ${getUnit(2)};
+                &:nth-child(even) {
+                    margin-right: ${getUnit(0)};
+                }
+            `
+        }
+        if (lineNum === 3) {
+            return css`
+                width: ${`calc(33.3% - ${getUnit(2)})`};
+                margin-right: ${getUnit(3)};
+                &:nth-child(3n) {
+                    margin-right: ${getUnit(0)};
+                }
+            `
+        }
+    }}
+`
+
+const GoodsImg = styled.div`
+    width: 100%;
+    padding-top: 100%;
+`
+
+const reorder = (list: any[], startIndex: number, endIndex: number) => {
     const result = Array.from(list)
     const [removed] = result.splice(startIndex, 1)
     result.splice(endIndex, 0, removed)
-
     return result
 }
 
@@ -136,7 +214,6 @@ interface IParams {
 }
 
 class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
-
     public state: any = {
         components: [],
         links: [],
@@ -169,6 +246,8 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
 
     private exFun: IFormFun | null = null
 
+    private acFun: IFormFun | null = null
+
     private title = getTitle('/diy')
 
     private loading: boolean = false
@@ -183,9 +262,10 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                     left={null}
                     theme={new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255) })}
                     title={<LabelHeader title={this.title} line="vertical" />}
+                    right={<Button mold="primary" async onClick={this.handleSave}>保存</Button>}
                 />
                 <LayoutLeft>
-                    {this.getActionsView()}
+                    {this.getComponentView()}
                 </LayoutLeft>
                 <LayoutActions>
                     {this.getActionsView()}
@@ -207,7 +287,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                             onDragEnter={this.handleDragEnter}
                             onDragSuccess={this.handleDragSuccess}
                         >
-                            <DragDropContext onDragEnd={this.onDragEnd}>
+                            <DragDropContext onDragEnd={this.onDragEnd.bind(this, 'null')}>
                                 <Droppable droppableId="droppable" >
                                     {(provided) => (
                                         <div
@@ -236,124 +316,6 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                         </TplScrollView>
                     </TplPhone>
                 </div>
-                {/* <Dialog visible={searchSelect} title="字体/图片" style={{ width: 1088, height: 756 }} onClose={this.handleCloseDialog.bind(this, 'searchSelect')} onFirstShow={this.getDialogData}>
-                    <TabBar tabBarClassName="mk_divider" style={{ height: '100%' }} onChange={this.handleTabBarChange}>
-                        <TabBar.Item label="字体">
-                            <BoxLine >
-                                {
-                                    icons.map((i: any) => {
-                                        return (
-                                            <div
-                                                className={`flex_center ${icons_items}`}
-                                                key={i.id}
-                                                onClick={this.setComProps.bind(this, { type: 'icon', 'url': i.name }, 'searchSelect')}
-                                            >
-                                                <Icon icon={i.name} />
-                                            </div>
-                                        )
-                                    })
-                                }
-                            </BoxLine>
-                        </TabBar.Item>
-                        <TabBar.Item label="服务器图片">
-                            <NavBar
-                                className={nav_color}
-                                left={null}
-                                right={
-                                    <Button mold="primary" onClick={this.handleShowUpload.bind(this, 'uploadDialog')}>上传图片</Button>
-                                }
-                            />
-                            <ScrollView scrollY className={scroll_view}>
-                                {
-                                    images.map((i: any) => {
-                                        return (
-                                            <div
-                                                className={image}
-                                                key={i.id}
-                                                onClick={this.setComProps.bind(this, { type: 'image', 'url': baseUrl + i.previewUrl }, 'searchSelect')}
-                                            >
-                                                <div className="flex_justify" style={{ width: '100%', height: '100%' }}>
-                                                    <Image src={baseUrl + i.previewUrl} className={image_item} />
-                                                </div>
-                                            </div>
-                                        )
-                                    })
-                                }
-                            </ScrollView>
-                            <div className="flex">
-                                <div className="flex_1" />
-                                <Pagination current={pageCurrent} total={total} pageSize={20} onChange={this.handleCurrent} />
-                            </div>
-                        </TabBar.Item>
-                    </TabBar>
-                </Dialog>
-                <Dialog visible={imagesDialog} title="图片" style={{ width: 1088, height: 756 }} onClose={this.handleCloseDialog.bind(this, 'imagesDialog')} onFirstShow={this.getImage}>
-                    <TabBar tabBarClassName="mk_divider" style={{ height: '100%' }} onChange={this.handleTabBarChange}>
-                        <TabBar.Item label="服务器图片">
-                            <NavBar
-                                className={nav_color}
-                                left={null}
-                                right={
-                                    <Button mold="primary" onClick={this.handleShowUpload.bind(this, 'uploadDialog')}>上传图片</Button>
-                                }
-                            />
-                            <ScrollView scrollY className={scroll_view}>
-                                {
-                                    images.map((i: any) => {
-                                        return (
-                                            <div
-                                                className={image}
-                                                key={i.id}
-                                                onClick={this.setCarouselUrl.bind(this, i.previewUrl, 'value', 'imagesDialog')}
-                                            >
-                                                <div className="flex_justify" style={{ width: '100%', height: '100%' }}>
-                                                    <Image src={baseUrl + i.previewUrl} className={image_item} />
-                                                </div>
-                                            </div>
-                                        )
-                                    })
-                                }
-                            </ScrollView>
-                            <div className="flex">
-                                <div className="flex_1" />
-                                <Pagination current={pageCurrent} total={total} pageSize={20} onChange={this.handleCurrent} />
-                            </div>
-                        </TabBar.Item>
-                    </TabBar>
-                </Dialog>
-                <Dialog title="上传图片" footer={null} visible={uploadDialog} onClose={this.handleCloseDialog.bind(this, 'uploadDialog')}>
-                    <Upload.Dragger
-                        style={{ marginTop: '10px' }}
-                        action={`${baseUrl}/admin/user/upload`}
-                        baserUrl={baseUrl}
-                        withCredentials
-                        onUploadSuccess={this.handleUploadSuccess}
-                        uploadViewClassName={uploadViewClassName}
-                    />
-                </Dialog>
-                <Dialog title="选择链接" style={{ width: 1088, height: 756 }} onFirstShow={this.handleLinkDialog} footer={null} visible={linkDialog} onClose={this.handleCloseDialog.bind(this, 'linkDialog')}>
-                    <ScrollView scrollY style={{ height: '100%' }}>
-                        <Alert title="如果底部菜单中已经选择该链接，页面中选择后点击无效" style={{ marginTop: '10px' }} inheritColor />
-                        {
-                            links.map((i: any) => {
-                                return (
-                                    <div key={i.id}>
-                                        <div className={`${link_view} flex_justify`}>
-                                            <Label>{i.name}</Label>
-                                        </div>
-                                        <div>
-                                            {
-                                                i.pages.map((v: any) => {
-                                                    return <Button className={link_view_btn} key={v.id} onClick={this.handleSetLink.bind(this, i.id)}>{v.name}</Button>
-                                                })
-                                            }
-                                        </div>
-                                    </div>
-                                )
-                            })
-                        }
-                    </ScrollView>
-                </Dialog> */}
             </GlobalView>
         )
     }
@@ -445,14 +407,17 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
             console.log(msg)
         }
     }
-    private handleUploadSuccess = (val: any, data: any) => {
-        const { images } = this.state
-        httpUtils.verify(data, (item) => {
+    private handleUploadSuccess = async (val: any, data: any) => {
+        try {
+            const { images } = this.state
+            await httpUtils.verify(data)
             images.unshift(data)
             this.setState({
                 images
             })
-        })
+        } catch (msg) {
+
+        }
     }
 
     private getItem = (exFun: IFormFun): IFormItem[] => {
@@ -490,15 +455,12 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
         const { dispatch } = this.props
         try {
             dispatch({ type: SET_SPINLOADING_DATA, data: true })
-            const data = await Axios.get('http://192.168.1.196:8800/set/admin/diy-menu', {
-                headers: {
-                    'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xOTIuMTY4LjEuMTk2Ojg4MDBcL3NldFwvYWRtaW5cL2xvZ2luIiwiaWF0IjoxNjAyNzMzMTg5LCJleHAiOjE2MDMzMzc5ODksIm5iZiI6MTYwMjczMzE4OSwianRpIjoiUWUzZEdBRUNxMWZOb0E0TSIsInN1YiI6MSwicHJ2IjoiZGY4ODNkYjk3YmQwNWVmOGZmODUwODJkNjg2YzQ1ZTgzMmU1OTNhOSJ9.ydNik3-OYZspzKc6fXUhFlhS1hy3axCcf8vjDCHHW4o'
-                }
-            })
-            dispatch({ type: SET_SPINLOADING_DATA, data: true })
+            const { data } = await http('http://192.168.1.105:8800/set/admin/diy-menu', {}, { method: 'GET' })
+            dispatch({ type: SET_SPINLOADING_DATA, data: false })
+            dispatch({ type: SET_DIY_COM_DATA, data: data })
         } catch (e) {
-            dispatch({ type: SET_SPINLOADING_DATA, data: true })
-            httpUtils.verify(e)
+            dispatch({ type: SET_SPINLOADING_DATA, data: false })
+            message.error(e.toString())
         }
     }
 
@@ -608,7 +570,6 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                     edit={data.edit}
                     key={index}
                     onClick={this.handleEdit.bind(this, data, index)}
-                    onEdit={this.handleEditStart.bind(this, data, index, 'LForm')}
                     onDelete={this.handleDelete.bind(this, index)}
                 >
                     <NavBar {...data.props} theme={new NavBarThemeData({ width: '100%' })} />
@@ -619,7 +580,6 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                     edit={data.edit}
                     key={index}
                     onClick={this.handleEdit.bind(this, data, index)}
-                    onEdit={this.handleEditStart.bind(this, data, index, 'LForm')}
                     onDelete={this.handleDelete.bind(this, index)}
                 >
                     <SearchBar {...data.props} />
@@ -630,7 +590,6 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                     edit={data.edit}
                     key={index}
                     onClick={this.handleEdit.bind(this, data, index)}
-                    onEdit={this.handleEditStart.bind(this, data, index, 'LForm')}
                     onDelete={this.handleDelete.bind(this, index)}
                 >
                     <Notice {...data.props} logo={baseUrl + data.props.logo} value={data.props.getType === 'read' ? [{ label: '内容将从数据库读取' }] : data.props.value} />
@@ -641,12 +600,40 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                     edit={data.edit}
                     key={index}
                     onClick={this.handleEdit.bind(this, data, index)}
-                    onEdit={this.handleEditStart.bind(this, data, index, 'Carousel')}
                     onDelete={this.handleDelete.bind(this, index)}
                 >
-                    <Carousel {...data.props} baseUrl={baseUrl} />
+                    <Carousel {...data.props} />
                 </EditComponent>
             )
+            case 'GoodsList': {
+                const value: any[] = data.props.value || []
+                return (
+                    <EditComponent
+                        edit={data.edit}
+                        key={index}
+                        onClick={this.handleEdit.bind(this, data, index)}
+                        onDelete={this.handleDelete.bind(this, index)}
+                        style={{ background: data.props.background, padding: `0 ${getUnit(4)}` }}
+                    >
+                        {
+                            value.map((i, index) => {
+                                return (
+                                    <GoodsView lineNum={data.props.lineNum} key={index}>
+                                        <GoodsImg style={{ background: `url(${i.url}) center`, backgroundSize: 'auto 100%' }} />
+                                        <div style={{ padding: `${getUnit(8)}`, backgroundColor: '#fff' }}>
+                                            {data.props.showView.includes('shopName') ? <div>{i.shopName}</div> : null}
+                                            <div className="flex" style={{ marginTop: 10 }}>
+                                                {data.props.showView.includes('price') ? <div style={{ color: 'red' }}>{i.price}</div> : null}
+                                                {data.props.showView.includes('ori_price') ? <div style={{ textDecoration: 'line-through', marginLeft: data.props.showView.includes('price') ? `${getUnit(10)}` : '0' }}>{i.ori_price}</div> : null}
+                                            </div>
+                                        </div>
+                                    </GoodsView>
+                                )
+                            })
+                        }
+                    </EditComponent>
+                )
+            }
             case 'TabBar': {
                 const value: ITabBarValue[] = data.props.value || []
                 omit(data.props, ['value'])
@@ -655,7 +642,6 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                         edit={data.edit}
                         key={index}
                         onClick={this.handleEdit.bind(this, data, index)}
-                        onEdit={this.handleEditStart.bind(this, data, index, 'Carousel')}
                         onDelete={this.handleDelete.bind(this, index)}
                     >
                         {/* <TabBar {...data.props} >
@@ -676,6 +662,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
     private handleDelete(index: number) {
         const { componentData, dispatch } = this.props
         componentData.pagePorps.splice(index, 1)
+        this.index = -1
         dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
@@ -699,7 +686,6 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
         this.setState({
             type: field,
             componentName: data.component,
-            selected: 1
         })
     }
 
@@ -719,22 +705,69 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
 
 
     private handleEdit(data: IComponents, index: number) {
-        const { components } = this.state
-        data.edit = true
-        components[index] = data
+        const { componentData, dispatch } = this.props
+        const pagePorps: any[] = componentData.pagePorps.map((i, k) => {
+            i.edit = false
+            return i
+        })
+        pagePorps[index].edit = true
+        componentData.pagePorps = pagePorps
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
+        this.index = index
+        this.componentType = data.component
         this.setState({
-            components: [...components]
+            componentName: data.component,
         })
     }
 
-    private handleUploadView = (index: number) => {
-        uploadModal({
-            uploadSuccess: this.handleImageUploadSuccess
+    private handleUploadView = (index: number, field: string) => {
+        imageModal({
+            crop: false,
+            onSelect: (data) => {
+                const { componentData, dispatch } = this.props
+                componentData.pagePorps[this.index].props[field][index].url = data.file_link
+                dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
+            }
         })
     }
 
-    private handleImageUploadSuccess = (val: any, data: any) => {
-        console.log(data)
+    private handleGoodsView = (index: number, field: string) => {
+        goodsModal({
+            onSelect: (type, data) => {
+                const { componentData, dispatch } = this.props
+                componentData.pagePorps[this.index].props[field][index].link = `?type=${type}&id=${data.id}`
+                dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
+            }
+        })
+    }
+
+    private handleCarouselHref = (index: number, e: ChangeEvent<HTMLInputElement>) => {
+        const { componentData, dispatch } = this.props
+        componentData.pagePorps[this.index].props.value[index].href = e.target.value
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
+    }
+
+    private handleFieldAdd = (field: string, comName: string) => {
+        const { componentData, dispatch } = this.props
+
+        switch (comName) {
+            case 'Carousel': {
+                componentData.pagePorps[this.index].props[field].push({
+                    url: defImg,
+                })
+                dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
+            }; break;
+            case 'GoodsList': {
+                shopModal()
+            }; break;
+        };
+    }
+
+
+    private handleDel = (index: number, field: string) => {
+        const { componentData, dispatch } = this.props
+        componentData.pagePorps[this.index].props[field].splice(index, 1)
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
     private handelSetType = (value: string) => {
@@ -756,118 +789,379 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
         dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
-    private getActionsView(): JSX.Element {
-        const { selected, componentName } = this.state
+    private getComponentView(): JSX.Element {
         return (
             <TabBar
-                selected={selected}
                 type="vertical"
-                theme={new TabBarThemeData({ height: '100%', width: 400 })}
+                theme={new TabBarThemeData({ height: '100%', width: 240 })}
                 itemBarClassName="tab_VE_line"
             >
-                <TabBar.Item icon={<Icon icon="ios-apps" />} tooltipTitle="页面组件" placement="left">
+                <TabBar.Item icon={<Icon icon="ios-apps" />} tooltipTitle="装修" placement="left">
                     {this.getComponentDataView()}
-                </TabBar.Item>
-                <TabBar.Item icon={<Icon icon="ios-arrow-back" />} tooltipTitle="参数设置" placement="left" >
-                    {
-                        componentName === 'Page' && this.getPageNode()
-                    }
-                    {
-                        componentName !== 'Page' && <Form getItems={this.getItem} />
-                    }
-                    {/*{this.componentType === 'TabBar' ?
-                        (
-                            <DragDropContext onDragEnd={this.onDragTabBar}>
-                                <Droppable droppableId="tab_bar" >
-                                    {(provided) => (
-                                        <div
-                                            {...provided.droppableProps}
-                                            ref={provided.innerRef}
-                                            className={label_view}
-                                        >
-                                            {components[this.index].props.value.map((i: ITabBarValue, index: number) => (
-                                                <Draggable key={index} draggableId={'tab_bar' + index.toString()} index={index}>
-                                                    {(provided) => (
-                                                        <div
-                                                            className={`flex ${label_view_list}`}
-                                                            ref={provided.innerRef}
-                                                            {...provided.draggableProps}
-                                                            {...provided.dragHandleProps}
-
-                                                        >
-                                                            <div className="flex_1">
-                                                                <div className="flex">
-                                                                    <div className={`flex_justify ${label_list}`}>选项卡文字</div>
-                                                                    <Input
-                                                                        className={`flex_1 ${label_list_int}`}
-                                                                        value={i.label}
-                                                                        onChange={this.handleTabBarInt.bind(this, index)}
-                                                                        closeIconShow={false}
-                                                                        maxLength={5}
-                                                                        showMaxLength
-                                                                    />
-                                                                </div>
-                                                                <div className="flex" style={{ marginTop: 10 }}>
-                                                                    <Input className={`flex_1 ${label_list_int}`} value={i.data} placeholder="请选择数据" disabled closeIconShow={false} style={{ borderRight: 0 }} />
-                                                                    <Button className={`flex_justify ${label_list_btn}`} mold="primary">选择数据</Button>
-                                                                </div>
-                                                            </div>
-                                                            <div className={`${label_list_icon} flex_justify`}>
-                                                                <Icon
-                                                                    icon="md-close-circle"
-                                                                    color="rgba(0, 0, 0, 0.3)"
-                                                                    style={{ cursor: 'pointer' }}
-                                                                    onClick={this.handleTabBarDel.bind(this, index)}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </Draggable>
-                                            ))}
-                                            {provided.placeholder}
-                                        </div>
-                                    )}
-                                </Droppable>
-                            </DragDropContext>
-
-                        ) : null
-                    } */}
                 </TabBar.Item>
             </TabBar>
         )
     }
 
-    private getPageComponentItem = (fn: IFormFun): IFormItem[] => {
+    private getActionsView(): JSX.Element {
+        const { componentName } = this.state
+        return (
+            <ComponentPropsVIew>
+                <Form getItems={this.getComponentItems} />
+            </ComponentPropsVIew>
+        )
+    }
+
+    private getComponentItems = (fn: IFormFun): IFormItem[] => {
         const { componentData } = this.props
-        return [{
-            component: 'Input',
-            label: '页面名称',
-            props: {
-                placeholder: '请输入名称',
-                value: componentData.name,
-                maxLength: 16,
-            },
-            additional: <Label color="#1890ff" style={{ paddingLeft: 0 }}>注意：页面名称是便于后台查找。</Label>,
-            field: 'name'
-        }, {
-            component: 'Textarea',
-            label: '页面介绍',
-            props: {
-                placeholder: '请输入标题',
-                value: componentData.introduce,
-                maxLength: 50,
-                showMaxLength: true,
-            },
-            field: 'introduce'
-        }, {
-            component: 'Colors',
-            label: '页面背景',
-            props: {
-                initColor: componentData.pageColor,
-                onChange: this.updateComColorData.bind(this, 'pageColor'),
-            },
-            field: 'pageColor'
-        }]
+        const { componentName } = this.state
+        this.acFun = fn
+        if (this.index === -1) {
+            return [];
+        }
+        switch (componentName) {
+            case 'Carousel':
+                return [{
+                    component: 'Slider',
+                    label: <ComponentLabel>圆角边框</ComponentLabel>,
+                    props: {
+                        value: get(componentData.pagePorps[this.index].props, 'style.borderRadius') || 0,
+                        max: 20,
+                        onChange: this.updateChangeComData.bind(this, 'style.borderRadius')
+                    },
+                    extend: (vals) => {
+                        return <div>{vals['style.borderRadius']}px(像数)</div>
+                    },
+                    field: 'style.borderRadius',
+                }, {
+                    component: 'Slider',
+                    label: <ComponentLabel>上边距</ComponentLabel>,
+                    props: {
+                        value: get(componentData.pagePorps[this.index].props, 'style.marginTop') || 0,
+                        max: 20,
+                        onChange: this.updateChangeComData.bind(this, 'style.marginTop')
+                    },
+                    extend: (vals) => {
+                        return <div>{vals['style.marginTop']}px(像数)</div>
+                    },
+                    field: 'style.marginTop',
+                }, {
+                    component: 'Slider',
+                    label: <ComponentLabel>下边距</ComponentLabel>,
+                    props: {
+                        value: get(componentData.pagePorps[this.index].props, 'style.marginBottom') || 0,
+                        max: 20,
+                        onChange: this.updateChangeComData.bind(this, 'style.marginBottom')
+                    },
+                    extend: (vals) => {
+                        return <div>{vals['style.marginBottom']}px(像数)</div>
+                    },
+                    field: 'style.marginBottom',
+                }, {
+                    component: 'RadioGroup',
+                    label: <ComponentLabel>指示点形状</ComponentLabel>,
+                    props: {
+                        value: componentData.pagePorps[this.index].props['dotType'],
+                        options: [{
+                            label: '圆形',
+                            value: 'circular',
+                        }, {
+                            label: '长方形',
+                            value: 'rectangle',
+                        }],
+                        onChange: this.updateChangeComData.bind(this, 'dotType')
+                    },
+                    field: 'dotType'
+                }, {
+                    component: 'RadioGroup',
+                    label: <ComponentLabel>自动播放</ComponentLabel>,
+                    props: {
+                        value: componentData.pagePorps[this.index].props['autoplay'],
+                        options: [{
+                            label: '是',
+                            value: true,
+                        }, {
+                            label: '否',
+                            value: false,
+                        }],
+                        onChange: this.updateChangeComData.bind(this, 'autoplay')
+                    },
+                    field: 'autoplay'
+                }, {
+                    component: 'Colors',
+                    label: <ComponentLabel>指示点颜色</ComponentLabel>,
+                    props: {
+                        initColor: componentData.pagePorps[this.index].props['dotColor'],
+                        onChange: this.updateComColorData.bind(this, 'dotColor'),
+                    },
+                    field: 'dotColor'
+                }, {
+                    component: 'NULL',
+                    props: {
+                        value: componentData.pagePorps[this.index].props['value'] || null
+                    },
+                    field: 'value',
+                }, {
+                    component: 'Colors',
+                    label: <ComponentLabel>背景颜色</ComponentLabel>,
+                    props: {
+                        initColor: componentData.pagePorps[this.index].props['background'],
+                        onChange: this.updateComColorData.bind(this, 'style.background'),
+                    },
+                    field: 'style.background',
+                }, {
+                    component: 'RadioGroup',
+                    label: <ComponentLabel>数据来源</ComponentLabel>,
+                    props: {
+                        value: componentData.pagePorps[this.index].props['dataGetType'],
+                        options: [{
+                            label: '服务端获取',
+                            value: 'server',
+                        }, {
+                            label: '自定义',
+                            value: 'diy',
+                        }],
+                        onChange: this.updateChangeComData.bind(this, 'dataGetType')
+                    },
+                    field: 'dataGetType',
+                    additional: (val) => {
+                        if (val.dataGetType == 'diy') {
+                            return (
+                                <div>
+                                    <DragDropContext onDragEnd={this.onDragEnd.bind(this, 'Carousel')}>
+                                        <Droppable droppableId="droppablea" >
+                                            {(provided) => (
+                                                <div
+                                                    {...provided.droppableProps}
+                                                    ref={provided.innerRef}
+                                                    style={{ height: '100%' }}
+                                                >
+                                                    {
+                                                        val.value.map((i: any, index: number) => {
+                                                            return (
+                                                                <Draggable key={index} draggableId={index.toString()} index={index}>
+                                                                    {(provided) => (
+                                                                        <div
+                                                                            ref={provided.innerRef}
+                                                                            {...provided.draggableProps}
+                                                                            {...provided.dragHandleProps}
+                                                                        >
+                                                                            <ItemBoxView className="flex" key={index}>
+                                                                                <ItemImgBox className="flex_center" onClick={this.handleUploadView.bind(this, index, 'value')}>
+                                                                                    <Image src={i.url} style={{ width: '100%' }} />
+                                                                                </ItemImgBox>
+                                                                                <div className="flex_1">
+                                                                                    <div className="flex">
+                                                                                        <Input className="flex_1" disabled value={i.link} />
+                                                                                        <Button mold="primary" onClick={this.handleGoodsView.bind(this, index, 'value')}>跳转地址</Button>
+                                                                                    </div>
+                                                                                    <div className="flex" style={{ marginTop: getUnit(16) }}>
+                                                                                        <Input className="flex_1" value={i.href} placeholder="外部连接(填写后将作为默认跳转)" onChange={this.handleCarouselHref.bind(this, index)} />
+                                                                                    </div>
+                                                                                </div>
+                                                                                <CloseIcon
+                                                                                    icon="md-close-circle"
+                                                                                    color="rgba(0, 0, 0, 0.3)"
+                                                                                    theme={new IconThemeData({ size: 18 })}
+                                                                                    style={{ cursor: 'pointer' }}
+                                                                                    onClick={this.handleDel.bind(this, index, 'value')}
+                                                                                />
+                                                                            </ItemBoxView>
+                                                                        </div>
+                                                                    )}
+                                                                </Draggable>
+                                                            )
+
+                                                        })
+                                                    }
+                                                    {provided.placeholder}
+                                                </div>
+                                            )}
+                                        </Droppable>
+                                    </DragDropContext>
+
+                                    <Button
+                                        theme={new ButtonThemeData({ width: '100%' })}
+                                        onClick={this.handleFieldAdd.bind(this, 'value', 'GoodsL')}
+                                    >
+                                        <div className="flex">
+                                            <Icon icon="ios-add" />
+                                            <div className="flex_center">添加</div>
+                                        </div>
+                                    </Button>
+                                </div>
+                            )
+                        }
+                        return <div />
+                    }
+                }]
+            case 'GoodsList': return [{
+                component: 'NULL',
+                props: {
+                    value: componentData.pagePorps[this.index].props['value'] || null
+                },
+                field: 'value',
+            }, {
+                component: 'RadioGroup',
+                label: <ComponentLabel>数据来源</ComponentLabel>,
+                props: {
+                    value: componentData.pagePorps[this.index].props['dataGetType'],
+                    options: [{
+                        label: '服务端获取',
+                        value: 'server',
+                    }, {
+                        label: '自定义',
+                        value: 'diy',
+                    }],
+                    onChange: this.updateChangeComData.bind(this, 'dataGetType')
+                },
+                field: 'dataGetType',
+                additional: (val) => {
+                    if (val.dataGetType == 'diy') {
+                        return (
+                            <div>
+                                <DragDropContext onDragEnd={this.onDragEnd.bind(this, 'Carousel')}>
+                                    <Droppable droppableId="droppablea" >
+                                        {(provided) => (
+                                            <div
+                                                {...provided.droppableProps}
+                                                ref={provided.innerRef}
+                                                style={{ height: '100%' }}
+                                            >
+                                                {
+                                                    val.value.map((i: any, index: number) => {
+                                                        return (
+                                                            <Draggable key={index} draggableId={index.toString()} index={index}>
+                                                                {(provided) => (
+                                                                    <div
+                                                                        ref={provided.innerRef}
+                                                                        {...provided.draggableProps}
+                                                                        {...provided.dragHandleProps}
+                                                                    >
+                                                                        <ItemBoxView className="flex" key={index}>
+                                                                            <ItemImgBox className="flex_center" onClick={this.handleUploadView.bind(this, index, 'value')}>
+                                                                                <Image src={i.url} style={{ width: '100%' }} />
+                                                                            </ItemImgBox>
+                                                                            <div className="flex_1">
+                                                                                <div className="flex">
+                                                                                    <Input className="flex_1" disabled value={i.link} />
+                                                                                    <Button mold="primary" onClick={this.handleGoodsView.bind(this, index, 'value')}>跳转地址</Button>
+                                                                                </div>
+                                                                                <div className="flex" style={{ marginTop: getUnit(16) }}>
+                                                                                    <Input className="flex_1" value={i.href} placeholder="外部连接(填写后将作为默认跳转)" onChange={this.handleCarouselHref.bind(this, index)} />
+                                                                                </div>
+                                                                            </div>
+                                                                            <CloseIcon
+                                                                                icon="md-close-circle"
+                                                                                color="rgba(0, 0, 0, 0.3)"
+                                                                                theme={new IconThemeData({ size: 18 })}
+                                                                                style={{ cursor: 'pointer' }}
+                                                                                onClick={this.handleDel.bind(this, index, 'value')}
+                                                                            />
+                                                                        </ItemBoxView>
+                                                                    </div>
+                                                                )}
+                                                            </Draggable>
+                                                        )
+
+                                                    })
+                                                }
+                                                {provided.placeholder}
+                                            </div>
+                                        )}
+                                    </Droppable>
+                                </DragDropContext>
+
+                                <Button
+                                    theme={new ButtonThemeData({ width: '100%' })}
+                                    onClick={this.handleFieldAdd.bind(this, 'value', 'GoodsList')}
+                                >
+                                    <div className="flex">
+                                        <Icon icon="ios-add" />
+                                        <div className="flex_center">添加</div>
+                                    </div>
+                                </Button>
+                            </div>
+                        )
+                    }
+                    return <div />
+                }
+            }, {
+                component: 'Colors',
+                label: <ComponentLabel>背景颜色</ComponentLabel>,
+                props: {
+                    initColor: componentData.pagePorps[this.index].props['background'],
+                    onChange: this.updateComColorData.bind(this, 'background'),
+                },
+                field: 'background',
+            }, {
+                component: 'RadioGroup',
+                label: <ComponentLabel>分列数量</ComponentLabel>,
+                props: {
+                    value: componentData.pagePorps[this.index].props['lineNum'],
+                    options: [{
+                        label: '单列',
+                        value: 1,
+                    }, {
+                        label: '两列',
+                        value: 2,
+                    }, {
+                        label: '三列',
+                        value: 3,
+                    }],
+                    onChange: this.updateChangeComData.bind(this, 'lineNum')
+                },
+                field: 'lineNum'
+            }, {
+                component: 'CheckBox',
+                label: <ComponentLabel>显示内容</ComponentLabel>,
+                props: {
+                    value: componentData.pagePorps[this.index].props['showView'],
+                    options: [{
+                        label: '商品名称',
+                        value: 'shopName',
+                    }, {
+                        label: '商品价格',
+                        value: 'price',
+                    }, {
+                        label: '划线价格',
+                        value: 'ori_price',
+                    }],
+                    onChange: this.updateChangeComData.bind(this, 'showView')
+                },
+                field: 'showView'
+            }]
+            default: return []
+        }
+        // return [{
+        //     component: 'Input',
+        //     label: '页面名称',
+        //     props: {
+        //         placeholder: '请输入名称',
+        //         value: componentData.name,
+        //         maxLength: 16,
+        //     },
+        //     additional: <Label color="#1890ff" style={{ paddingLeft: 0 }}>注意：页面名称是便于后台查找。</Label>,
+        //     field: 'name'
+        // }, {
+        //     component: 'Textarea',
+        //     label: '页面介绍',
+        //     props: {
+        //         placeholder: '请输入标题',
+        //         value: componentData.introduce,
+        //         maxLength: 50,
+        //         showMaxLength: true,
+        //     },
+        //     field: 'introduce'
+        // }, {
+        //     component: 'Colors',
+        //     label: '页面背景',
+        //     props: {
+        //         initColor: componentData.pageColor,
+        //         onChange: this.updateComColorData.bind(this, 'pageColor'),
+        //     },
+        //     field: 'pageColor'
+        // }]
     }
 
     private handleSelectView = (index: number, field: any) => {
@@ -879,46 +1173,15 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
 
     // 获得定义好的页面组件
     private getComponentDataView = () => {
-        const { match } = this.props
-        const data = [{
-            label: '基础组件',
-            components: [{
-                label: '导航栏'
-            }, {
-                label: '轮播'
-            }, {
-                label: '公告'
-            }, {
-                label: '商品组'
-            }, {
-                label: '搜索框'
-            }, {
-                label: '固定搜索框'
-            }, {
-                label: '版权'
-            }, {
-                label: '列表导航'
-            }, {
-                label: '辅助线'
-            }, {
-                label: '选项卡'
-            }]
-        }, {
-            label: '其他',
-            components: [{
-                label: '其他',
-            }, {
-                label: '视频',
-            }]
-        }]
+        const { diyCom } = this.props
         const components: JSX.Element[] = []
-        data.forEach((i, k) => {
+        diyCom.forEach((i, k) => {
             components.push(
                 <div key={k}>
-                    <Label color="#999">{i.label}</Label>
+                    <Label color="#999">{i.display_name}</Label>
                 </div>
             )
-            i.components.forEach((v, index) => {
+            i.children.forEach((v, index) => {
                 components.push(
                     <EditBtn
                         theme={new ButtonThemeData({
@@ -929,8 +1192,9 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                             })
                         })}
                         key={`${k}_${index}`}
+                        onClick={this.handleAddComponent.bind(this, v)}
                     >
-                        {v.label}
+                        {v.display_name}
                     </EditBtn>
                 )
             })
@@ -938,17 +1202,60 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
         return components
     }
 
-    private getPageNode() {
-        return (
-            <Form
-                getItems={this.getPageComponentItem}
-            />
-        )
+    private handleAddComponent(data: DiyComItem) {
+        const { componentData, dispatch } = this.props
+        let props: any = {}
+        switch (data.module) {
+            case 'Carousel': {
+                props['value'] = [{
+                    url: defImg,
+                }, {
+                    url: defImg,
+                }]
+                props['dotType'] = 'circular'
+                props['dataGetType'] = 'server'
+                props['autoplay'] = true
+            }; break;
+            case 'GoodsList': {
+                props['value'] = [{
+                    url: defImg,
+                    shopName: '此处显示商品名称',
+                    price: '99.00',
+                    ori_price: '139.00',
+                }, {
+                    url: defImg,
+                    shopName: '此处显示商品名称',
+                    price: '99.00',
+                    ori_price: '139.00',
+                }, {
+                    url: defImg,
+                    shopName: '此处显示商品名称',
+                    price: '99.00',
+                    ori_price: '139.00',
+                },]
+                props['dataGetType'] = 'server'
+                props['lineNum'] = 2
+                props['showView'] = ['shopName', 'price', 'ori_price']
+                props['background'] = '#fff'
+            }; break;
+        }
+        componentData.pagePorps.push({
+            component: data.module,
+            props,
+        })
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
+
+    private updateChangeComData = (field: string, value: any) => {
+        const { componentData, dispatch } = this.props
+        set(componentData.pagePorps[this.index]['props'], field, value)
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
+    }
+
     private updateComColorData = (field: string, value: any) => {
-        const { componentData, setComponentData }: any = this.props
-        componentData[field] = value.hex
-        setComponentData(cloneDeep(componentData))
+        const { componentData, dispatch } = this.props
+        set(componentData.pagePorps[this.index]['props'], field, value.hex)
+        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
     private onDragTabBar = (result: DropResult) => {
@@ -982,17 +1289,32 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
         dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
-    private onDragEnd = (result: DropResult) => {
+    private onDragEnd = (comName: string, result: DropResult) => {
         if (!result.destination) {
             return
         }
+        console.log(result)
         const { componentData, dispatch } = this.props
-        const items = reorder(
-            componentData.pagePorps,
-            result.source.index,
-            result.destination.index
-        );
-        componentData.pagePorps = items
+        let items: any
+        switch (comName) {
+            case 'Carousel': {
+                items = reorder(
+                    componentData.pagePorps[this.index].props.value,
+                    result.source.index,
+                    result.destination.index
+                );
+                componentData.pagePorps[this.index].props.value = items
+                this.acFun?.setFieldValue({ value: items })
+            }; break;
+            default: {
+                items = reorder(
+                    componentData.pagePorps,
+                    result.source.index,
+                    result.destination.index
+                );
+                componentData.pagePorps = items
+            }
+        }
         dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
     }
 
@@ -1001,6 +1323,27 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
             componentName: name,
             selected: 1
         })
+    }
+
+    private handleSave = async () => {
+        const { componentData } = this.props
+        componentData.pagePorps = componentData.pagePorps.map((i) => {
+            if (i.component == 'Carousel' && i.props['dataGetType'] == 'server') {
+                i.props.value = []
+            }
+            return i
+        })
+        try {
+            const data = await http('http://192.168.1.105:8800/set/admin/diy', {
+                path: 'home',
+                title: '首页',
+                pageColor: '#fff',
+                content: JSON.stringify(componentData.pagePorps)
+            })
+            // await httpUtils.verify(data)
+        } catch (e) {
+            message.error(e.toString())
+        }
     }
 
 
@@ -1038,6 +1381,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
 }
 export default connect(
     (state: IInitState) => ({
-        componentData: state.componentData
+        componentData: state.componentData,
+        diyCom: state.diyCom
     })
 )(AppsDesign)

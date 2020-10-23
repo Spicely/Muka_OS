@@ -24,6 +24,8 @@ import spinLoading from './spinLoading'
 import carousel from './carousel'
 import imageModalVisible from './imageModal/index'
 import selectModalVisible from './selectModal/index'
+import diyCom from './diyCom'
+import goodsModalVisible from './goods_model/index'
 
 export interface IConfig {
     amapKey: string
@@ -55,4 +57,6 @@ export default combineReducers({
     spinLoading,
     carousel,
     selectModalVisible,
+    diyCom,
+    goodsModalVisible,
 })

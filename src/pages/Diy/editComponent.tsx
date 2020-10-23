@@ -1,4 +1,4 @@
-import React, { Component, MouseEvent } from 'react'
+import React, { Component, MouseEvent, CSSProperties } from 'react'
 import { isFunction } from 'lodash'
 import styled, { css } from 'styled-components'
 import { Color, BorderStyle, Border, getRatioUnit } from 'src/components/lib/utils'
@@ -39,25 +39,23 @@ const EditViewLabel = styled.div`
 interface IProps {
     edit: boolean
     onClick: () => void
-    onEdit: () => void
     onDelete: () => void
+    style?: CSSProperties
 }
 
 export default class EditComponent extends Component<IProps, any> {
     public render(): JSX.Element {
-        const { children, edit } = this.props
+        const { children, edit, style } = this.props
         return (
             <EditView
                 edit={edit}
                 onClick={this.handleClick}
+                style={style}
             >
                 {children}
                 {
                     edit && (
                         <EditViewBox className="flex">
-                            <EditViewLabel onClick={this.handleEdit}>
-                                编辑
-                            </EditViewLabel>
                             <EditViewLabel onClick={this.handleDelet}>
                                 删除
                             </EditViewLabel>
@@ -72,14 +70,6 @@ export default class EditComponent extends Component<IProps, any> {
         const { onClick } = this.props
         if (isFunction(onClick)) {
             onClick()
-        }
-    }
-
-    private handleEdit = (e: MouseEvent<HTMLDivElement>) => {
-        const { onEdit } = this.props
-        e.stopPropagation()
-        if (isFunction(onEdit)) {
-            onEdit()
         }
     }
 

@@ -353,7 +353,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                 style={i.crop ? { width: getUnit(Number(i.width) / 5), height: getUnit(Number(i.height) / 5) } : {}}
                                 onClick={this.handleImageView.bind(this, i.field, i.crop || false, { width: Number(i.width), height: Number(i.height) })}
                             >
-                                {val ? <Image src={imgUrl + val.preview} style={{ width: '100%' }} /> : <UoloadIcon icon="ios-add" theme={uploadIconTheme} />}
+                                {/* {val ? <Image src={imgUrl + val.preview} style={{ width: '100%' }} /> : <UoloadIcon icon="ios-add" theme={uploadIconTheme} />} */}
                             </UploadBox>
                         )
                     },
@@ -377,7 +377,7 @@ class View extends Component<IProps & RouteComponentProps<{ id: string }>, IStat
                                             style={i.crop ? { width: getUnit(Number(i.width) / 5), height: getUnit(Number(i.height) / 5), marginRight: getUnit(4) } : { marginRight: getUnit(4) }}
                                             onClick={this.handleImageView.bind(this, i.field, i.crop || false, { width: Number(i.width), height: Number(i.height) })}
                                         >
-                                            <Image src={imgUrl + item.preview} style={{ width: '100%' }} />
+                                            {/* <Image src={imgUrl + item.preview} style={{ width: '100%' }} /> */}
                                             <CloseIcon icon="ios-close" theme={closeIconTheme} onClick={this.handleCloseItem.bind(this, i.field, index)} />
                                         </UploadBox>
                                     ))

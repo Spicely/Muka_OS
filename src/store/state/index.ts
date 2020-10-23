@@ -37,6 +37,16 @@ export interface CarouselData {
     id: string
 }
 
+export interface DiyComItem {
+    display_name: string
+    id: number
+    is_menus: number
+    module: any
+    pid: number
+    sort: number
+}
+
+
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace MukaOS {
     export interface Region {
@@ -53,19 +63,12 @@ export namespace MukaOS {
     }
 
     export interface IImageParams {
-        id: string
-        url: string
-        status: true,
-        original: string
-        preview: string
-        size: string
-        mimeType: string
-        height: number
-        width: number
-        type: 'private' | 'public'
-        user: string
-        createdAt: number
-        updatedAt: number
+        file_link: string
+        group_id: number
+        id: number
+    }
+    export interface DiyCom extends DiyComItem {
+        children: DiyComItem[]
     }
 }
 
@@ -103,4 +106,6 @@ export interface IInitState {
     spinLoading: boolean
     carousel: MukaOS.Carousel
     selectModalVisible: boolean
+    diyCom: MukaOS.DiyCom[]
+    goodsModalVisible: boolean
 }

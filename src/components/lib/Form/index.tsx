@@ -34,7 +34,7 @@ export interface IFormItem {
     field?: string
     alias?: string
     label?: string | JSX.Element | ((val: any) => JSX.Element)
-    additional?: string | JSX.Element
+    additional?: string | JSX.Element | ((val: any) => JSX.Element)
     className?: string
     render?: (val: any) => JSX.Element
     visible?: ((val: any) => boolean) | boolean
@@ -70,7 +70,7 @@ interface IFormChild {
     label?: string | JSX.Element | ((val: any) => JSX.Element)
     className?: string
     props: IValue | ((val: any) => props)
-    additional?: string | JSX.Element
+    additional?: string | JSX.Element | ((val: any) => JSX.Element)
     view: any
     render?: (val: any) => JSX.Element
     visible: ((val: any) => boolean) | boolean
@@ -376,7 +376,7 @@ export default class Form extends Component<IFormProps, IState> {
     }
 
     // tslint:disable-next-line: no-shadowed-variable
-    private setTypeCom(component: component, View: any, props: props, field: string | undefined, key: number | string, className?: string, label?: string | JSX.Element | ((val: any) => JSX.Element), additional?: string | JSX.Element, render?: (val: any) => JSX.Element, extend?: ((val: any) => JSX.Element) | string | JSX.Element): JSX.Element | null {
+    private setTypeCom(component: component, View: any, props: props, field: string | undefined, key: number | string, className?: string, label?: string | JSX.Element | ((val: any) => JSX.Element), additional?: string | JSX.Element | ((val: any) => JSX.Element), render?: (val: any) => JSX.Element, extend?: ((val: any) => JSX.Element) | string | JSX.Element): JSX.Element | null {
         const { vals } = this.state
         const { labelSpacing } = this.props
         /// 得到field
@@ -405,7 +405,7 @@ export default class Form extends Component<IFormProps, IState> {
                             </div>
                             <div className="flex_center">{isFunction(extend) ? extend(vals) : extend}</div>
                         </div>
-                        {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
+                        {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
                     </FormItem>
                 )
             }
@@ -427,7 +427,7 @@ export default class Form extends Component<IFormProps, IState> {
                                 />
                             </div>
                         </div>
-                        {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
+                        {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
                     </ItemMar>
                 )
             }
@@ -464,7 +464,7 @@ export default class Form extends Component<IFormProps, IState> {
                                 />
                             </div>
                         </div>
-                        {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
+                        {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
                     </div>
                 )
             }
@@ -484,7 +484,9 @@ export default class Form extends Component<IFormProps, IState> {
                                     onChange={this.setRVal.bind(this, field, onChange)}
                                 />
                             </div>
+                            <div className="flex_center">{isFunction(extend) ? extend(vals) : extend}</div>
                         </div>
+                        {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
                     </div>
                 )
             }
@@ -497,7 +499,7 @@ export default class Form extends Component<IFormProps, IState> {
                             {label ? (isFunction(label) ? label(vals) : <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>) : null}
                             <View {...vProps} key={field} className={`flex_1 ${_porps.className || ''}`} />
                         </div>
-                        {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
+                        {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
                     </FormItem>
                 )
             }
@@ -518,7 +520,7 @@ export default class Form extends Component<IFormProps, IState> {
                                 />
                             </div>
                         </div>
-                        {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
+                        {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
                     </ItemMar>
                 )
             }
@@ -539,7 +541,7 @@ export default class Form extends Component<IFormProps, IState> {
                                 />
                             </div>
                         </div>
-                        {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
+                        {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
                     </FormItem>
                 )
             }
@@ -563,26 +565,30 @@ export default class Form extends Component<IFormProps, IState> {
                 const onClose: any = _porps.onClose || function (val: string) { }
                 return (
                     <div className={`flex mk_divider ${className || ''}`} key={field}>
-                        <div className="flex_1">
-                            <View
-                                {...vProps}
-                                key={field}
-                                flexType="value"
-                                value={
-                                    <Input
-                                        theme={itemInputTheme}
-                                        placeholder={vProps.placeholder}
-                                        type={vProps.type}
-                                        value={vals[field]}
-                                        maxLength={vProps.maxLength}
-                                        onChange={this.setVal.bind(this, field, onChange)}
-                                        onClose={this.cleanInputVal.bind(this, field, onClose)}
-                                    />
-                                }
-                                onChange={this.setRVal.bind(this, field, onChange)}
-                            />
+                        <div className="flex">
+                            {label ? (isFunction(label) ? label(vals) : <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>) : null}
+                            <div className="flex_1">
+                                <View
+                                    {...vProps}
+                                    key={field}
+                                    flexType="value"
+                                    value={
+                                        <Input
+                                            theme={itemInputTheme}
+                                            placeholder={vProps.placeholder}
+                                            type={vProps.type}
+                                            value={vals[field]}
+                                            maxLength={vProps.maxLength}
+                                            onChange={this.setVal.bind(this, field, onChange)}
+                                            onClose={this.cleanInputVal.bind(this, field, onClose)}
+                                        />
+                                    }
+                                    onChange={this.setRVal.bind(this, field, onChange)}
+                                />
+                            </div>
+                            <div className="flex_center">{isFunction(extend) ? extend(vals) : extend}</div>
                         </div>
-                        <div className="flex_center">{isFunction(extend) ? extend(vals) : extend}</div>
+                        {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
                     </div>
                 )
             }
@@ -602,7 +608,7 @@ export default class Form extends Component<IFormProps, IState> {
                                 />
                             </div>
                         </div>
-                        {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
+                        {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
                     </FormItem>
                 )
             }
@@ -639,7 +645,7 @@ export default class Form extends Component<IFormProps, IState> {
                                 />
                             </div>
                         </div>
-                        {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
+                        {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
                     </FormItem>
                 )
             }
@@ -662,7 +668,7 @@ export default class Form extends Component<IFormProps, IState> {
                             </div>
                             <div className="flex_center">{isFunction(extend) ? extend(vals) : extend}</div>
                         </div>
-                        {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
+                        {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
                     </FormItem>
                 )
             }
@@ -684,7 +690,7 @@ export default class Form extends Component<IFormProps, IState> {
                                 />
                             </div>
                         </div>
-                        {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
+                        {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
                     </FormItem>
                 )
             }
@@ -721,6 +727,7 @@ export default class Form extends Component<IFormProps, IState> {
                                 )}
                             </div>
                         </div>
+                        {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
                     </ItemMar>
                 )
             }
@@ -740,7 +747,7 @@ export default class Form extends Component<IFormProps, IState> {
                                 />
                             </div>
                         </div>
-                        {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
+                        {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
                     </FormItem>
                 )
             }
@@ -762,7 +769,7 @@ export default class Form extends Component<IFormProps, IState> {
                             </div>
                             <div className="flex_center">{isFunction(extend) ? extend(vals) : extend}</div>
                         </div>
-                        {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
+                        {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
                     </FormItem>
                 )
             }
@@ -782,7 +789,7 @@ export default class Form extends Component<IFormProps, IState> {
                                 />
                             </div>
                         </div>
-                        {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
+                        {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
                     </FormItem>
                 )
             }
@@ -802,7 +809,7 @@ export default class Form extends Component<IFormProps, IState> {
                                 />
                             </div>
                         </div>
-                        {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
+                        {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
                     </FormItem>
                 )
             }
@@ -828,7 +835,7 @@ export default class Form extends Component<IFormProps, IState> {
                                 {extend}
                             </div>
                         </div>
-                        {additional && <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div>}
+                        {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
                     </FormItem>
                 )
             }

@@ -18,6 +18,7 @@ export interface IEmptyProps {
 
 const EmptyView = styled.div`
     text-align: center;
+    height: 100%;
 `
 
 const DesView = styled.div`
@@ -44,7 +45,6 @@ export default class Empty extends Component<IEmptyProps, any> {
                                 (value) => {
                                     const emptyProps: any = value.emptyProps
                                     return (
-
                                         <EmptyView className={getClassName(`${(center || emptyProps.center) ? 'flex_center' : ''}`, className || emptyProps.className)}>
                                             <div >
                                                 {isNull(image) ? null : isString(image || emptyProps.image) ? <EmptyImage className={getClassName( imageClassName || emptyProps.imageClassName)} src={image || emptyProps.image} /> : image}

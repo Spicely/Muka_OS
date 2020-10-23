@@ -172,6 +172,15 @@ export default class Carousel extends Component<ICarouselProps, IState> {
 
     private animateNode: Element | null = null
 
+    private Children = (callback: any) => {
+        const { children, value } = this.props
+        if (children != null) {
+            return Children.map(children, callback)
+        } else {
+            return value.map(callback)
+        }
+    }
+
     public render(): JSX.Element {
         const { className, dotPosition, dotClassName, dots, effect, style, autoplay, value, dotType, dotColor, baseUrl, theme, children } = this.props
         const { selectIndex, left, top, animate } = this.state
@@ -199,7 +208,7 @@ export default class Carousel extends Component<ICarouselProps, IState> {
                             ref={(e) => this.carouselNode = e}
                         >
                             {
-                                Children.map(childs, (child?: IValue, index?: any) => {
+                                this.Children((child: any, index: any) => {
                                     return (
                                         <CarouselViewItem
                                             className="flex_center"
@@ -212,13 +221,13 @@ export default class Carousel extends Component<ICarouselProps, IState> {
                                             key={index}
                                         >
                                             {
-                                                isObject(child) ? child._owner ? child : <CarouselViewItemImg src={baseUrl + child.url} /> : child
+                                                isObject(child) as any ? child._owner ? child : <CarouselViewItemImg src={baseUrl + child.url} /> : child
                                             }
                                         </CarouselViewItem>
                                     )
                                 })
                             }
-                            {autoplay && effect !== 'fade' && Children.map(childs, (child?: IValue, index?: any) => {
+                            {autoplay && effect !== 'fade' && this.Children((child?: any, index?: any) => {
                                 if (index === 0) {
                                     return (
                                         <CarouselViewItem
@@ -229,7 +238,7 @@ export default class Carousel extends Component<ICarouselProps, IState> {
                                             ref={(e) => this.animateNode = e}
                                         >
                                             {
-                                                isObject(child) ? child._owner ? child : <CarouselViewItemImg src={baseUrl + child.url} /> : child
+                                                isObject(child) as any ? child._owner ? child : <CarouselViewItemImg src={baseUrl + child.url} /> : child
                                             }
                                         </CarouselViewItem>
                                     )
@@ -246,7 +255,7 @@ export default class Carousel extends Component<ICarouselProps, IState> {
                                         <div className="flex_center">
                                             <span className={(dotPosition === 'bottom' || dotPosition === 'top' || dotPosition === 'bottomRight' || dotPosition === 'bottomLeft') ? 'flex' : ''}>
                                                 {
-                                                    Children.map(childs, (child, index) => {
+                                                    this.Children((child: any, index: any) => {
                                                         return (
                                                             <CarouselDotItem
                                                                 carouselTheme={theme || init.theme.carouselTheme}

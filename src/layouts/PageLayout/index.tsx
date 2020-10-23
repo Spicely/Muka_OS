@@ -431,14 +431,14 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
             extendSelected: arr.includes('view') ? arr[2] : history.location.pathname
         })
         const { dispatch } = this.props
-        try {
-            const { data } = await http('/admin/icon/get')
-            const res = await http('/admin/router/user')
-            dispatch({ type: SET_ICONS_DATA, data: data })
-            dispatch({ type: SET_ROUTER_DATA, data: res.data || [] })
-        } catch (e) {
-            httpUtils.verify(e)
-        }
+        // try {
+        //     const { data } = await http('/admin/icon/get')
+        //     const res = await http('/admin/router/user')
+        //     dispatch({ type: SET_ICONS_DATA, data: data })
+        //     dispatch({ type: SET_ROUTER_DATA, data: res.data || [] })
+        // } catch (e) {
+        //     httpUtils.verify(e)
+        // }
     }
 
     private getItems = (fn: IFormFun): IFormItem[] => {

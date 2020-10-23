@@ -1,5 +1,3 @@
-import { isFunction } from 'lodash'
-import { message } from 'antd'
 import CryptoJS from 'crypto-js'
 import axois, { AxiosRequestConfig } from 'axios'
 import { store } from 'src/store'
@@ -8,7 +6,7 @@ interface IValue {
     [name: string]: any
 }
 // export const baseUrl = 'https://api.muka.site'
-export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://192.168.1.134:8080/': 'http://api.muka.site'
+export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://192.168.1.134:8080/' : 'http://api.muka.site'
 export const imgUrl = 'https://img.muka.site'
 
 export interface IRresItem<T = any> {
@@ -59,10 +57,15 @@ export const deviaDecrypt = (data: string) => {
     return decryptedStr.toString()
 }
 
+instance.interceptors.request.use(function (req: AxiosRequestConfig) {
+    req.headers.Authorization = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xOTIuMTY4LjEuMTA1Ojg4MDBcL3NldFwvYWRtaW5cL2xvZ2luIiwiaWF0IjoxNjAzMzM3ODEwLCJleHAiOjE2MDM5NDI2MTAsIm5iZiI6MTYwMzMzNzgxMCwianRpIjoiZEF3dE1pemtYaFo4Q2huQiIsInN1YiI6MSwicHJ2IjoiZGY4ODNkYjk3YmQwNWVmOGZmODUwODJkNjg2YzQ1ZTgzMmU1OTNhOSJ9.QmNEyI0xEOQ2wANKfDeYGZZ-12GJ4ITbK5Aw8NiGpPg'
+    return req
+})
+
 instance.interceptors.response.use(async function (res: any) {
     // const devia = deviaDecrypt(res.data.devia)
     // res.data = JSON.parse(decrypt(res.data.value, res.data.secret, devia))
-    if (res.status === 200 && res.data.code === 200) {
+    if (res.status === 200 && res.data.code === 0) {
         return res.data
     } else {
         return Promise.reject(res.data)
@@ -84,16 +87,14 @@ export default http
 
 
 export class httpUtils {
-    public static verify(data: IRresItem | IRresItems, callback?: (data: any) => void) {
+    public static verify(data: IRresItem | IRresItems) {
         if (data.code === 400) {
-            message.error(data.msg || '登录失效,请重新登录')
-            return
+            return Promise.reject(data.msg || '登录失效,请重新登录')
         }
-        if (data.code !== 200 ) {
-            message.error(data.msg || '网络连接失败')
-            return
+        if (data.code !== 0) {
+            return Promise.reject(data.msg || '网络连接失败')
         }
-        if (isFunction(callback)) callback(data.data)
+        return Promise.resolve(data.data)
     }
 }
 

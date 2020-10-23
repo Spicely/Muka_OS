@@ -13,10 +13,12 @@ import { SET_IMAGE_MODAL_VISIBLE, SET_IMAGES_DATA, SET_SELECT_MODAL_VISIBLE } fr
 import { DialogThemeData, TabBarThemeData, getRatioUnit, getUnit, IconThemeData, UploadThemeData } from 'src/components/lib/utils'
 import { IUploadFileListProps } from 'src/components/lib/Upload/dragger'
 import { theme } from 'src/App'
-import http, { httpUtils, imgUrl, baseUrl } from './axios'
+import http, { httpUtils, imgUrl } from './axios'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { GlobalForm } from './node'
 import { IFile } from 'src/components/lib/Upload'
+export { goodsModal } from './goods'
+export { shopModal } from './shop'
 
 const dialogTheme = new DialogThemeData({
     height: 'auto'
@@ -52,6 +54,7 @@ interface IProps extends IDialogProps {
 
 interface IState {
     activeNum: number
+    baseUrl: string
 }
 
 const uploadTheme = new UploadThemeData({
@@ -70,11 +73,12 @@ class ImageModal extends PureComponent<IProps & IImageModalProps & DispatchProp,
 
     public state: IState = {
         activeNum: 0,
+        baseUrl: '',
     }
 
     public render(): JSX.Element {
         const { images, imageModalVisible, crop, cropSize } = this.props
-        const { activeNum } = this.state
+        const { activeNum, baseUrl } = this.state
         return (
             <Dialog
                 visible={imageModalVisible}
@@ -92,9 +96,6 @@ class ImageModal extends PureComponent<IProps & IImageModalProps & DispatchProp,
                     onChange={this.handleTabChange}
                     selected={activeNum}
                 >
-                    <TabBar.Item title="共享图库">
-                        <div style={{ color: 'red' }}>sss</div>
-                    </TabBar.Item>
                     <TabBar.Item title="私人图库">
                         <MobileLayout>
                             <Upload
@@ -107,7 +108,7 @@ class ImageModal extends PureComponent<IProps & IImageModalProps & DispatchProp,
                                 theme={uploadTheme}
                                 fileList={images.private.map((i) => {
                                     return {
-                                        url: imgUrl + i.preview
+                                        url: i.file_link
                                     }
                                 })}
                                 onItemClick={this.handleItemClick.bind(this, 'private')}
@@ -130,9 +131,6 @@ class ImageModal extends PureComponent<IProps & IImageModalProps & DispatchProp,
                                     )
                                 })
                             } */}
-                            {
-                                !images.private.length ? <div className="flex_center" style={{ height: '100%' }}><Empty /></div> : null
-                            }
                         </MobileLayout>
                     </TabBar.Item>
                 </TabBar>
@@ -161,13 +159,14 @@ class ImageModal extends PureComponent<IProps & IImageModalProps & DispatchProp,
     private handleFirstLoading = async () => {
         try {
             const { images } = this.props
-            const { data } = await http('/admin/image/find', {
-                type: this.type,
-                number: 20,
-                time: images[this.type].length ? images[this.type][0]['createdAt'] : Date.now(),
-                query: images[this.type].length ? '$gt' : '$lte'
+            const { data } = await http('http://192.168.1.105:8800/set/admin/diy/upload-file', {}, {
+                method: 'GET',
             })
-            images[this.type] = data.concat(images[this.type])
+            const res = await http('http://192.168.1.105:8800/set/common/pic-host', {}, { method: 'GET' })
+            images.private = data.data.map((i: MukaOS.IImageParams) => {
+                i.file_link = res.data + '/' + i.file_link
+                return i
+            })
             store.dispatch({ type: SET_IMAGES_DATA, data: { ...images } })
         } catch (e) {
             httpUtils.verify(e)
@@ -257,7 +256,7 @@ class ImageUpload extends PureComponent<ImageUploadProps, ImageUploadState> {
                 <UploadBox>
                     <Upload
                         crop
-                        action={baseUrl + '/upload/stream'}
+                        // action={baseUrl + '/upload/stream'}
                         name="file"
                         withCredentials
                         params={{ type: 1 }}
