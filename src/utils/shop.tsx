@@ -3,7 +3,7 @@ import { render } from 'react-dom'
 import { isFunction } from 'lodash'
 import { connect, Provider, DispatchProp } from 'react-redux'
 import styled from 'styled-components'
-import { ThemeProvider, Dialog, TabBar, Image, Empty } from 'components'
+import { ThemeProvider, Dialog, TabBar, Image, Empty, Table } from 'components'
 import { IActionsProps } from '../saga'
 import { IInitState, MukaOS } from 'src/store/state'
 import { IImages } from 'src/store/reducers/images'
@@ -14,6 +14,7 @@ import { DialogThemeData, TabBarThemeData, getUnit } from 'src/components/lib/ut
 import { theme } from 'src/App'
 import http, { httpUtils } from './axios'
 import { IFile } from 'src/components/lib/Upload'
+import { ITableColumns } from 'src/components/lib/Table'
 
 export interface IConnectProps {
     dispatch: (actions: IActionsProps) => void
@@ -48,9 +49,29 @@ class ShopModal extends PureComponent<IProps & IGoodsModalProps & DispatchProp, 
         data: [],
     }
 
+    private columns: ITableColumns<any>[] = [{
+        title: '商品ID',
+        dataIndex: 'id',
+        key: 'id',
+        width: '4rem',
+
+    }, {
+        title: '商品图片',
+        dataIndex: 'cover_pic',
+        key: 'cover_pic',
+        width: '4rem',
+        render: (value: string) => {
+            return <Image src={value} style={{height: `${getUnit(50)}`}}/>
+        }
+    }, {
+        title: '商品名称',
+        dataIndex: 'name',
+        key: 'name',
+    }]
+
     public render(): JSX.Element {
         const { goodsModalVisible } = this.props
-        const {  data } = this.state
+        const { data } = this.state
 
         return (
             <Dialog
@@ -64,16 +85,10 @@ class ShopModal extends PureComponent<IProps & IGoodsModalProps & DispatchProp, 
                 })}
                 footer={null}
             >
-                {
-                    data.map((i: any, index: number) => {
-                        return (
-                            <ListItem key={index} onClick={this.handleItem.bind(this, 1, i)}>
-                                <Image src={i.pic} />
-                            </ListItem>
-                        )
-                    })
-                }
-                {data.length === 0 ? <Empty /> : null}
+                <Table
+                    dataSource={data}
+                    columns={this.columns}
+                />
             </Dialog>
         )
     }
@@ -89,10 +104,10 @@ class ShopModal extends PureComponent<IProps & IGoodsModalProps & DispatchProp, 
     private handleFirstLoading = async () => {
         try {
             const { data } = this.state
-            const res = await http(`http://192.168.1.105:8800/set`, {}, {
+            const res = await http(`http://192.168.1.105:8800/set/admin/marketing-integral-goods?status=0&category_id=&name=`, {}, {
                 method: 'GET',
             })
-            this.setState({ data: [...data] })
+            this.setState({ data: res.data.data })
         } catch (e) {
             httpUtils.verify(e)
         }
