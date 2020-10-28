@@ -165,6 +165,7 @@ interface IGoodsViewProps {
 
 const GoodsView = styled.div<IGoodsViewProps>`
     display: inline-block;
+    vertical-align:top;
     margin-top: ${getUnit(5)};
     ${({ lineNum }) => {
         if (lineNum === 1) {
@@ -197,9 +198,25 @@ const GoodsView = styled.div<IGoodsViewProps>`
     }}
 `
 
-const GoodsImg = styled.div`
+const GoodsName = styled.div`
+    text-overflow: -o-ellipsis-lastline;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+`
+interface IGoodsImgProps {
+    url: string
+}
+const GoodsImg = styled.div<IGoodsImgProps>`
     width: 100%;
     padding-top: 100%;
+    ${({ url }) => {
+        return css`background:url(${url}) center;`
+    }}
+    background-size: auto 100%;
 `
 
 const reorder = (list: any[], startIndex: number, endIndex: number) => {
@@ -619,12 +636,12 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                             value.map((i, index) => {
                                 return (
                                     <GoodsView lineNum={data.props.lineNum} key={index}>
-                                        <GoodsImg style={{ background: `url(${i.url}) center`, backgroundSize: 'auto 100%' }} />
+                                        <GoodsImg url={i.cover_pic || i.url} />
                                         <div style={{ padding: `${getUnit(8)}`, backgroundColor: '#fff' }}>
-                                            {data.props.showView.includes('shopName') ? <div>{i.shopName}</div> : null}
+                                            {data.props.showView.includes('shopName') ? <GoodsName>{i.name || i.shopName}</GoodsName> : null}
                                             <div className="flex" style={{ marginTop: 10 }}>
-                                                {data.props.showView.includes('price') ? <div style={{ color: 'red' }}>{i.price}</div> : null}
-                                                {data.props.showView.includes('ori_price') ? <div style={{ textDecoration: 'line-through', marginLeft: data.props.showView.includes('price') ? `${getUnit(10)}` : '0' }}>{i.ori_price}</div> : null}
+                                                {data.props.showView.includes('price') ? <div style={{ color: 'red' }}>{i.cash_buy || i.price}</div> : null}
+                                                {data.props.showView.includes('ori_price') ? <div style={{ textDecoration: 'line-through', marginLeft: data.props.showView.includes('price') ? `${getUnit(10)}` : '0' }}>{i.cash_buy_discount || i.ori_price}</div> : null}
                                             </div>
                                         </div>
                                     </GoodsView>
@@ -761,10 +778,10 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                 shopModal({
                     onSelect: (data) => {
                         const { componentData, dispatch } = this.props
-                        componentData.pagePorps[this.index].props[field].concat(data) 
+                        componentData.pagePorps[this.index].props[field] = componentData.pagePorps[this.index].props[field].concat(data)
                         dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
                         this.acFun?.setFieldValue({
-                            [field]: componentData.pagePorps[this.index].props[field].concat(data) 
+                            [field]: componentData.pagePorps[this.index].props[field]
                         })
                     }
                 })
@@ -943,12 +960,12 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                                                 <div
                                                     {...provided.droppableProps}
                                                     ref={provided.innerRef}
-                                                    style={{ height: '100%'}}
+                                                    style={{ height: '100%' }}
                                                 >
                                                     {
                                                         val.value.map((i: any, index: number) => {
                                                             return (
-                                                                <Draggable  key={index} draggableId={index.toString()} index={index}>
+                                                                <Draggable key={index} draggableId={index.toString()} index={index}>
                                                                     {(provided) => {
                                                                         return (
                                                                             <div
@@ -1048,11 +1065,11 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                                                                         ref={provided.innerRef}
                                                                         {...provided.draggableProps}
                                                                         {...provided.dragHandleProps}
-                                                                        style={{width:'33%', display: 'inline-block'}}
+                                                                    // style={{ width: '33%', display: 'inline-block' }}
                                                                     >
                                                                         <ItemBoxView className="flex" key={index}>
                                                                             <ItemImgBox className="flex_center" onClick={this.handleUploadView.bind(this, index, 'value')}>
-                                                                                <Image src={i.url} style={{ width: '100%' }} />
+                                                                                <Image src={val.dataGetType == 'diy' ? i.cover_pic || i.url : i.url} style={{ width: '100%' }} />
                                                                             </ItemImgBox>
                                                                             <CloseIcon
                                                                                 icon="md-close-circle"
