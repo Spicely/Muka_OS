@@ -3,7 +3,7 @@ import { render } from 'react-dom'
 import { isFunction } from 'lodash'
 import { connect, Provider, DispatchProp } from 'react-redux'
 import styled from 'styled-components'
-import { ThemeProvider, Dialog, TabBar, Image, Empty, Table } from 'components'
+import { ThemeProvider, Dialog, TabBar, Image, Empty, Table, Button } from 'components'
 import { IActionsProps } from '../saga'
 import { IInitState, MukaOS } from 'src/store/state'
 import { IImages } from 'src/store/reducers/images'
@@ -29,7 +29,7 @@ const ListItem = styled.div`
 `
 
 interface IGoodsModalProps {
-    onSelect?: (type: any, data: MukaOS.IImageParams) => void
+    onSelect?: ( data: any[]) => void
 }
 
 interface IProps extends IDialogProps {
@@ -48,6 +48,8 @@ class ShopModal extends PureComponent<IProps & IGoodsModalProps & DispatchProp, 
         baseUrl: '',
         data: [],
     }
+
+    private selectedRows: any[] = [];
 
     private columns: ITableColumns<any>[] = [{
         title: '商品ID',
@@ -83,20 +85,30 @@ class ShopModal extends PureComponent<IProps & IGoodsModalProps & DispatchProp, 
                     width: '80%',
                     height: '80%'
                 })}
-                footer={null}
+                footer={
+                    <Button mold="primary" onClick={this.handleItem}>确认</Button>
+                }
             >
                 <Table
                     dataSource={data}
                     columns={this.columns}
+                    rowKey={(data) => data.id}
+                    rowSelection={{
+                        onChange: this.handleSelectChange,
+                    }}
                 />
             </Dialog>
         )
     }
 
-    private handleItem = (type: any, data: any) => {
+    private handleSelectChange = (selectedRowKeys:any[], selectedRows:any[]) => {
+        this.selectedRows = selectedRows
+    }
+
+    private handleItem = () => {
         const { onSelect, dispatch } = this.props
         if (isFunction(onSelect)) {
-            onSelect(type, data)
+            onSelect(this.selectedRows)
             dispatch({ type: SET_GOODS_MODAL_VISIBLE, data: false })
         }
     }

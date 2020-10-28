@@ -758,7 +758,16 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                 dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
             }; break;
             case 'GoodsList': {
-                shopModal()
+                shopModal({
+                    onSelect: (data) => {
+                        const { componentData, dispatch } = this.props
+                        componentData.pagePorps[this.index].props[field].concat(data) 
+                        dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
+                        this.acFun?.setFieldValue({
+                            [field]: componentData.pagePorps[this.index].props[field].concat(data) 
+                        })
+                    }
+                })
             }; break;
         };
     }
@@ -934,41 +943,43 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                                                 <div
                                                     {...provided.droppableProps}
                                                     ref={provided.innerRef}
-                                                    style={{ height: '100%' }}
+                                                    style={{ height: '100%'}}
                                                 >
                                                     {
                                                         val.value.map((i: any, index: number) => {
                                                             return (
-                                                                <Draggable key={index} draggableId={index.toString()} index={index}>
-                                                                    {(provided) => (
-                                                                        <div
-                                                                            ref={provided.innerRef}
-                                                                            {...provided.draggableProps}
-                                                                            {...provided.dragHandleProps}
-                                                                        >
-                                                                            <ItemBoxView className="flex" key={index}>
-                                                                                <ItemImgBox className="flex_center" onClick={this.handleUploadView.bind(this, index, 'value')}>
-                                                                                    <Image src={i.url} style={{ width: '100%' }} />
-                                                                                </ItemImgBox>
-                                                                                <div className="flex_1">
-                                                                                    <div className="flex">
-                                                                                        <Input className="flex_1" disabled value={i.link} />
-                                                                                        <Button mold="primary" onClick={this.handleGoodsView.bind(this, index, 'value')}>跳转地址</Button>
+                                                                <Draggable  key={index} draggableId={index.toString()} index={index}>
+                                                                    {(provided) => {
+                                                                        return (
+                                                                            <div
+                                                                                ref={provided.innerRef}
+                                                                                {...provided.draggableProps}
+                                                                                {...provided.dragHandleProps}
+                                                                            >
+                                                                                <ItemBoxView className="flex" key={index}>
+                                                                                    <ItemImgBox className="flex_center" onClick={this.handleUploadView.bind(this, index, 'value')}>
+                                                                                        <Image src={i.url} style={{ width: '100%' }} />
+                                                                                    </ItemImgBox>
+                                                                                    <div className="flex_1">
+                                                                                        <div className="flex">
+                                                                                            <Input className="flex_1" disabled value={i.link} />
+                                                                                            <Button mold="primary" onClick={this.handleGoodsView.bind(this, index, 'value')}>跳转地址</Button>
+                                                                                        </div>
+                                                                                        <div className="flex" style={{ marginTop: getUnit(16) }}>
+                                                                                            <Input className="flex_1" value={i.href} placeholder="外部连接(填写后将作为默认跳转)" onChange={this.handleCarouselHref.bind(this, index)} />
+                                                                                        </div>
                                                                                     </div>
-                                                                                    <div className="flex" style={{ marginTop: getUnit(16) }}>
-                                                                                        <Input className="flex_1" value={i.href} placeholder="外部连接(填写后将作为默认跳转)" onChange={this.handleCarouselHref.bind(this, index)} />
-                                                                                    </div>
-                                                                                </div>
-                                                                                <CloseIcon
-                                                                                    icon="md-close-circle"
-                                                                                    color="rgba(0, 0, 0, 0.3)"
-                                                                                    theme={new IconThemeData({ size: 18 })}
-                                                                                    style={{ cursor: 'pointer' }}
-                                                                                    onClick={this.handleDel.bind(this, index, 'value')}
-                                                                                />
-                                                                            </ItemBoxView>
-                                                                        </div>
-                                                                    )}
+                                                                                    <CloseIcon
+                                                                                        icon="md-close-circle"
+                                                                                        color="rgba(0, 0, 0, 0.3)"
+                                                                                        theme={new IconThemeData({ size: 18 })}
+                                                                                        style={{ cursor: 'pointer' }}
+                                                                                        onClick={this.handleDel.bind(this, index, 'value')}
+                                                                                    />
+                                                                                </ItemBoxView>
+                                                                            </div>
+                                                                        )
+                                                                    }}
                                                                 </Draggable>
                                                             )
 
@@ -1037,20 +1048,12 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                                                                         ref={provided.innerRef}
                                                                         {...provided.draggableProps}
                                                                         {...provided.dragHandleProps}
+                                                                        style={{width:'33%', display: 'inline-block'}}
                                                                     >
                                                                         <ItemBoxView className="flex" key={index}>
                                                                             <ItemImgBox className="flex_center" onClick={this.handleUploadView.bind(this, index, 'value')}>
                                                                                 <Image src={i.url} style={{ width: '100%' }} />
                                                                             </ItemImgBox>
-                                                                            <div className="flex_1">
-                                                                                <div className="flex">
-                                                                                    <Input className="flex_1" disabled value={i.link} />
-                                                                                    <Button mold="primary" onClick={this.handleGoodsView.bind(this, index, 'value')}>跳转地址</Button>
-                                                                                </div>
-                                                                                <div className="flex" style={{ marginTop: getUnit(16) }}>
-                                                                                    <Input className="flex_1" value={i.href} placeholder="外部连接(填写后将作为默认跳转)" onChange={this.handleCarouselHref.bind(this, index)} />
-                                                                                </div>
-                                                                            </div>
                                                                             <CloseIcon
                                                                                 icon="md-close-circle"
                                                                                 color="rgba(0, 0, 0, 0.3)"
