@@ -6,7 +6,7 @@ import { assign, cloneDeep, set, get, isNil } from 'lodash'
 import { LayoutNavBar, LayoutActions, LayoutLeft } from 'src/layouts/PageLayout'
 import { omit, isArray, isString } from 'muka'
 import { IInitState, MukaOS, DiyComItem } from 'src/store/state'
-import { Alert, BoxLine, Button, Carousel, Dialog, Drag, Icon, Image, Label, LabelHeader, NavBar, TabBar, Form, Pagination, ScrollView, SearchBar, Upload, Notice, Input, Select } from 'components'
+import { Alert, BoxLine, Button, Carousel, Dialog, Drag, Icon, Image, Label, LabelHeader, NavBar, TabBar, Form, Pagination, ScrollView, SearchBar, Upload, Notice, Input, Select, Grid } from 'components'
 import http, { IRresItems, IRresItem, baseUrl, httpUtils, getTitle } from 'src/utils/axios'
 import { connect, DispatchProp } from 'react-redux'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
@@ -41,7 +41,7 @@ interface IComponents {
     edit: boolean
 }
 
-type IComponentType = 'TabBar' | 'NavBar' | 'Carousel' | 'SearchBar' | 'Notice' | 'GoodsList' | ''
+type IComponentType = 'TabBar' | 'NavBar' | 'Carousel' | 'SearchBar' | 'Notice' | 'GoodsList' | 'Navigation' | ''
 
 type typeList = 'LForm' | 'Carousel'
 
@@ -130,6 +130,7 @@ const ComponentPropsVIew = styled.div`
     background: #fff;
     height: 100%;
     padding: ${getUnit(10)};
+    overflow-y: auto;
 `
 
 const ComponentLabel = styled.div`
@@ -472,7 +473,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
         const { dispatch } = this.props
         try {
             dispatch({ type: SET_SPINLOADING_DATA, data: true })
-            const { data } = await http('http://192.168.1.105:8800/set/admin/diy-menu', {}, { method: 'GET' })
+            const { data } = await http('http://192.168.1.103:8800/set/admin/diy-menu', {}, { method: 'GET' })
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
             dispatch({ type: SET_DIY_COM_DATA, data: data })
         } catch (e) {
@@ -622,6 +623,16 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                     <Carousel {...data.props} />
                 </EditComponent>
             )
+            case 'Navigation': return (
+                <EditComponent
+                    edit={data.edit}
+                    key={index}
+                    onClick={this.handleEdit.bind(this, data, index)}
+                    onDelete={this.handleDelete.bind(this, index)}
+                >
+                    <Grid  {...data.props} />
+                </EditComponent>
+            )
             case 'GoodsList': {
                 const value: any[] = data.props.value || []
                 return (
@@ -758,10 +769,14 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
         })
     }
 
-    private handleCarouselHref = (index: number, e: ChangeEvent<HTMLInputElement>) => {
+    private handleCarouselHref = (index: number, field: string, ve: string, e: ChangeEvent<HTMLInputElement>) => {
         const { componentData, dispatch } = this.props
-        componentData.pagePorps[this.index].props.value[index].href = e.target.value
+        componentData.pagePorps[this.index].props[field][index][ve] = e.target.value
         dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
+        console.log(this.acFun, field)
+        this.acFun?.setFieldValue({
+            [field]: componentData.pagePorps[this.index].props[field]
+        })
     }
 
     private handleFieldAdd = (field: string, comName: string) => {
@@ -785,6 +800,13 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                         })
                     }
                 })
+            }; break;
+            case 'Navigation': {
+                componentData.pagePorps[this.index].props[field].push({
+                    url: defImg,
+                    label: '标题',
+                })
+                dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
             }; break;
         };
     }
@@ -983,8 +1005,9 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                                                                                             <Button mold="primary" onClick={this.handleGoodsView.bind(this, index, 'value')}>跳转地址</Button>
                                                                                         </div>
                                                                                         <div className="flex" style={{ marginTop: getUnit(16) }}>
-                                                                                            <Input className="flex_1" value={i.href} placeholder="外部连接(填写后将作为默认跳转)" onChange={this.handleCarouselHref.bind(this, index)} />
+                                                                                            <Input className="flex_1" value={i.href} placeholder="外部连接(填写后将作为默认跳转)" onChange={this.handleCarouselHref.bind(this, index, 'value', 'href')} />
                                                                                         </div>
+
                                                                                     </div>
                                                                                     <CloseIcon
                                                                                         icon="md-close-circle"
@@ -1151,6 +1174,165 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                 },
                 field: 'showView'
             }]
+            case 'Navigation': return [{
+                component: 'Slider',
+                label: <ComponentLabel>圆角边框</ComponentLabel>,
+                props: {
+                    value: get(componentData.pagePorps[this.index].props, 'style.borderRadius') || 0,
+                    max: 20,
+                    onChange: this.updateChangeComData.bind(this, 'style.borderRadius')
+                },
+                extend: (vals) => {
+                    return <div>{vals['style.borderRadius']}px(像数)</div>
+                },
+                field: 'style.borderRadius',
+            }, {
+                component: 'Slider',
+                label: <ComponentLabel>上边距</ComponentLabel>,
+                props: {
+                    value: get(componentData.pagePorps[this.index].props, 'style.marginTop') || 0,
+                    max: 20,
+                    onChange: this.updateChangeComData.bind(this, 'style.marginTop')
+                },
+                extend: (vals) => {
+                    return <div>{vals['style.marginTop']}px(像数)</div>
+                },
+                field: 'style.marginTop',
+            }, {
+                component: 'Slider',
+                label: <ComponentLabel>下边距</ComponentLabel>,
+                props: {
+                    value: get(componentData.pagePorps[this.index].props, 'style.marginBottom') || 0,
+                    max: 20,
+                    onChange: this.updateChangeComData.bind(this, 'style.marginBottom')
+                },
+                extend: (vals) => {
+                    return <div>{vals['style.marginBottom']}px(像数)</div>
+                },
+                field: 'style.marginBottom',
+            }, {
+                component: 'RadioGroup',
+                label: <ComponentLabel>每列个数</ComponentLabel>,
+                props: {
+                    value: componentData.pagePorps[this.index].props['columnNum'],
+                    options: [{
+                        label: '3个',
+                        value: 3,
+                    }, {
+                        label: '4个',
+                        value: 4,
+                    }, {
+                        label: '5个',
+                        value: 5,
+                    }],
+                    onChange: this.updateChangeComData.bind(this, 'columnNum')
+                },
+                field: 'columnNum'
+            }, {
+                component: 'NULL',
+                props: {
+                    value: componentData.pagePorps[this.index].props['data'] || null
+                },
+                field: 'data',
+            }, {
+                component: 'Colors',
+                label: <ComponentLabel>背景颜色</ComponentLabel>,
+                props: {
+                    initColor: componentData.pagePorps[this.index].props['background'],
+                    onChange: this.updateComColorData.bind(this, 'style.background'),
+                },
+                field: 'style.background',
+            }, {
+                component: 'RadioGroup',
+                label: <ComponentLabel>数据来源</ComponentLabel>,
+                props: {
+                    value: componentData.pagePorps[this.index].props['dataGetType'],
+                    options: [{
+                        label: '服务端获取',
+                        value: 'server',
+                    }, {
+                        label: '自定义',
+                        value: 'diy',
+                    }],
+                    onChange: this.updateChangeComData.bind(this, 'dataGetType')
+                },
+                field: 'dataGetType',
+                additional: (val) => {
+                    if (val.dataGetType == 'diy') {
+                        return (
+                            <div>
+                                <DragDropContext onDragEnd={this.onDragEnd.bind(this, 'Navigation')}>
+                                    <Droppable droppableId="droppablea" >
+                                        {(provided) => (
+                                            <div
+                                                {...provided.droppableProps}
+                                                ref={provided.innerRef}
+                                                style={{ height: '100%' }}
+                                            >
+                                                {
+                                                    val.data.map((i: any, index: number) => {
+                                                        return (
+                                                            <Draggable key={index} draggableId={index.toString()} index={index}>
+                                                                {(provided) => {
+                                                                    return (
+                                                                        <div
+                                                                            ref={provided.innerRef}
+                                                                            {...provided.draggableProps}
+                                                                            {...provided.dragHandleProps}
+                                                                        >
+                                                                            <ItemBoxView className="flex" key={index}>
+                                                                                <ItemImgBox className="flex_center" 
+                                                                                style={{marginTop: getUnit(14) }} onClick={this.handleUploadView.bind(this, index, 'data')}>
+                                                                                    <Image src={i.url} style={{ width: '100%' }} />
+                                                                                </ItemImgBox>
+                                                                                <div className="flex_1">
+                                                                                    <div className="flex">
+                                                                                        <Input className="flex_1" disabled value={i.link} />
+                                                                                        <Button mold="primary" onClick={this.handleGoodsView.bind(this, index, 'data')}>跳转地址</Button>
+                                                                                    </div>
+                                                                                    <div className="flex" style={{ marginTop: getUnit(4) }}>
+                                                                                        <Input className="flex_1" value={i.href} placeholder="外部连接(填写后将作为默认跳转)" onChange={this.handleCarouselHref.bind(this, index, 'data', 'href')} />
+                                                                                    </div>
+                                                                                    <div className="flex" style={{ marginTop: getUnit(4) }}>
+                                                                                        <Input className="flex_1" value={i.label} placeholder="显示名称" onChange={this.handleCarouselHref.bind(this, index, 'data', 'label')} />
+                                                                                    </div>
+                                                                                </div>
+                                                                                <CloseIcon
+                                                                                    icon="md-close-circle"
+                                                                                    color="rgba(0, 0, 0, 0.3)"
+                                                                                    theme={new IconThemeData({ size: 18 })}
+                                                                                    style={{ cursor: 'pointer' }}
+                                                                                    onClick={this.handleDel.bind(this, index, 'value')}
+                                                                                />
+                                                                            </ItemBoxView>
+                                                                        </div>
+                                                                    )
+                                                                }}
+                                                            </Draggable>
+                                                        )
+
+                                                    })
+                                                }
+                                                {provided.placeholder}
+                                            </div>
+                                        )}
+                                    </Droppable>
+                                </DragDropContext>
+                                <Button
+                                    theme={new ButtonThemeData({ width: '100%' })}
+                                    onClick={this.handleFieldAdd.bind(this, 'data', 'Navigation')}
+                                >
+                                    <div className="flex">
+                                        <Icon icon="ios-add" />
+                                        <div className="flex_center">添加</div>
+                                    </div>
+                                </Button>
+                            </div>
+                        )
+                    }
+                    return <div />
+                }
+            }]
             default: return []
         }
         // return [{
@@ -1258,6 +1440,26 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                 props['showView'] = ['shopName', 'price', 'ori_price']
                 props['background'] = '#fff'
             }; break;
+            case 'Navigation': {
+                props['data'] = [{
+                    url: defImg,
+                    label: '标题',
+                }, {
+                    url: defImg,
+                    label: '标题',
+                }, {
+                    url: defImg,
+                    label: '标题',
+                }, {
+                    url: defImg,
+                    label: '标题',
+                }, {
+                    url: defImg,
+                    label: '标题',
+                },]
+                props['dataGetType'] = 'server'
+                props['columnNum'] = 4
+            }; break;
         }
         componentData.pagePorps.push({
             component: data.module,
@@ -1313,7 +1515,6 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
         if (!result.destination) {
             return
         }
-        console.log(result)
         const { componentData, dispatch } = this.props
         let items: any
         switch (comName) {
@@ -1325,6 +1526,15 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                 );
                 componentData.pagePorps[this.index].props.value = items
                 this.acFun?.setFieldValue({ value: items })
+            }; break;
+            case 'Navigation': {
+                items = reorder(
+                    componentData.pagePorps[this.index].props.data,
+                    result.source.index,
+                    result.destination.index
+                );
+                componentData.pagePorps[this.index].props.value = items
+                this.acFun?.setFieldValue({ data: items })
             }; break;
             default: {
                 items = reorder(
@@ -1354,7 +1564,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
             return i
         })
         try {
-            const data = await http('http://192.168.1.105:8800/set/admin/diy', {
+            const data = await http('http://192.168.1.103:8800/set/admin/diy', {
                 path: 'home',
                 title: '首页',
                 pageColor: '#fff',

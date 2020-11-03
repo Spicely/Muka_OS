@@ -116,7 +116,7 @@ class ShopModal extends PureComponent<IProps & IGoodsModalProps & DispatchProp, 
     private handleFirstLoading = async () => {
         try {
             const { data } = this.state
-            const res = await http(`http://192.168.1.105:8800/set/admin/marketing-integral-goods?status=0&category_id=&name=`, {}, {
+            const res = await http(`http://192.168.1.103:8800/set/admin/marketing-integral-goods?status=0&category_id=&name=`, {}, {
                 method: 'GET',
             })
             this.setState({ data: res.data.data })
