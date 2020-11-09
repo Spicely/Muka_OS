@@ -5,8 +5,8 @@ import { store } from 'src/store'
 interface IValue {
     [name: string]: any
 }
-export const baseUrl = 'https://api.muka.site'
-// export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://192.168.1.134:8080/' : 'http://api.muka.site'
+// export const baseUrl = 'https://192.168.1.5:8'
+export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://192.168.1.5:8081/' : 'http://api.muka.site'
 export const imgUrl = 'https://img.muka.site'
 
 export interface IRresItem<T = any> {
@@ -66,9 +66,9 @@ instance.interceptors.response.use(async function (res: any) {
     // const devia = deviaDecrypt(res.data.devia)
     // res.data = JSON.parse(decrypt(res.data.value, res.data.secret, devia))
     if (res.status === 200 && res.data.code === 200) {
-        return res.data
+        return Promise.resolve(res.data.data)
     } else {
-        return Promise.reject(res.data)
+        return Promise.reject(res.data.msg)
     }
 })
 

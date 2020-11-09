@@ -12,7 +12,7 @@ import CopyToClipboard from 'react-copy-to-clipboard'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { NavBarThemeData, Color, getRatioUnit } from 'src/components/lib/utils'
 import { GlobalView } from 'src/utils/node'
-import { SET_ICONS_DATA, GET_ROUTER } from 'src/store/action'
+import { SET_ICONS_DATA, GET_ROUTER, SET_SPINLOADING_DATA } from 'src/store/action'
 
 interface IProps extends DispatchProp {
     icons: IIcons[]
@@ -91,8 +91,20 @@ class RouterIcons extends Component<IProps, IState> {
     }
 
     public componentDidMount() {
+        this.getData()
+    }
+
+    private async getData() {
         const { dispatch } = this.props
-        dispatch({ type: GET_ROUTER })
+        try {
+            dispatch({ type: SET_SPINLOADING_DATA, data: true })
+            const data = await http('/admin/icon/get')
+            dispatch({ type: SET_SPINLOADING_DATA, data: false })
+            dispatch({ type: SET_ICONS_DATA, data: data })
+        } catch (msg) {
+            dispatch({ type: SET_SPINLOADING_DATA, data: false })
+            message.success(msg)
+        }
     }
 
     private getItems = (fn: IFormFun) => {

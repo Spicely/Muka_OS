@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import styled from 'styled-components'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
 import { Button, LabelHeader, Tag, Form, Table, Label, Dialog, Tree } from 'components'
-import http, {  getTitle } from 'src/utils/axios'
+import http, { getTitle } from 'src/utils/axios'
 import { IJurisd } from 'src/store/reducers/jurisd'
 import { IJurisdiction } from 'src/store/reducers/jurisdiction'
 import { connect, DispatchProp } from 'react-redux'
@@ -11,7 +11,7 @@ import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { ITableColumns } from 'src/components/lib/Table'
 import { GlobalView } from 'src/utils/node'
 import { Color, NavBarThemeData, getUnit, DialogThemeData } from 'src/components/lib/utils'
-import { SET_JURISDICTION_DATA, GET_JURISDICTION } from 'src/store/action'
+import { SET_JURISDICTION_DATA, GET_JURISDICTION, SET_SPINLOADING_DATA } from 'src/store/action'
 import { IJurisdictionOptions } from 'src/store/reducers/jurisdictionOptions'
 import { IRouter } from 'src/store/reducers/router'
 import { message } from 'antd'
@@ -64,8 +64,8 @@ class Jurisdiction extends Component<IProps, IState> {
         key: 'name',
     }, {
         title: '拥有权限',
-        dataIndex: 'jurisd',
-        key: 'jurisd',
+        dataIndex: 'children',
+        key: 'children',
         render: (data: { name: string, id: string }[]) => {
             return data.map((i) => {
                 return <Tag key={i.id} style={{ marginBottom: getUnit(8) }} color="#7edc55" >{i.name}</Tag>
@@ -100,6 +100,7 @@ class Jurisdiction extends Component<IProps, IState> {
                     columns={this.columns}
                     dataSource={jurisdiction}
                     bordered
+                    childrenColumnName="child"
                     rowKey={(data: any) => data.id}
                 />
                 <Dialog
@@ -121,9 +122,17 @@ class Jurisdiction extends Component<IProps, IState> {
         this.getData()
     }
 
-    private getData() {
+    private async getData() {
         const { dispatch } = this.props
-        dispatch({ type: GET_JURISDICTION })
+        try {
+            dispatch({ type: SET_SPINLOADING_DATA, data: true })
+            const data = await http('/admin/authority/find')
+            dispatch({ type: SET_SPINLOADING_DATA, data: false })
+            dispatch({ type: SET_JURISDICTION_DATA, data: data })
+        } catch (msg) {
+            dispatch({ type: SET_SPINLOADING_DATA, data: false })
+            message.success(msg)
+        }
     }
 
     private getItems = (fn: IFormFun) => {

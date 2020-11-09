@@ -21,8 +21,9 @@ export const routes: IRoutes[] = [{
     component: import('../pages/ShopList'),
     path: '/ShopList'
 }, {
+    /// 权限设置
     component: import('../pages/Jurisdiction'),
-    path: '/system/jurisd'
+    path: '/setting/authority'
 }, {
     component: import('../pages/Routers'),
     path: '/setting/router'

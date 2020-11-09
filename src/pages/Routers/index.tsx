@@ -3,7 +3,7 @@ import { find } from 'lodash'
 import { message, Modal } from 'antd'
 import styled from 'styled-components'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
-import { Button, Dialog, LabelHeader, Form, Table, Label, Icon, Image, Tag } from 'components'
+import { Button, Dialog, LabelHeader, Form, Table, Label, Icon, Image, Tag, Toast } from 'components'
 import http, { imgUrl, httpUtils } from '../../utils/axios'
 import { connect, DispatchProp } from 'react-redux'
 import { IFormItem, IFormFun } from 'src/components/lib/Form'
@@ -20,7 +20,7 @@ const { confirm } = Modal
 
 interface IProps extends DispatchProp {
     routers: IRouter[]
-    lastIds: string[]
+    lastIds: number[]
     jurisd: IJurisd[]
     icons: IIcons[]
 }
@@ -28,8 +28,8 @@ interface IProps extends DispatchProp {
 interface IState {
     classifyVisible: boolean
     dialogName: string
-    lastIds: string[]
-    parents: { label: string, value: any }[]
+    lastIds: number[]
+    parents: { label: number, value: any }[]
 }
 
 const FromLabel = styled.div`
@@ -109,12 +109,12 @@ class Routers extends Component<IProps, IState> {
         const { dispatch } = this.props
         try {
             dispatch({ type: SET_SPINLOADING_DATA, data: true })
-            const { data } = await http('/admin/router/get')
+            const data = await http('/admin/router/get')
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
             dispatch({ type: SET_ROUTERS_DATA, data: data })
-        } catch (e) {
+        } catch (msg) {
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
-            httpUtils.verify(e)
+            message.success(msg)
         }
     }
 
@@ -135,6 +135,7 @@ class Routers extends Component<IProps, IState> {
                     dataSource={routers}
                     rowKey={(data: any) => data.id}
                     expandedRowKeys={routers.map(item => item.id)}
+                    pagination={false}
                 />
                 <Dialog
                     visible={classifyVisible}
@@ -254,12 +255,9 @@ class Routers extends Component<IProps, IState> {
                 }
                 if (!router.id) delete router.id
                 if (!router.router_id) delete router.router_id
-                let url = '/admin/router/create'
-                if (router.id) {
-                    url = '/admin/router/update'
-                }
-                const data = await http(url, {
-                    ...router
+                const data = await http(router.id ? '/admin/router/update' : '/admin/router/create', {
+                    ...router,
+                    'icon_id': router.icon_id ? Number(router.icon_id) : null
                 })
                 const { dispatch } = this.props
                 dispatch({ type: SET_ROUTERS_DATA, data: data.data })
@@ -272,8 +270,9 @@ class Routers extends Component<IProps, IState> {
                 })
             }
 
-        } catch (data) {
-            httpUtils.verify(data)
+        } catch (msg) {
+            console.log(msg)
+            message.error(msg)
         }
     }
 
@@ -305,7 +304,6 @@ class Routers extends Component<IProps, IState> {
                     id: ids,
                     status
                 })
-
                 const { dispatch } = this.props
                 dispatch({ type: SET_ROUTERS_DATA, data: data.data })
                 message.success(data.msg)
@@ -340,7 +338,7 @@ class Routers extends Component<IProps, IState> {
             classifyVisible: true,
             dialogName: '修改路由'
         }, () => {
-            // this.initIds(data.id)
+            this.initIds(data.id)
             setTimeout(() => {
                 this.fn && this.fn.setFieldValue({
                     ...data,
@@ -350,10 +348,10 @@ class Routers extends Component<IProps, IState> {
         })
     }
 
-    private initIds = (id?: string) => {
+    private initIds = (id?: number) => {
         const { routers } = this.props
-        const lastIds: string[] = []
-        const parents: { label: string, value: any, children?: any[] }[] = []
+        const lastIds: number[] = []
+        const parents: { label: number, value: any, children?: any[] }[] = []
         routers.forEach((i: any) => {
             if (i.id !== id) {
                 parents.push({
