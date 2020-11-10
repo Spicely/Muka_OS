@@ -6,7 +6,7 @@ interface IValue {
     [name: string]: any
 }
 // export const baseUrl = 'https://192.168.1.5:8'
-export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://192.168.1.5:8081/' : 'http://api.muka.site'
+export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://192.168.1.114:8081/' : 'http://api.muka.site'
 export const imgUrl = 'https://img.muka.site'
 
 export interface IRresItem<T = any> {
@@ -57,10 +57,10 @@ export const deviaDecrypt = (data: string) => {
     return decryptedStr.toString()
 }
 
-instance.interceptors.request.use(function (req: AxiosRequestConfig) {
-    req.headers.Authorization = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xOTIuMTY4LjEuMTAzOjg4MDBcL3NldFwvYWRtaW5cL2xvZ2luIiwiaWF0IjoxNjA0MzczMzI3LCJleHAiOjE2MDQ5NzgxMjcsIm5iZiI6MTYwNDM3MzMyNywianRpIjoiNkJoVW9oZk05WjlSbGYxeSIsInN1YiI6MSwicHJ2IjoiZGY4ODNkYjk3YmQwNWVmOGZmODUwODJkNjg2YzQ1ZTgzMmU1OTNhOSJ9.RHm99X8k0TncjJXQ6wdcIlcQyU1Rbcm7sFuHlG8wXDA'
-    return req
-})
+// instance.interceptors.request.use(function (req: AxiosRequestConfig) {
+//     req.headers.Authorization = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xOTIuMTY4LjEuMTAzOjg4MDBcL3NldFwvYWRtaW5cL2xvZ2luIiwiaWF0IjoxNjA0MzczMzI3LCJleHAiOjE2MDQ5NzgxMjcsIm5iZiI6MTYwNDM3MzMyNywianRpIjoiNkJoVW9oZk05WjlSbGYxeSIsInN1YiI6MSwicHJ2IjoiZGY4ODNkYjk3YmQwNWVmOGZmODUwODJkNjg2YzQ1ZTgzMmU1OTNhOSJ9.RHm99X8k0TncjJXQ6wdcIlcQyU1Rbcm7sFuHlG8wXDA'
+//     return req
+// })
 
 instance.interceptors.response.use(async function (res: any) {
     // const devia = deviaDecrypt(res.data.devia)

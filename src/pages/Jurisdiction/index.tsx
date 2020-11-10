@@ -16,6 +16,7 @@ import { IJurisdictionOptions } from 'src/store/reducers/jurisdictionOptions'
 import { IRouter } from 'src/store/reducers/router'
 import { message } from 'antd'
 import { union } from 'lodash'
+import routers from 'src/store/reducers/routers'
 
 const { TreeNode } = Tree
 
@@ -137,7 +138,7 @@ class Jurisdiction extends Component<IProps, IState> {
 
     private getItems = (fn: IFormFun) => {
         const { jurisdictionOptions, routers } = this.props
-        const { treeVal } = this.state
+        const { treeVal, parentVal } = this.state
         this.fn = fn
         const items: IFormItem[] = [{
             component: 'NULL',
@@ -166,6 +167,7 @@ class Jurisdiction extends Component<IProps, IState> {
                         onCheck={this.handleSelectRouter}
                         selectable={false}
                         checkedKeys={treeVal}
+                        expandedKeys={parentVal}
                     >
                         {
                             routers.map((i: any) => {
@@ -200,10 +202,8 @@ class Jurisdiction extends Component<IProps, IState> {
 
     private handleSelectRouter = (checkedKeys: any, info: any) => {
         const treeVal = [...checkedKeys]
-        const parentVal = [...info.halfCheckedKeys]
         this.setState({
             treeVal,
-            parentVal
         })
     }
 
@@ -212,51 +212,51 @@ class Jurisdiction extends Component<IProps, IState> {
             if (this.fn) {
                 const { treeVal, parentVal } = this.state
                 const jurisd = this.fn.getFieldValue()
-                let url = '/admin/jurisd_classify/create'
-                if (jurisd.id) {
-                    url = '/admin/jurisd_classify/update'
-                }
-                const data = await http(url, {
+                console.log(union(treeVal, parentVal))
+                const data = await http(jurisd.id ? '/admin/authority/update' : '/admin/authority/create', {
                     ...jurisd,
-                    routers: union(treeVal, parentVal)
+                    type: 1,
+                    children: union(treeVal, parentVal).map((i) => Number(i))
+                }, {
+                    method: jurisd.id ? 'PUT' : 'POST'
                 })
-                const { dispatch } = this.props
-                dispatch({ type: SET_JURISDICTION_DATA, data: data.data })
-                message.success(data.msg)
-                this.setState({
-                    visible: false
-                })
-                this.fn.cleanFieldValue()
+                // const { dispatch } = this.props
+                // dispatch({ type: SET_JURISDICTION_DATA, data: data.data })
+                // message.success(data.msg)
+                // this.setState({
+                //     visible: false
+                // })
+                // this.fn.cleanFieldValue()
             }
 
-        } catch (e) {
-            message.error(e.msg || '网络不稳定,请稍后再试')
+        } catch (msg) {
+            message.error(msg)
         }
     }
 
-    private handleEdit = async (data: IJurisdiction, index: number) => {
+    private handleEdit = async (data: any, index: number) => {
         const { routers } = this.props
         const treeVal: string[] = []
         const parentVal: string[] = []
         routers.forEach((i: any) => {
-            parentVal.push(i.id)
+            parentVal.push(i.id.toString())
             if (i.children) {
                 i.children.forEach((v: any) => {
-                    if (data.routers.includes(v.id)) {
-                        treeVal.push(v.id)
+                    if (data.children.find((z: any) => z.id == v.id) != -1) {
+                        treeVal.push(v.id.toString());
                     }
                     if (v.children) {
                         parentVal.push(v.id)
                         v.children.forEach((e: any) => {
-                            if (data.routers.includes(e.id)) {
-                                treeVal.push(e.id)
+                            if (data.routers.find((z: any) => z.id == e.id) != -1) {
+                                treeVal.push(e.id.toString())
                             }
                         })
                     }
                 })
             } else {
-                if (data.routers.includes(i.id)) {
-                    treeVal.push(i.id)
+                if (data.children?.find((z: any) => z.id == i.id) != -1) {
+                    treeVal.push(i.id.toString())
                 }
             }
         })
@@ -268,7 +268,7 @@ class Jurisdiction extends Component<IProps, IState> {
             setTimeout(() => {
                 this.fn && this.fn.setFieldValue({
                     ...data,
-                    jurisd: data.jurisd.map(i => i.id)
+                    // jurisd: data.jurisd.map(i => i.id)
                 })
             }, 10)
         })

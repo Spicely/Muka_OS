@@ -156,14 +156,14 @@ class Login extends Component<IProps & DispatchProp, IState> {
                 const res = await http('/admin/user/login', { ...data, keep: data.keep[0] || false })
                 const { history, dispatch } = this.props
                 dispatch({ type: SET_LOGIN, data: true })
-                dispatch({ type: SET_USERINFO_DATA, data: res.data })
-                dispatch({ type: SET_ROUTER_DATA, data: res.data?.authority?.children || [] })
+                dispatch({ type: SET_USERINFO_DATA, data: res })
+                dispatch({ type: SET_ROUTER_DATA, data: res?.authority?.children || [] })
                 setTimeout(() => {
                     history.replace('/')
                 }, 10)
             }
-        } catch (e) {
-            message.error(e.msg || '网络不稳定,请稍后再试')
+        } catch (msg) {
+            message.error(msg)
         }
     }
 }

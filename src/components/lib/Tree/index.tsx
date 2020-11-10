@@ -25,6 +25,9 @@ const LATree = styled(ATree) <{ treeTheme: TreeThemeData }>`
     .ant-tree-checkbox-wrapper:hover .ant-tree-checkbox-inner, .ant-tree-checkbox:hover .ant-tree-checkbox-inner, .ant-tree-checkbox-input:focus + .ant-tree-checkbox-inner {
         border-color: ${({ theme, treeTheme }) => treeTheme.treeColor || theme.primarySwatch};
     }
+    .ant-tree-checkbox-inner:after {
+        background-color: ${({ theme, treeTheme }) => treeTheme.treeColor || theme.primarySwatch};
+    }
 `
 
 export default class Tree extends Component<ITreeProps, any> {

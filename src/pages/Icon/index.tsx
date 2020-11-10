@@ -46,7 +46,6 @@ class RouterIcons extends Component<IProps, IState> {
     public render(): JSX.Element {
         const { icons } = this.props
         const { classifyVisible, dialogName } = this.state
-        console.log(icons)
         return (
             <GlobalView>
                 <LayoutNavBar
