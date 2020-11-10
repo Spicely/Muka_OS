@@ -5,8 +5,7 @@ import { store } from 'src/store'
 interface IValue {
     [name: string]: any
 }
-// export const baseUrl = 'https://api.muka.site'
-export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://192.168.1.134:8080/' : 'http://api.muka.site'
+export const baseUrl = process.env.NODE_ENV === 'development' ? '' : window.parent.localStorage.getItem('baseURL')
 export const imgUrl = 'https://img.muka.site'
 
 export interface IRresItem<T = any> {
@@ -21,7 +20,7 @@ export interface IRresItems<T = any> {
 }
 
 const instance = axois.create({
-    baseURL: baseUrl,
+    baseURL: baseUrl || '',
     timeout: 25000,
     method: 'POST',
     withCredentials: true,
@@ -58,7 +57,7 @@ export const deviaDecrypt = (data: string) => {
 }
 
 instance.interceptors.request.use(function (req: AxiosRequestConfig) {
-    req.headers.Authorization = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xOTIuMTY4LjEuMTAzOjg4MDBcL3NldFwvYWRtaW5cL2xvZ2luIiwiaWF0IjoxNjA0MzczMzI3LCJleHAiOjE2MDQ5NzgxMjcsIm5iZiI6MTYwNDM3MzMyNywianRpIjoiNkJoVW9oZk05WjlSbGYxeSIsInN1YiI6MSwicHJ2IjoiZGY4ODNkYjk3YmQwNWVmOGZmODUwODJkNjg2YzQ1ZTgzMmU1OTNhOSJ9.RHm99X8k0TncjJXQ6wdcIlcQyU1Rbcm7sFuHlG8wXDA'
+    req.headers.Authorization = process.env.NODE_ENV === 'development' ? '12' : window.parent.localStorage.getItem('token')
     return req
 })
 

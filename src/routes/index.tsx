@@ -18,40 +18,7 @@ export interface IRoutes {
 }
 
 export const routes: IRoutes[] = [{
-    component: import('../pages/ShopList'),
-    path: '/ShopList'
-}, {
-    component: import('../pages/Jurisdiction'),
-    path: '/system/jurisd'
-}, {
-    component: import('../pages/Routers'),
-    path: '/setting/router'
-}, {
-    component: import('../pages/Setting'),
-    path: '/setting/config'
-}, {
-    component: import('../pages/Setting'),
-    path: '/system'
-}, {
-    component: import('../pages/Icon'),
-    path: '/setting/icon'
-}, {
-    component: import('../pages/Diy'),
-    path: '/page/diy'
-}, {
     component: import('../pages/Diy/edit'),
-    path: '/diy/item'
-}, {
-    component: import('../pages/Carousel'),
-    path: '/platform/carousel'
-}, {
-    component: import('../pages/Region'),
-    path: '/platform/region'
-}, {
-    component: import('../pages/View'),
-    path: '/view/:id'
-}, {
-    component: import('../pages/Index'),
     path: '/'
 },]
 

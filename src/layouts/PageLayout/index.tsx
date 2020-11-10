@@ -281,11 +281,11 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
         )
         return (
             <Layout
-                menuOptions={menuOptions}
+                // menuOptions={menuOptions}
                 baseUrl={imgUrl}
-                logoView={logoView}
-                pageNav={pageNav}
-                menuChange={this.handleChange}
+                // logoView={logoView}
+                // pageNav={pageNav}
+                // menuChange={this.handleChange}
             >
                 <div className="flex_column" style={{ height: '100%' }}>
                     <div id="navBar_item"></div>
@@ -300,9 +300,9 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                             extendRoute.length ? (
                                 <LayoutMenu>
                                     <LayoutAniMenu className="flex_column" show={solo}>
-                                        <LayoutTitle className="flex_center">
+                                        {/* <LayoutTitle className="flex_center">
                                             {title}
-                                        </LayoutTitle>
+                                        </LayoutTitle> */}
                                         <Menu
                                             arrowIconPos="left"
                                             fieldToUrl

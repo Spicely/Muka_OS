@@ -473,7 +473,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
         const { dispatch } = this.props
         try {
             dispatch({ type: SET_SPINLOADING_DATA, data: true })
-            const { data } = await http('http://192.168.1.103:8800/set/admin/diy-menu', {}, { method: 'GET' })
+            const { data } = await http('/admin/diy-menu', {}, { method: 'GET' })
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
             dispatch({ type: SET_DIY_COM_DATA, data: data })
         } catch (e) {
@@ -1561,10 +1561,16 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
             if (i.component == 'Carousel' && i.props['dataGetType'] == 'server') {
                 i.props.value = []
             }
+            if (i.component == 'Navigation' && i.props['dataGetType'] == 'server') {
+                i.props.data = []
+            }
+            if (i.component == 'GoodsList' && i.props['dataGetType'] == 'server') {
+                i.props.value = []
+            }
             return i
         })
         try {
-            const data = await http('http://192.168.1.103:8800/set/admin/diy', {
+            const data = await http('/admin/diy', {
                 path: 'home',
                 title: '首页',
                 pageColor: '#fff',

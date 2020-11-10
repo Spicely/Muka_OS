@@ -9,12 +9,11 @@ class RouterItem extends Component<any, any> {
 
     public render(): JSX.Element {
         const { userInfo } = this.props
-        console.log(userInfo)
         return (
             <Switch>
                 {
                     routes.map((item: IRoutes, index: number) => {
-                        return <Route path={item.path} exact component={loadable(item.component)} key={index} />
+                        return <Route path={item.path} component={loadable(item.component)} key={index} />
                     })
                 }
             </Switch>
