@@ -114,7 +114,7 @@ class Routers extends Component<IProps, IState> {
             dispatch({ type: SET_ROUTERS_DATA, data: data })
         } catch (msg) {
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
-            message.success(msg)
+            message.error(msg)
         }
     }
 

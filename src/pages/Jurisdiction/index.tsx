@@ -4,19 +4,17 @@ import { LayoutNavBar } from 'src/layouts/PageLayout'
 import { Button, LabelHeader, Tag, Form, Table, Label, Dialog, Tree } from 'components'
 import http, { getTitle } from 'src/utils/axios'
 import { IJurisd } from 'src/store/reducers/jurisd'
-import { IJurisdiction } from 'src/store/reducers/jurisdiction'
 import { connect, DispatchProp } from 'react-redux'
 import { IInitState } from 'src/store/state'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { ITableColumns } from 'src/components/lib/Table'
 import { GlobalView } from 'src/utils/node'
 import { Color, NavBarThemeData, getUnit, DialogThemeData } from 'src/components/lib/utils'
-import { SET_JURISDICTION_DATA, GET_JURISDICTION, SET_SPINLOADING_DATA } from 'src/store/action'
+import { SET_JURISDICTION_DATA, SET_SPINLOADING_DATA } from 'src/store/action'
 import { IJurisdictionOptions } from 'src/store/reducers/jurisdictionOptions'
 import { IRouter } from 'src/store/reducers/router'
 import { message } from 'antd'
 import { union } from 'lodash'
-import routers from 'src/store/reducers/routers'
 
 const { TreeNode } = Tree
 
@@ -64,7 +62,7 @@ class Jurisdiction extends Component<IProps, IState> {
         dataIndex: 'name',
         key: 'name',
     }, {
-        title: '拥有权限',
+        title: '拥有路由',
         dataIndex: 'children',
         key: 'children',
         render: (data: { name: string, id: string }[]) => {
@@ -132,12 +130,12 @@ class Jurisdiction extends Component<IProps, IState> {
             dispatch({ type: SET_JURISDICTION_DATA, data: data })
         } catch (msg) {
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
-            message.success(msg)
+            message.error(msg)
         }
     }
 
     private getItems = (fn: IFormFun) => {
-        const { jurisdictionOptions, routers } = this.props
+        const { routers } = this.props
         const { treeVal, parentVal } = this.state
         this.fn = fn
         const items: IFormItem[] = [{
@@ -150,13 +148,6 @@ class Jurisdiction extends Component<IProps, IState> {
                 placeholder: '请输入角色名'
             },
             field: 'name'
-        }, {
-            component: 'CheckBox',
-            label: <FromLabel>权限</FromLabel>,
-            props: {
-                options: jurisdictionOptions
-            },
-            field: 'jurisd'
         }, {
             component: 'Label',
             label: <FromLabel>路由设置</FromLabel>,

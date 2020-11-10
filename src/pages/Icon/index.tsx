@@ -102,7 +102,7 @@ class RouterIcons extends Component<IProps, IState> {
             dispatch({ type: SET_ICONS_DATA, data: data })
         } catch (msg) {
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
-            message.success(msg)
+            message.error(msg)
         }
     }
 
