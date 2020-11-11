@@ -1,12 +1,14 @@
 import CryptoJS from 'crypto-js'
 import axois, { AxiosRequestConfig } from 'axios'
 import { store } from 'src/store'
+import { error } from 'console'
+import { message } from 'antd'
 
 interface IValue {
     [name: string]: any
 }
 // export const baseUrl = 'https://192.168.1.5:8'
-export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://192.168.1.5:8081/' : 'http://api.muka.site'
+export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://192.168.1.114:8081/' : 'http://api.muka.site'
 export const imgUrl = 'https://img.muka.site'
 
 export interface IRresItem<T = any> {
@@ -67,9 +69,17 @@ instance.interceptors.response.use(async function (res: any) {
     // res.data = JSON.parse(decrypt(res.data.value, res.data.secret, devia))
     if (res.status === 200 && res.data.code === 200) {
         return Promise.resolve(res.data.data)
+    } else if (res.status === 200 && res.data.code === 400) {
+        message.error(res.data.msg)
+        // window.location.replace('/login')
     } else {
         return Promise.reject(res.data.msg)
     }
+}, error => {
+    if (error.message == 'Network Error') {
+        return Promise.reject('服务器异常')
+    }
+    return Promise.reject('请求超时')
 })
 
 const http = function (url: string, params?: IValue, config?: AxiosRequestConfig): any {

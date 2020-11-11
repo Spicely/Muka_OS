@@ -14,6 +14,7 @@ import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import Color from 'src/components/lib/utils/Color'
 import { IconThemeData, MenuThemeData, ThemeData, transition, InputThemeData, NavBarThemeData, getUnit } from 'src/components/lib/utils'
 import { GET_LAYOUT_DATA, SET_COLLAPSED, SET_SOLO, SET_LOGIN, SET_ICONS_DATA, SET_ROUTER_DATA } from 'src/store/action'
+import msg from 'src/components/lib/Icon/global/msg'
 
 interface IPageLayout extends DispatchProp {
     solo: boolean
@@ -396,7 +397,7 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
         for (let i = 0; i < router.length; i++) {
             if (router[i].path === field) {
                 selected = field
-                if (router[i].children) {
+                if (router[i].children?.length) {
                     initSelectd = (router[i].children || [])[0].path
                 }
                 break

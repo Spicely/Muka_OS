@@ -10,11 +10,11 @@ import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { ITableColumns } from 'src/components/lib/Table'
 import { GlobalView } from 'src/utils/node'
 import { Color, NavBarThemeData, getUnit, DialogThemeData } from 'src/components/lib/utils'
-import { SET_JURISDICTION_DATA, SET_SPINLOADING_DATA } from 'src/store/action'
+import { SET_JURISDICTION_DATA, SET_ROUTER_DATA, SET_SPINLOADING_DATA } from 'src/store/action'
 import { IJurisdictionOptions } from 'src/store/reducers/jurisdictionOptions'
 import { IRouter } from 'src/store/reducers/router'
 import { message } from 'antd'
-import { union } from 'lodash'
+import { difference, union } from 'lodash'
 
 const { TreeNode } = Tree
 
@@ -36,6 +36,8 @@ interface IState {
     dialogName: string
     treeVal: string[]
     parentVal: string[]
+    halfCheckedKeys: string[]
+    diffVal: string[]
 }
 
 const dialogTheme = new DialogThemeData({
@@ -48,7 +50,9 @@ class Jurisdiction extends Component<IProps, IState> {
         visible: false,
         dialogName: '',
         treeVal: [],
-        parentVal: []
+        parentVal: [],
+        halfCheckedKeys: [],
+        diffVal: [],
     }
 
     private fn: IFormFun | null = null
@@ -66,7 +70,7 @@ class Jurisdiction extends Component<IProps, IState> {
         dataIndex: 'children',
         key: 'children',
         render: (data: { name: string, id: string }[]) => {
-            return data.map((i) => {
+            return (data || []).map((i) => {
                 return <Tag key={i.id} style={{ marginBottom: getUnit(8) }} color="#7edc55" >{i.name}</Tag>
             })
         }
@@ -136,7 +140,7 @@ class Jurisdiction extends Component<IProps, IState> {
 
     private getItems = (fn: IFormFun) => {
         const { routers } = this.props
-        const { treeVal, parentVal } = this.state
+        const { treeVal, diffVal, parentVal } = this.state
         this.fn = fn
         const items: IFormItem[] = [{
             component: 'NULL',
@@ -157,7 +161,7 @@ class Jurisdiction extends Component<IProps, IState> {
                         checkable
                         onCheck={this.handleSelectRouter}
                         selectable={false}
-                        checkedKeys={treeVal}
+                        checkedKeys={difference(treeVal, diffVal)}
                         expandedKeys={parentVal}
                     >
                         {
@@ -195,29 +199,29 @@ class Jurisdiction extends Component<IProps, IState> {
         const treeVal = [...checkedKeys]
         this.setState({
             treeVal,
+            halfCheckedKeys: info.halfCheckedKeys
         })
     }
 
     private handleUpdateOrCreate = async () => {
         try {
             if (this.fn) {
-                const { treeVal, parentVal } = this.state
+                const { treeVal, halfCheckedKeys } = this.state
                 const jurisd = this.fn.getFieldValue()
-                console.log(union(treeVal, parentVal))
                 const data = await http(jurisd.id ? '/admin/authority/update' : '/admin/authority/create', {
                     ...jurisd,
                     type: 1,
-                    children: union(treeVal, parentVal).map((i) => Number(i))
+                    children: union(treeVal, halfCheckedKeys).map((i) => Number(i))
                 }, {
                     method: jurisd.id ? 'PUT' : 'POST'
                 })
-                // const { dispatch } = this.props
-                // dispatch({ type: SET_JURISDICTION_DATA, data: data.data })
-                // message.success(data.msg)
-                // this.setState({
-                //     visible: false
-                // })
-                // this.fn.cleanFieldValue()
+                const { dispatch } = this.props
+                dispatch({ type: SET_JURISDICTION_DATA, data: data.authority })
+                dispatch({ type: SET_ROUTER_DATA, data: data.routers })
+                this.setState({
+                    visible: false
+                })
+                this.fn.cleanFieldValue()
             }
 
         } catch (msg) {
@@ -225,41 +229,29 @@ class Jurisdiction extends Component<IProps, IState> {
         }
     }
 
-    private handleEdit = async (data: any, index: number) => {
+    private handleEdit = async (data: any) => {
         const { routers } = this.props
         const treeVal: string[] = []
         const parentVal: string[] = []
+        const diffVal: string[] = []
         routers.forEach((i: any) => {
             parentVal.push(i.id.toString())
             if (i.children) {
-                i.children.forEach((v: any) => {
-                    if (data.children.find((z: any) => z.id == v.id) != -1) {
-                        treeVal.push(v.id.toString());
-                    }
-                    if (v.children) {
-                        parentVal.push(v.id)
-                        v.children.forEach((e: any) => {
-                            if (data.routers.find((z: any) => z.id == e.id) != -1) {
-                                treeVal.push(e.id.toString())
-                            }
-                        })
-                    }
-                })
-            } else {
-                if (data.children?.find((z: any) => z.id == i.id) != -1) {
-                    treeVal.push(i.id.toString())
-                }
+                diffVal.push(i.id.toString())
             }
+        })
+        data.children.forEach((i: any) => {
+            treeVal.push(i.id.toString())
         })
         this.setState({
             visible: true,
             treeVal,
-            parentVal
+            parentVal,
+            diffVal,
         }, () => {
             setTimeout(() => {
                 this.fn && this.fn.setFieldValue({
                     ...data,
-                    // jurisd: data.jurisd.map(i => i.id)
                 })
             }, 10)
         })

@@ -74,10 +74,10 @@ export default class Setting extends Component<IProps, IState> {
     private getData = async () => {
         try {
             const data = await http('/admin/config/get')
-            this.fn && this.fn.setFieldValue(data.data)
-            this.payFn && this.payFn.setFieldValue(data.data)
-        } catch (e) {
-            message.error('网络不稳定,请稍后再试')
+            this.fn && this.fn.setFieldValue(data)
+            this.payFn && this.payFn.setFieldValue(data)
+        } catch (msg) {
+            message.error(msg)
         }
     }
 

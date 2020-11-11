@@ -15,7 +15,7 @@ import { IFormItem, IFormFun } from 'src/components/lib/Form'
 import { ITableColumns } from 'src/components/lib/Table'
 import { GlobalView, FormRequire, FormLable } from 'src/utils/node'
 import { NavBarThemeData, Color, getUnit } from 'src/components/lib/utils'
-import { SET_USERLIST_DATA, GET_USERLIST } from 'src/store/action'
+import { GET_USERLIST } from 'src/store/action'
 
 interface IProps extends DispatchProp {
     userList: IUserList
