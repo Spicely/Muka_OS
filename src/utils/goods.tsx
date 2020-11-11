@@ -113,7 +113,7 @@ class GoodsModal extends PureComponent<IProps & IGoodsModalProps & DispatchProp,
             switch (activeNum) {
                 default: url = '/admin/marketing-integral-goods'
             }
-            const res = await http(`http://192.168.1.103:8800/set${url}`, {}, {
+            const res = await http(`${url}`, {}, {
                 method: 'GET',
             })
             data[activeNum] = res.data.data
