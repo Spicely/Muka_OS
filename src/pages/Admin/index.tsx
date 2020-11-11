@@ -1,11 +1,8 @@
 import React, { Component } from 'react'
 import { message } from 'antd'
-import moment from 'moment'
-import { find } from 'lodash'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
 import { Button, Dialog, LabelHeader, Form, Tag, Table, Label } from 'components'
-import http, { httpUtils, getTitle } from 'src/utils/axios'
-import { IUserList } from 'src/store/reducers/userList'
+import http, { httpUtils } from 'src/utils/axios'
 import { IJurisdiction } from 'src/store/reducers/jurisdiction'
 import { IJurisd } from 'src/store/reducers/jurisd'
 import { IUserInfo } from 'src/store/reducers/userInfo'
@@ -15,10 +12,11 @@ import { IFormItem, IFormFun } from 'src/components/lib/Form'
 import { ITableColumns } from 'src/components/lib/Table'
 import { GlobalView, FormRequire, FormLable } from 'src/utils/node'
 import { NavBarThemeData, Color, getUnit } from 'src/components/lib/utils'
-import { GET_USERLIST } from 'src/store/action'
+import { SET_SPINLOADING_DATA, SET_USERLIST_DATA } from 'src/store/action'
+import moment from 'moment'
 
 interface IProps extends DispatchProp {
-    userList: IUserList
+    userList: IUserInfo[]
     jurisd: IJurisd[]
     userInfo: IUserInfo
     jurisdiction: IJurisdiction[]
@@ -38,30 +36,32 @@ class AdminList extends Component<IProps, IState> {
 
     private fn: IFormFun | null = null
 
-    private title = getTitle('/system/user')
+    private pageNum: number = 1
 
     private columns: ITableColumns<any>[] = [{
         title: '用户名',
-        dataIndex: 'username',
-        key: 'username',
+        dataIndex: 'userName',
+        key: 'userName',
 
     }, {
         title: '注册时间',
         dataIndex: 'created_at',
-        key: 'created_at'
+        key: 'created_at',
+        render: (value: string) => {
+            return moment(value).format('YYYY-MM-DD HH:mm:ss')
+        }
     }, {
         title: '权限',
-        dataIndex: 'role',
-        key: 'role',
-        render: (role: any) => {
-            return role.name
+        dataIndex: 'authority',
+        key: 'authority',
+        render: (authority: any) => {
+            return <Tag>{authority.name}</Tag>
         }
     }, {
         title: '操作',
         dataIndex: 'actions',
         key: 'actions',
-        render: (val: any, data: IUserList) => {
-            const { jurisd, userInfo } = this.props
+        render: (val: any, data: IUserInfo) => {
             return (
                 <div>
                     <Label onClick={this.handleEdit.bind(this, data)}>修改</Label>
@@ -78,12 +78,13 @@ class AdminList extends Component<IProps, IState> {
                 <LayoutNavBar
                     left={null}
                     theme={new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255) })}
-                    title={<LabelHeader title={this.title} line="vertical" />}
+                    title={<LabelHeader title="用户列表" line="vertical" />}
                     right={<Button mold="primary" onClick={this.setClassifyVisble}>创建管理员</Button>}
                 />
                 <Table
                     columns={this.columns}
-                    dataSource={userList.data}
+                    dataSource={userList}
+                    bordered
                     rowKey={(data: any) => data.id}
                 />
                 <Dialog
@@ -105,9 +106,20 @@ class AdminList extends Component<IProps, IState> {
         this.getData()
     }
 
-    private getData() {
+    private async getData() {
         const { dispatch } = this.props
-        dispatch({ type: GET_USERLIST })
+        try {
+            dispatch({ type: SET_SPINLOADING_DATA, data: true })
+            const data = await http('/admin/user/get', {
+                page_size: 20,
+                page_num: this.pageNum
+            })
+            dispatch({ type: SET_SPINLOADING_DATA, data: false })
+            dispatch({ type: SET_USERLIST_DATA, data: data })
+        } catch (msg) {
+            dispatch({ type: SET_SPINLOADING_DATA, data: false })
+            message.error(msg)
+        }
     }
 
     private getItems = (fn: IFormFun) => {
@@ -211,7 +223,7 @@ class AdminList extends Component<IProps, IState> {
         }
     }
 
-    private handleEdit = (data: IUserList) => {
+    private handleEdit = (data: IUserInfo) => {
         this.setState({
             classifyVisible: true,
             dialogName: '修改管理员'
@@ -237,10 +249,8 @@ class AdminList extends Component<IProps, IState> {
 }
 
 export default connect(
-    ({ userList, jurisd, jurisdiction, userInfo }: IInitState) => ({
+    ({ userList, userInfo }: IInitState) => ({
         userList,
-        jurisd,
-        jurisdiction,
         userInfo
     })
 )(AdminList)

@@ -3,17 +3,16 @@ import { render } from 'react-dom'
 import { isFunction } from 'lodash'
 import { connect, Provider, DispatchProp } from 'react-redux'
 import styled from 'styled-components'
-import { ThemeProvider, Dialog, TabBar, Image, Empty, Table, Button } from 'components'
+import { ThemeProvider, Dialog, Image, Table, Button } from 'components'
 import { IActionsProps } from '../saga'
-import { IInitState, MukaOS } from 'src/store/state'
+import { IInitState } from 'src/store/state'
 import { IImages } from 'src/store/reducers/images'
 import { IDialogProps } from 'src/components/lib/Dialog'
 import { store } from 'src/store'
 import { SET_GOODS_MODAL_VISIBLE } from 'src/store/action'
-import { DialogThemeData, TabBarThemeData, getUnit } from 'src/components/lib/utils'
+import { DialogThemeData, getUnit } from 'src/components/lib/utils'
 import { theme } from 'src/App'
 import http, { httpUtils } from './axios'
-import { IFile } from 'src/components/lib/Upload'
 import { ITableColumns } from 'src/components/lib/Table'
 
 export interface IConnectProps {
@@ -29,7 +28,7 @@ const ListItem = styled.div`
 `
 
 interface IGoodsModalProps {
-    onSelect?: ( data: any[]) => void
+    onSelect?: (data: any[]) => void
 }
 
 interface IProps extends IDialogProps {
@@ -63,7 +62,7 @@ class ShopModal extends PureComponent<IProps & IGoodsModalProps & DispatchProp, 
         key: 'cover_pic',
         width: '4rem',
         render: (value: string) => {
-            return <Image src={value} style={{height: `${getUnit(50)}`}}/>
+            return <Image src={value} style={{ height: `${getUnit(50)}` }} />
         }
     }, {
         title: '商品名称',
@@ -101,7 +100,7 @@ class ShopModal extends PureComponent<IProps & IGoodsModalProps & DispatchProp, 
         )
     }
 
-    private handleSelectChange = (selectedRowKeys:any[], selectedRows:any[]) => {
+    private handleSelectChange = (selectedRowKeys: any[], selectedRows: any[]) => {
         this.selectedRows = selectedRows
     }
 

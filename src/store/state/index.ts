@@ -3,7 +3,6 @@ import { IJurisd } from '../reducers/jurisd'
 import { IJurisdiction } from '../reducers/jurisdiction'
 import { IJurisdictionOptions } from '../reducers/jurisdictionOptions'
 import { IRouter } from '../reducers/router'
-import { IUserList } from '../reducers/userList'
 import { IUserInfo } from '../reducers/userInfo'
 import { IArticle } from '../reducers/article'
 import { IImages } from '../reducers/images'
@@ -86,7 +85,7 @@ export interface IInitState {
     jurisd: IJurisd[]
     jurisdiction: IJurisdiction[]
     router: IRouter[]
-    userList: IUserList
+    userList: IUserInfo[]
     userInfo: IUserInfo
     shopList: IShopList
     article: IArticle[]
