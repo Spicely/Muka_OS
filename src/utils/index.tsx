@@ -159,12 +159,12 @@ class ImageModal extends PureComponent<IProps & IImageModalProps & DispatchProp,
     private handleFirstLoading = async () => {
         try {
             const { images } = this.props
-            const { data } = await http('/set/admin/diy/upload-file', {}, {
+            const { data } = await http('/admin/diy/upload-file', {}, {
                 method: 'GET',
             })
             const res = await http('/common/pic-host', {}, { method: 'GET' })
             images.private = data.data.map((i: MukaOS.IImageParams) => {
-                i.file_link = res.data + '/' + i.file_link
+                i.file_link = res.data  + i.file_link
                 return i
             })
             store.dispatch({ type: SET_IMAGES_DATA, data: { ...images } })
