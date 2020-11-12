@@ -5,7 +5,7 @@ import { store } from 'src/store'
 interface IValue {
     [name: string]: any
 }
-export const baseUrl = process.env.NODE_ENV === 'development' ? '' : window.parent.localStorage.getItem('baseURL')
+export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://a.cbdmng.com/mistep' : window.parent.localStorage.getItem('baseURL')
 export const imgUrl = 'https://img.muka.site'
 
 export interface IRresItem<T = any> {
@@ -57,7 +57,7 @@ export const deviaDecrypt = (data: string) => {
 }
 
 instance.interceptors.request.use(function (req: AxiosRequestConfig) {
-    req.headers.Authorization = process.env.NODE_ENV === 'development' ? '12' : window.parent.localStorage.getItem('token')
+    req.headers.Authorization = process.env.NODE_ENV === 'development' ? 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9hLmNiZG1uZy5jb21cL21pc3RlcFwvYWRtaW5cL2xvZ2luIiwiaWF0IjoxNjA1MTQ1MzEyLCJleHAiOjE2MDU3NTAxMTIsIm5iZiI6MTYwNTE0NTMxMiwianRpIjoiUk00WjlSa3dFNlZieUY2dyIsInN1YiI6MSwicHJ2IjoiZGY4ODNkYjk3YmQwNWVmOGZmODUwODJkNjg2YzQ1ZTgzMmU1OTNhOSJ9.LiD5JmsOA8niTd7JP7TZ_lLFQDpC9GCcI5Sm9TJiPTY' : window.parent.localStorage.getItem('token')
     return req
 })
 
