@@ -1594,8 +1594,8 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
             }; break;
             case 'Divider': {
                 props['type'] = 'horizontal'
-                props['height'] = '3px'
-            }
+                props['height'] = 3
+            }; break;
             case 'Advertising': {
                 props['value'] = [{
                     url: defImg,
