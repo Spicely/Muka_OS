@@ -1,30 +1,11 @@
 import { SET_USERINFO_DATA } from '../../action'
-import { IRouter } from '../router'
 import { AnyAction } from 'redux'
-
-export interface IUserInfo {
-    authority?: {
-        children?: IRouter[]
-        created_at: string
-        id: number
-        name: string
-        type: number
-        updated_at: string
-    },
-    avatar?: string,
-    created_at?: string,
-    id?: number
-    status?: true,
-    type?: number
-    updated_at?: string,
-    userName?: string
-}
-
+import { MukaOS } from 'src/store/state'
 export interface IUserInfoProps {
-    userInfo: IUserInfo
+    userInfo: MukaOS.UserInfo
 }
 
-const initData: IUserInfo = {}
+const initData: MukaOS.UserInfo = {}
 
 export default function userInfo(state = initData, action: AnyAction) {
     switch (action.type) {

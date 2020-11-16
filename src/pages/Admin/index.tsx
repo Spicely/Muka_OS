@@ -5,9 +5,8 @@ import { Button, Dialog, LabelHeader, Form, Tag, Table, Label } from 'components
 import http, { httpUtils } from 'src/utils/axios'
 import { IJurisdiction } from 'src/store/reducers/jurisdiction'
 import { IJurisd } from 'src/store/reducers/jurisd'
-import { IUserInfo } from 'src/store/reducers/userInfo'
 import { connect, DispatchProp } from 'react-redux'
-import { IInitState } from 'src/store/state'
+import { IInitState, MukaOS } from 'src/store/state'
 import { IFormItem, IFormFun } from 'src/components/lib/Form'
 import { ITableColumns } from 'src/components/lib/Table'
 import { GlobalView, FormRequire, FormLable } from 'src/utils/node'
@@ -16,9 +15,9 @@ import { SET_SPINLOADING_DATA, SET_USERLIST_DATA } from 'src/store/action'
 import moment from 'moment'
 
 interface IProps extends DispatchProp {
-    userList: IUserInfo[]
+    userList: MukaOS.UserInfo[]
     jurisd: IJurisd[]
-    userInfo: IUserInfo
+    userInfo: MukaOS.UserInfo
     jurisdiction: IJurisdiction[]
 }
 
@@ -61,7 +60,7 @@ class AdminList extends Component<IProps, IState> {
         title: '操作',
         dataIndex: 'actions',
         key: 'actions',
-        render: (val: any, data: IUserInfo) => {
+        render: (val: any, data: MukaOS.UserInfo) => {
             return (
                 <div>
                     <Label onClick={this.handleEdit.bind(this, data)}>修改</Label>
@@ -223,7 +222,7 @@ class AdminList extends Component<IProps, IState> {
         }
     }
 
-    private handleEdit = (data: IUserInfo) => {
+    private handleEdit = (data: MukaOS.UserInfo) => {
         this.setState({
             classifyVisible: true,
             dialogName: '修改管理员'

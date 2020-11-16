@@ -5,28 +5,26 @@ import { withRouter, RouteComponentProps } from 'react-router'
 import { Tooltip, message } from 'antd'
 import styled, { css } from 'styled-components'
 import { Icon, Input, Layout, Menu, NavBar, Image, Dialog, Form, Spin } from 'components'
-import { IInitState } from 'src/store/state'
+import { IInitState, MukaOS } from 'src/store/state'
 import { IRouter } from 'src/store/reducers/router'
-import { IUserInfo } from 'src/store/reducers/userInfo'
 import { IJurisd } from 'src/store/reducers/jurisd'
 import http, { imgUrl, httpUtils } from 'src/utils/axios'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import Color from 'src/components/lib/utils/Color'
 import { IconThemeData, MenuThemeData, ThemeData, transition, InputThemeData, NavBarThemeData, getUnit } from 'src/components/lib/utils'
-import { GET_LAYOUT_DATA, SET_COLLAPSED, SET_SOLO, SET_LOGIN, SET_ICONS_DATA, SET_ROUTER_DATA } from 'src/store/action'
-import msg from 'src/components/lib/Icon/global/msg'
+import {  SET_COLLAPSED, SET_SOLO, SET_LOGIN,  SET_ROUTER_DATA } from 'src/store/action'
 
 interface IPageLayout extends DispatchProp {
     solo: boolean
     collapsed: boolean
     isLogin: boolean
     spinLoading: boolean
-    userInfo: IUserInfo
+    userInfo: MukaOS.UserInfo
     router: IRouter[]
     navBar?: JSX.Element
     title?: string | JSX.Element
     setRouter: (data: IRouter[]) => void
-    setUserInfo: (data: IUserInfo) => void
+    setUserInfo: (data: MukaOS.UserInfo) => void
     setJurisd: (data: IJurisd[]) => void
 }
 

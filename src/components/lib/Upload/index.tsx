@@ -144,7 +144,7 @@ export interface IUploadProps {
     params?: IValue
     withCredentials?: boolean
     onFileTypeError?: () => void
-    onItemClick?:(val: IFile, index: number) => void
+    onItemClick?: (val: IFile, index: number) => void
     onUploadSuccess?: (val: IFile, data: any, files: IFile[]) => void
     onUploadError?: (val: IFile, data: any, files: IFile[]) => void
     onBeforeUpload?: (file: File) => (boolean | object | Promise<object | boolean>)
@@ -248,7 +248,7 @@ export default class Upload extends Component<IUploadProps, IState> {
                                                 className="flex_center mk_picker_img"
                                             >
                                                 {
-                                                    imgTypes.includes(i.file?.type || extname(i.url?.toString() || '')) ? <UploadImage src={i.url} /> : <Icon icon="md-filing" theme={iconFillTheme} />
+                                                    imgTypes.includes((i.file)?.type || extname(i.url?.toString() || '')) || this.isBase64(i.url) ? <UploadImage src={i.url} /> : <Icon icon="md-filing" theme={iconFillTheme} />
                                                 }
 
                                             </UploadItemBox>
@@ -555,6 +555,13 @@ export default class Upload extends Component<IUploadProps, IState> {
                 resolve()
             }
         })
+    }
+
+    private isBase64(str: any): boolean {
+        if (str.indexOf('data:') != -1 && str.indexOf('base64') != -1) {
+            return true;
+        }
+        return false
     }
 
     private handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {

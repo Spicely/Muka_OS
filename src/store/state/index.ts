@@ -3,7 +3,6 @@ import { IJurisd } from '../reducers/jurisd'
 import { IJurisdiction } from '../reducers/jurisdiction'
 import { IJurisdictionOptions } from '../reducers/jurisdictionOptions'
 import { IRouter } from '../reducers/router'
-import { IUserInfo } from '../reducers/userInfo'
 import { IArticle } from '../reducers/article'
 import { IImages } from '../reducers/images'
 import { ICurrency } from '../action/currency'
@@ -48,6 +47,24 @@ export interface DiyComItem {
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace MukaOS {
+    export interface UserInfo {
+        authority?: {
+            children?: IRouter[]
+            created_at: string
+            id: number
+            name: string
+            type: number
+            updated_at: string
+        },
+        avatar?: string,
+        created_at?: string,
+        id?: number
+        status?: true,
+        type?: number
+        updated_at?: string,
+        userName?: string
+        business?: any
+    }
     export interface Region {
         id: string
         name: string
@@ -85,8 +102,8 @@ export interface IInitState {
     jurisd: IJurisd[]
     jurisdiction: IJurisdiction[]
     router: IRouter[]
-    userList: IUserInfo[]
-    userInfo: IUserInfo
+    userList: MukaOS.UserInfo[]
+    userInfo: MukaOS.UserInfo
     shopList: IShopList
     article: IArticle[]
     images: IImages
