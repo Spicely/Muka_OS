@@ -1,7 +1,6 @@
 import CryptoJS from 'crypto-js'
 import axois, { AxiosRequestConfig } from 'axios'
 import { store } from 'src/store'
-import { error } from 'console'
 import { message } from 'antd'
 
 interface IValue {

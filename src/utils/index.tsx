@@ -115,7 +115,7 @@ class ImageModal extends PureComponent<IProps & IImageModalProps & DispatchProp,
                                 // onUploadSuccess={uploadSuccess}
                                 // onUploadError={uploadError}
                                 cropProps={{
-                                    cropShape: 'rect',
+                                    // cropShape: 'rect',
                                     cropSize,
                                     showGrid: true,
                                 }}
@@ -263,7 +263,7 @@ class ImageUpload extends PureComponent<ImageUploadProps, ImageUploadState> {
                         // onUploadSuccess={uploadSuccess}
                         // onUploadError={uploadError}
                         cropProps={{
-                            cropShape: 'rect',
+                            // cropShape: 'rect',
                             cropSize: {
                                 width: 1440,
                                 height: 423,

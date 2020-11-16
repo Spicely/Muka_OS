@@ -1,5 +1,5 @@
 import React, { Component, ChangeEvent } from 'react'
-import Cropper from 'react-easy-crop'
+import Cropper from 'react-cropper'
 import { isFunction, isString } from 'muka'
 import CropImage from './cropImage'
 import Icon, { iconType } from '../Icon'
@@ -141,7 +141,7 @@ export default class ImagePicker extends Component<IImagePickerProps, IState> {
                     onClose={this.handleCropClose}
                     onOk={this.handleOk}
                 >
-                    <Cropper
+                    {/* <Cropper
                         {...cropProps}
                         image={image}
                         crop={cropXY}
@@ -159,7 +159,7 @@ export default class ImagePicker extends Component<IImagePickerProps, IState> {
                         onCropComplete={this.onCropComplete}
                         onCropChange={this.onCropChange}
                         onZoomChange={this.onZoomChange}
-                    />
+                    /> */}
                 </Dialog>}
             </div>
         )
