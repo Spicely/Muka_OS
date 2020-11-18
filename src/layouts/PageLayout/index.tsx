@@ -12,7 +12,7 @@ import http, { imgUrl, httpUtils } from 'src/utils/axios'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import Color from 'src/components/lib/utils/Color'
 import { IconThemeData, MenuThemeData, ThemeData, transition, InputThemeData, NavBarThemeData, getUnit } from 'src/components/lib/utils'
-import {  SET_COLLAPSED, SET_SOLO, SET_LOGIN,  SET_ROUTER_DATA } from 'src/store/action'
+import { SET_COLLAPSED, SET_SOLO, SET_LOGIN, SET_ROUTER_DATA } from 'src/store/action'
 
 interface IPageLayout extends DispatchProp {
     solo: boolean
@@ -166,17 +166,32 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
     public render(): JSX.Element {
         const { children, navBar, collapsed, title, router, userInfo, solo, spinLoading } = this.props
         const { visible, selected, extendSelected } = this.state
-        const items: any[] = router.map((i) => {
-            return {
-                item: {
+        let items: any[] = []
+        if (userInfo.type == 2 && !userInfo.business) {
+            items = router.filter((i) => i.path == '/').map((i) => {
+                return {
+                    item: {
+                        field: i.path,
+                        label: i.name,
+                        icon: i.icon,
+                    },
                     field: i.path,
-                    label: i.name,
                     icon: i.icon,
-                },
-                field: i.path,
-                icon: i.icon,
-            }
-        })
+                }
+            })
+        } else {
+            items = router.map((i) => {
+                return {
+                    item: {
+                        field: i.path,
+                        label: i.name,
+                        icon: i.icon,
+                    },
+                    field: i.path,
+                    icon: i.icon,
+                }
+            })
+        }
         let extendRoute = []
         let typeSeletct = ''
         if (selected) {
@@ -293,7 +308,7 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                         className="flex flex_1"
                         style={{ overflow: 'hidden' }}
                     >
-                        
+
                         <div id="pgae_view_left"></div>
                         {
                             extendRoute.length ? (

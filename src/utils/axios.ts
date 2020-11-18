@@ -7,7 +7,7 @@ interface IValue {
     [name: string]: any
 }
 // export const baseUrl = 'https://192.168.1.5:8'
-export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://192.168.1.114:8081/' : 'http://api.muka.site'
+export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://192.168.1.5:8081/' : 'http://api.muka.site'
 export const imgUrl = 'https://img.muka.site'
 
 export interface IRresItem<T = any> {
@@ -69,8 +69,8 @@ instance.interceptors.response.use(async function (res: any) {
     if (res.status === 200 && res.data.code === 200) {
         return Promise.resolve(res.data.data)
     } else if (res.status === 200 && res.data.code === 400) {
-        message.error(res.data.msg)
-        // window.location.replace('/login')
+        // message.error(res.data.msg)
+        window.location.replace('/login')
     } else {
         return Promise.reject(res.data.msg)
     }

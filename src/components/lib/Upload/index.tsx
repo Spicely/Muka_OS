@@ -282,7 +282,7 @@ export default class Upload extends Component<IUploadProps, IState> {
                                         minCropBoxHeight={cropProps?.cropSize?.height}
                                         minCropBoxWidth={cropProps?.cropSize?.width}
                                         style={{ height: getUnit(502), width: '100%', overflow: 'hidden' }}
-                                        onInitialized={(instance) => {
+                                        onInitialized={(instance: any) => {
                                             this.cropper = instance;
                                         }}
                                     />

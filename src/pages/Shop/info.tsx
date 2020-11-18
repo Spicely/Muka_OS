@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
 import { LabelHeader, Button, Form, TabBar } from 'components'
 import http from 'src/utils/axios'
-import { NavBarThemeData, Color, getUnit, TabBarThemeData, ButtonThemeData } from 'src/components/lib/utils'
+import { NavBarThemeData, Color, getUnit, TabBarThemeData, ButtonThemeData, UploadThemeData } from 'src/components/lib/utils'
 import { GlobalView } from 'src/utils/node'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { IConfig } from 'src/store/reducers'
@@ -40,6 +40,7 @@ export default class ShopInfo extends Component<IProps, IState> {
                     left={null}
                     theme={new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255) })}
                     title={<LabelHeader title="商家信息设置" line="vertical" />}
+                    right={<Button mold="primary" async onClick={this.handleSave}>保存</Button>}
                 />
                 <Form getItems={this.getItems} style={{ width: getUnit(560) }} />
             </GlobalView>
@@ -82,36 +83,59 @@ export default class ShopInfo extends Component<IProps, IState> {
                     },
                 },
             },
-            field: 'logo'
+            field: 'logoFile'
+        }, {
+            component: 'Upload',
+            label: <FormLabel>背景图标</FormLabel>,
+            props: {
+                maxLength: 1,
+                crop: true,
+                fileTypes: ['.jpeg', '.jpg', '.png'],
+                theme: new UploadThemeData({
+                    itemWidth: 360,
+                    itemHeight: 180,
+                }),
+                cropProps: {
+                    cropSize: {
+                        width: 720,
+                        height: 360,
+                    },
+                },
+            },
+            field: 'backdropFile'
         }, {
             component: 'Editor',
             label: <FormLabel>商家介绍</FormLabel>,
             props: {
-                placeholder: '请输入商家介绍'
+                placeholder: '请输入商家介绍',
+                container: [
+                    [{ 'size': ['small', false, 'large', 'huge'] }],
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote', 'code-block'],
+                    [{ 'header': 1 }, { 'header': 2 }],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    [{ 'script': 'sub' }, { 'script': 'super' }],
+                    ['link'],
+                    [{ 'indent': '-1' }, { 'indent': '+1' }],
+                    [{ 'direction': 'rtl' }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'align': [] }],
+                    ['clean']
+                ]
             },
             field: 'introduce'
         }]
         return items
     }
 
-    private handleOk = async () => {
+    private handleSave = async () => {
         try {
             if (this.fn) {
                 const value = this.fn.getFieldValue()
-                await http('/admin/config/update', value)
-                message.success('更新成功')
-            }
-        } catch (e) {
-            message.error('网络不稳定,请稍后再试')
-        }
-    }
-
-    private handlePayOk = async () => {
-        try {
-            if (this.payFn) {
-                const value = this.payFn.getFieldValue()
-                await http('/admin/config/update', value)
-                message.success('更新成功')
+                console.log(value)
+                // await http('/admin/config/update', value)
+                // message.success('更新成功')
             }
         } catch (e) {
             message.error('网络不稳定,请稍后再试')
