@@ -104,25 +104,12 @@ export default class ShopInfo extends Component<IProps, IState> {
             },
             field: 'backdropFile'
         }, {
-            component: 'Editor',
+            component: 'Textarea',
             label: <FormLabel>商家介绍</FormLabel>,
             props: {
                 placeholder: '请输入商家介绍',
-                container: [
-                    [{ 'size': ['small', false, 'large', 'huge'] }],
-                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    ['blockquote', 'code-block'],
-                    [{ 'header': 1 }, { 'header': 2 }],
-                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                    [{ 'script': 'sub' }, { 'script': 'super' }],
-                    ['link'],
-                    [{ 'indent': '-1' }, { 'indent': '+1' }],
-                    [{ 'direction': 'rtl' }],
-                    [{ 'color': [] }, { 'background': [] }],
-                    [{ 'align': [] }],
-                    ['clean']
-                ]
+                maxLength: 120,
+                showMaxLength: true,
             },
             field: 'introduce'
         }]
@@ -133,9 +120,18 @@ export default class ShopInfo extends Component<IProps, IState> {
         try {
             if (this.fn) {
                 const value = this.fn.getFieldValue()
-                console.log(value)
-                // await http('/admin/config/update', value)
-                // message.success('更新成功')
+                const formData = new FormData()
+                Object.keys(value).forEach((i) => {
+                    if (i == 'logoFile' || i == 'backdropFile'){
+                        // formData.append(i, value[i][0].file)
+                        return i
+                    } else {
+                        formData.append(i, value[i])
+                    }
+                    return i
+                })
+                await http('/admin/business/info', formData, { method: 'PUT' })
+                message.success('更新成功')
             }
         } catch (e) {
             message.error('网络不稳定,请稍后再试')
