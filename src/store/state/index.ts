@@ -56,14 +56,20 @@ export namespace MukaOS {
             type: number
             updated_at: string
         },
-        avatar?: string,
-        created_at?: string,
+        avatar?: string
+        created_at?: string
         id?: number
-        status?: true,
+        status?: true
         type?: number
-        updated_at?: string,
+        updated_at?: string
         userName?: string
-        business?: any
+        business?: {
+            name: string
+            logo: MukaOS.Image
+            status: number
+            introduce: string
+            backdrop: MukaOS.Image
+        }
     }
     export interface Region {
         id: string
@@ -71,7 +77,14 @@ export namespace MukaOS {
         status: boolean
         children?: MukaOS.Region[]
     }
-
+    export interface Image {
+        url: string
+        size: number
+        mimeType: string
+        height: number
+        width: number
+        type: string
+    }
     export interface Carousel {
         page: number
         skip: number
