@@ -122,13 +122,11 @@ export default class ShopInfo extends Component<IProps, IState> {
                 const value = this.fn.getFieldValue()
                 const formData = new FormData()
                 Object.keys(value).forEach((i) => {
-                    if (i == 'logoFile' || i == 'backdropFile'){
-                        // formData.append(i, value[i][0].file)
-                        return i
+                    if (i == 'logoFile' || i == 'backdropFile') {
+                        value[i][0] && formData.append(i, value[i][0].file)
                     } else {
                         formData.append(i, value[i])
                     }
-                    return i
                 })
                 await http('/admin/business/info', formData, { method: 'PUT' })
                 message.success('更新成功')

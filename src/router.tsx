@@ -13,23 +13,22 @@ class RouterItem extends Component<IProps, any> {
     public render(): JSX.Element {
         const { userInfo } = this.props
         console.log(userInfo)
-        if (userInfo.type == 2 && !userInfo.business) {
+        if (userInfo.type == 2 && (!userInfo.business || userInfo.business.status != 3)) {
             return (
                 <Switch>
                     <Route path="/" exact component={loadable(import('./pages/Shop/info'))} />
                 </Switch>
             )
-        } else {
-            return (
-                <Switch>
-                    {
-                        routes.map((item: IRoutes, index: number) => {
-                            return <Route path={item.path} exact component={loadable(item.component)} key={index} />
-                        })
-                    }
-                </Switch>
-            )
-        }
+        } 
+        return (
+            <Switch>
+                {
+                    routes.map((item: IRoutes, index: number) => {
+                        return <Route path={item.path} exact component={loadable(item.component)} key={index} />
+                    })
+                }
+            </Switch>
+        )
     }
 }
 

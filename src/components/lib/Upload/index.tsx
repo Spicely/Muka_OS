@@ -4,7 +4,6 @@ import axios from 'axios'
 import { isFunction, isString, isObject } from 'lodash'
 import { extname } from 'path'
 import styled, { css } from 'styled-components'
-import CropImage from './cropImage'
 import Dragger from './dragger'
 import { Consumer } from '../ThemeProvider'
 import Icon, { iconType } from '../Icon'
@@ -362,16 +361,30 @@ export default class Upload extends Component<IUploadProps, IState> {
         })
     }
 
-    private dataURLtoFile(blob: any, filename: string) {
-        if (/Edge/.test(navigator.userAgent)) {
-            blob.lastModifiedDate = new Date()
-            blob.name = filename
-            blob.filename = filename
-            return blob
-        } else {
-            const file = new File([blob], filename)
-            return file
+    private dataURLtoFile(base64Data: any, filename: string) {
+        let arr = base64Data.split(','),
+            fileType = arr[0].match(/:(.*?);/)[1],
+            bstr = atob(arr[1]),
+            l = bstr.length,
+            u8Arr = new Uint8Array(l);
+
+        while (l--) {
+            u8Arr[l] = bstr.charCodeAt(l);
         }
+        const blob = new Blob([u8Arr], {
+            type: fileType
+        })
+        const file = new File([blob], filename)
+        return file
+        // if (/Edge/.test(navigator.userAgent)) {
+        //     blob.lastModifiedDate = new Date()
+        //     blob.name = filename
+        //     blob.filename = filename
+        //     return blob
+        // } else {
+        //     const file = new File([blob], filename)
+        //     return file
+        // }
     }
 
     private handleOk = async () => {
