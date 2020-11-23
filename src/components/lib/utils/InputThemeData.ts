@@ -7,6 +7,7 @@ import IconThemeData from './IconThemeData'
 interface IInputThemeDataProps {
     inputColor?: Color
     disabledColor?: Color
+    disabledBorderColor?: Color
     height?: number | string
     fontSize?: number
     color?: Color
@@ -31,6 +32,7 @@ export default class InputThemeData {
             if (data.hoverColor) this.hoverColor = data.hoverColor
             if (data.iconCloseTheme) this.iconCloseTheme = data.iconCloseTheme
             if (data.borderRadius) this.borderRadius = data.borderRadius
+            if (data.disabledBorderColor) this.disabledBorderColor = data.disabledBorderColor
         }
     }
 
@@ -60,4 +62,6 @@ export default class InputThemeData {
     public width?: number | string
 
     public disabledColor: Color = Color.fromRGB(255, 255, 255)
+
+    public disabledBorderColor?: Color
 }

@@ -41,6 +41,7 @@ const TextView = styled.textarea<ITextareaViewProps>`
 
         :hover {
              border-color: ${({ textareaTheme, theme }) => textareaTheme.disabledBorderColor || theme.disabledBorderColor};
+             cursor: not-allowed;
         }
     }
 `

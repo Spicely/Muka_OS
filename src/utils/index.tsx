@@ -3,13 +3,13 @@ import { render } from 'react-dom'
 import { isFunction } from 'lodash'
 import { connect, Provider, DispatchProp } from 'react-redux'
 import styled from 'styled-components'
-import { Button, ThemeProvider, Upload, Dialog, TabBar, MobileLayout, Image, Empty, Form, Icon } from 'components'
+import { Button, ThemeProvider, Upload, Dialog, TabBar, MobileLayout, Form, Icon } from 'components'
 import { IActionsProps } from '../saga'
 import { IInitState, MukaOS } from 'src/store/state'
 import { IImages } from 'src/store/reducers/images'
 import { IDialogProps } from 'src/components/lib/Dialog'
 import { store } from 'src/store'
-import { SET_IMAGE_MODAL_VISIBLE, SET_IMAGES_DATA, SET_SELECT_MODAL_VISIBLE } from 'src/store/action'
+import { SET_IMAGE_MODAL_VISIBLE, SET_IMAGES_DATA } from 'src/store/action'
 import { DialogThemeData, TabBarThemeData, getRatioUnit, getUnit, IconThemeData, UploadThemeData } from 'src/components/lib/utils'
 import { IUploadFileListProps } from 'src/components/lib/Upload/dragger'
 import { theme } from 'src/App'
@@ -115,7 +115,7 @@ class ImageModal extends PureComponent<IProps & IImageModalProps & DispatchProp,
                                 // onUploadSuccess={uploadSuccess}
                                 // onUploadError={uploadError}
                                 cropProps={{
-                                    cropShape: 'rect',
+                                    // cropShape: 'rect',
                                     cropSize,
                                     showGrid: true,
                                 }}
@@ -263,7 +263,7 @@ class ImageUpload extends PureComponent<ImageUploadProps, ImageUploadState> {
                         // onUploadSuccess={uploadSuccess}
                         // onUploadError={uploadError}
                         cropProps={{
-                            cropShape: 'rect',
+                            // cropShape: 'rect',
                             cropSize: {
                                 width: 1440,
                                 height: 423,

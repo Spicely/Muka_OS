@@ -4,6 +4,7 @@ import Border, { BorderStyle } from './Border'
 import IconThemeData from './IconThemeData'
 import BorderRadius from './BorderRadius'
 import DialogThemeData from './DialogThemeData'
+import Padding from './Padding'
 
 interface IUploadThemeDataProps {
     uploadColor?: Color
@@ -67,7 +68,8 @@ export default class UploadThemeData {
 
     public cropDialogTheme: DialogThemeData = new  DialogThemeData({
         width: 900,
-        height: 600
+        height: 600,
+        padding: Padding.all(0)
     })
 
     public closeIconTheme: IconThemeData = new IconThemeData({

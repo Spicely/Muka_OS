@@ -1,6 +1,6 @@
 import React, { InputHTMLAttributes, Component, ChangeEvent, FocusEvent, CSSProperties } from 'react'
 import styled, { css } from 'styled-components'
-import { omit, isFunction, isEmpty, isNil, isNumber } from 'lodash'
+import { omit, isFunction, isEmpty, isNil } from 'lodash'
 import InputSearch from './search'
 import { getClassName, prefix, IStyledProps, transition, InputThemeData, Color, getUnit } from '../utils'
 import { Consumer } from '../ThemeProvider'
@@ -74,10 +74,10 @@ const Int = styled.input<IStyleProps>`
     }
 
     &:disabled {
-        background: ${({ inputTheme }) => inputTheme.disabledColor.toString()};
+        background: ${({ inputTheme }) => inputTheme.disabledColor?.toString()};
 
         &:hover {
-            border-color: ${({ theme, inputTheme }) => inputTheme.hoverColor || theme.primarySwatch};
+            border-color: ${({ theme, inputTheme }) => inputTheme.disabledBorderColor || theme.disabledBorderColor};
             cursor: not-allowed;
         }
     }
@@ -118,7 +118,7 @@ const IntView = styled.div<IIntViewProps>`
     }}
 
     &:hover {
-        border-color: ${({ theme, inputTheme }) => inputTheme.hoverColor || theme.primarySwatch};
+        border-color: ${({ theme, inputTheme }) => inputTheme.disabledBorderColor || theme.disabledBorderColor};
     }
 `
 

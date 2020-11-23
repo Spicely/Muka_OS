@@ -1064,7 +1064,7 @@ export default class Form extends Component<IFormProps, IState> {
                     case 'Upload': {
                         const _props: any = item.props || {}
                         const baseUrl = _props.baseUrl || ''
-                        if (_props.maxLength === 1) {
+                        if (_props.maxLength === 1 && !isArray(params[field])) {
                             vals[field] = [{
                                 uid: '-1',
                                 name: 'xxx.png',

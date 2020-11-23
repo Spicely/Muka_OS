@@ -57,7 +57,7 @@ export const deviaDecrypt = (data: string) => {
 }
 
 instance.interceptors.request.use(function (req: AxiosRequestConfig) {
-    req.headers.Authorization = process.env.NODE_ENV === 'development' ? 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9hLmNiZG1uZy5jb21cL21pc3RlcFwvYWRtaW5cL2xvZ2luIiwiaWF0IjoxNjA1MTQ1MzEyLCJleHAiOjE2MDU3NTAxMTIsIm5iZiI6MTYwNTE0NTMxMiwianRpIjoiUk00WjlSa3dFNlZieUY2dyIsInN1YiI6MSwicHJ2IjoiZGY4ODNkYjk3YmQwNWVmOGZmODUwODJkNjg2YzQ1ZTgzMmU1OTNhOSJ9.LiD5JmsOA8niTd7JP7TZ_lLFQDpC9GCcI5Sm9TJiPTY' : window.parent.localStorage.getItem('token')
+    req.headers.Authorization = process.env.NODE_ENV === 'development' ? 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9hLmNiZG1uZy5jb21cL21pc3RlcFwvYWRtaW5cL2xvZ2luIiwiaWF0IjoxNjA1Nzc0MDIyLCJleHAiOjE2MDYzNzg4MjIsIm5iZiI6MTYwNTc3NDAyMiwianRpIjoidjRmUGdqSlcxekxNSldFaSIsInN1YiI6MSwicHJ2IjoiZGY4ODNkYjk3YmQwNWVmOGZmODUwODJkNjg2YzQ1ZTgzMmU1OTNhOSJ9.kKQU-fIlOj1dLI3WWd1T0VoshhsR5OxUf1KAKA_SrJY' : window.parent.localStorage.getItem('token')
     return req
 })
 

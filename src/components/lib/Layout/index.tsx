@@ -71,7 +71,7 @@ export default class Layout extends Component<ILayoutProps, any> {
         const options = omit(menuOptions, ['items', 'className'])
         return (
             <LayoutDiv className="flex">
-                {/* <div className="flex_column">
+                <div className="flex_column">
                     <div>
                         {logoView}
                     </div>
@@ -82,7 +82,7 @@ export default class Layout extends Component<ILayoutProps, any> {
                     >
                         {this.getMenuView()}
                     </Menu>
-                </div> */}
+                </div>
                 <div className="flex_column flex_1">
                     <LayoutNav>
                         {pageNav}

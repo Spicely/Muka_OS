@@ -84,7 +84,7 @@ export default class Table extends Component<ITableProps, any> {
     }
 
     public render(): JSX.Element {
-        const { className, theme } = this.props
+        const { theme } = this.props
         const props = omit(this.props, ['theme'])
         return (
             <Consumer>

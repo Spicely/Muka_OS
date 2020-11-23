@@ -1,17 +1,16 @@
 import React, { Component, ChangeEvent, CSSProperties } from 'react'
-import Cropper from 'react-easy-crop'
+import Cropper from 'react-cropper';
 import axios from 'axios'
 import { isFunction, isString, isObject } from 'lodash'
 import { extname } from 'path'
 import styled, { css } from 'styled-components'
-import CropImage from './cropImage'
 import Dragger from './dragger'
 import { Consumer } from '../ThemeProvider'
 import Icon, { iconType } from '../Icon'
 import Dialog from '../Dialog'
 import Image from '../Image'
 import { UploadThemeData, getUnit, transition, IValue, IconThemeData } from '../utils'
-
+import "cropperjs/dist/cropper.css";
 export interface ICroppedArea {
     height: number
     width: number
@@ -97,13 +96,11 @@ interface IIconStyle {
 }
 
 interface ICropProps {
-    cropShape?: 'rect' | 'round'
     cropSize?: {
         width?: number
         height?: number
     }
     showGrid?: boolean
-    crossOrigin?: string
 }
 
 interface ICrop {
@@ -144,7 +141,7 @@ export interface IUploadProps {
     params?: IValue
     withCredentials?: boolean
     onFileTypeError?: () => void
-    onItemClick?:(val: IFile, index: number) => void
+    onItemClick?: (val: IFile, index: number) => void
     onUploadSuccess?: (val: IFile, data: any, files: IFile[]) => void
     onUploadError?: (val: IFile, data: any, files: IFile[]) => void
     onBeforeUpload?: (file: File) => (boolean | object | Promise<object | boolean>)
@@ -175,6 +172,8 @@ export default class Upload extends Component<IUploadProps, IState> {
     }
 
     public static Dragger = Dragger
+
+    private cropper: Cropper | null = null
 
     public state: IState = {
         files: [],
@@ -248,7 +247,7 @@ export default class Upload extends Component<IUploadProps, IState> {
                                                 className="flex_center mk_picker_img"
                                             >
                                                 {
-                                                    imgTypes.includes(i.file?.type || extname(i.url?.toString() || '')) ? <UploadImage src={i.url} /> : <Icon icon="md-filing" theme={iconFillTheme} />
+                                                    imgTypes.includes((i.file)?.type || extname(i.url?.toString() || '')) || this.isBase64(i.url) ? <UploadImage src={i.url} /> : <Icon icon="md-filing" theme={iconFillTheme} />
                                                 }
 
                                             </UploadItemBox>
@@ -275,23 +274,16 @@ export default class Upload extends Component<IUploadProps, IState> {
                                     theme={theme ? theme.cropDialogTheme : val.theme.uploadTheme.cropDialogTheme}
                                 >
                                     <Cropper
-                                        {...cropProps}
-                                        image={image}
-                                        crop={cropXY}
-                                        aspect={aspect}
-                                        zoom={zoom}
-                                        classes={{
-                                            containerClassName: 'mk_upload_crop__container'
+                                        src={image}
+                                        guides={true}
+                                        dragMode={cropProps?.cropSize ? 'move' : 'crop'}
+                                        aspectRatio={cropProps?.cropSize ? (cropProps?.cropSize?.width || 0) / (cropProps?.cropSize?.height || 0) || undefined : undefined}
+                                        minCropBoxHeight={cropProps?.cropSize?.height}
+                                        minCropBoxWidth={cropProps?.cropSize?.width}
+                                        style={{ height: getUnit(502), width: '100%', overflow: 'hidden' }}
+                                        onInitialized={(instance: any) => {
+                                            this.cropper = instance;
                                         }}
-                                        style={{
-                                            containerStyle: {
-                                                position: 'relative',
-                                                height: '500px'
-                                            }
-                                        }}
-                                        onCropComplete={this.onCropComplete}
-                                        onCropChange={this.onCropChange}
-                                        onZoomChange={this.onZoomChange}
                                     />
                                 </Dialog>
                             )}
@@ -349,19 +341,6 @@ export default class Upload extends Component<IUploadProps, IState> {
         }
     }
 
-    private onCropChange = (crop: ICrop) => {
-        this.setState({ cropXY: crop })
-    }
-
-    private onCropComplete = (croppedArea: ICroppedArea, croppedAreaPixels: ICroppedArea) => {
-        this.croppedArea = croppedArea
-        this.croppedAreaPixels = croppedAreaPixels
-    }
-
-    private onZoomChange = (zoom: number) => {
-        this.setState({ zoom })
-    }
-
     private handleCropClose = (val: boolean) => {
         this.setState({
             visible: val
@@ -382,35 +361,43 @@ export default class Upload extends Component<IUploadProps, IState> {
         })
     }
 
-    private dataURLtoFile(dataurl: string, filename: string) {
-        const arr = dataurl.split(',')
-        const mime = ((arr[0] || '').match(/:(.*?);/) || [])[1]
-        const bstr = atob(arr[1])
-        let n = bstr.length
-        const u8arr = new Uint8Array(n)
-        while (n--) {
-            u8arr[n] = bstr.charCodeAt(n)
+    private dataURLtoFile(base64Data: any, filename: string) {
+        let arr = base64Data.split(','),
+            fileType = arr[0].match(/:(.*?);/)[1],
+            bstr = atob(arr[1]),
+            l = bstr.length,
+            u8Arr = new Uint8Array(l);
+
+        while (l--) {
+            u8Arr[l] = bstr.charCodeAt(l);
         }
-        const blob: any = new Blob([u8arr], { type: mime })
-        if (/Edge/.test(navigator.userAgent)) {
-            blob.lastModifiedDate = new Date()
-            blob.name = filename
-            blob.filename = filename
-            return blob
-        } else {
-            const file = new File([blob], filename)
-            return file
-        }
+        const blob = new Blob([u8Arr], {
+            type: fileType
+        })
+        const file = new File([blob], filename)
+        return file
+        // if (/Edge/.test(navigator.userAgent)) {
+        //     blob.lastModifiedDate = new Date()
+        //     blob.name = filename
+        //     blob.filename = filename
+        //     return blob
+        // } else {
+        //     const file = new File([blob], filename)
+        //     return file
+        // }
     }
 
     private handleOk = async () => {
-        const { onChange, onBeforeUpload } = this.props
-        const { image, files } = this.state
-        const croppedImage: any = await CropImage(image, this.croppedAreaPixels)
-        const file = this.dataURLtoFile(croppedImage, this.fileName)
+        const { onChange, onBeforeUpload, cropProps } = this.props
+        const { files } = this.state
+        const image = this.cropper?.getCroppedCanvas({
+            width: cropProps?.cropSize?.width,
+            height: cropProps?.cropSize?.height,
+        })?.toDataURL()
+        const file = this.dataURLtoFile(image, this.fileName)
         const fileObj: IFile = {
             file,
-            url: croppedImage,
+            url: image || '',
             info: {
                 progress: 0,
                 status: 'uploading',
@@ -555,6 +542,13 @@ export default class Upload extends Component<IUploadProps, IState> {
                 resolve()
             }
         })
+    }
+
+    private isBase64(str: any): boolean {
+        if (str.indexOf('data:') != -1 && str.indexOf('base64') != -1) {
+            return true;
+        }
+        return false
     }
 
     private handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
