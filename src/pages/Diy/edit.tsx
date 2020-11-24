@@ -566,7 +566,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
         goodsModal({
             onSelect: (type, data) => {
                 const { componentData, dispatch } = this.props
-                componentData.pageProps[this.index].props[field][index].link = `?type=${type}&id=${data.id}`
+                componentData.pageProps[this.index].props[field][index].link = `?type=${type}${data ? `&id=${data.id}` : ''}`
                 dispatch({ type: SET_COMPONENT_DATA, data: { ...componentData } })
             }
         })
@@ -1407,75 +1407,93 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                         onChange: this.updateChangeComData.bind(this, 'lineNum')
                     },
                     field: 'lineNum',
+                }, {
+                    component: 'RadioGroup',
+                    label: <ComponentLabel>数据来源</ComponentLabel>,
+                    props: {
+                        value: componentData.pageProps[this.index].props['dataGetType'],
+                        options: [{
+                            label: '服务端获取',
+                            value: 'server',
+                        }, {
+                            label: '自定义',
+                            value: 'diy',
+                        }],
+                        onChange: this.updateChangeComData.bind(this, 'dataGetType')
+                    },
+                    field: 'dataGetType',
                     additional: (val) => {
-                        return (
-                            <div>
-                                <DragDropContext onDragEnd={this.onDragEnd.bind(this, 'Carousel')}>
-                                    <Droppable droppableId="droppablea" >
-                                        {(provided) => (
-                                            <div
-                                                {...provided.droppableProps}
-                                                ref={provided.innerRef}
-                                                style={{ height: '100%' }}
-                                            >
-                                                {
-                                                    (val.value || []).map((i: any, index: number) => {
-                                                        return (
-                                                            <Draggable key={index} draggableId={index.toString()} index={index}>
-                                                                {(provided) => {
-                                                                    return (
-                                                                        <div
-                                                                            ref={provided.innerRef}
-                                                                            {...provided.draggableProps}
-                                                                            {...provided.dragHandleProps}
-                                                                        >
-                                                                            <ItemBoxView className="flex" key={index}>
-                                                                                <ItemImgBox className="flex_center" onClick={this.handleUploadView.bind(this, index, 'value')}>
-                                                                                    <Image src={i.url} style={{ width: '100%' }} />
-                                                                                </ItemImgBox>
-                                                                                <div className="flex_1">
-                                                                                    <div className="flex">
-                                                                                        <Input className="flex_1" disabled value={i.link} />
-                                                                                        <Button mold="primary" onClick={this.handleGoodsView.bind(this, index, 'value')}>跳转地址</Button>
+                        if (val.dataGetType == 'diy') {
+                            return (
+                                <div>
+                                    <DragDropContext onDragEnd={this.onDragEnd.bind(this, 'Carousel')}>
+                                        <Droppable droppableId="droppablea" >
+                                            {(provided) => (
+                                                <div
+                                                    {...provided.droppableProps}
+                                                    ref={provided.innerRef}
+                                                    style={{ height: '100%' }}
+                                                >
+                                                    {
+                                                        (val.value || []).map((i: any, index: number) => {
+                                                            return (
+                                                                <Draggable key={index} draggableId={index.toString()} index={index}>
+                                                                    {(provided) => {
+                                                                        return (
+                                                                            <div
+                                                                                ref={provided.innerRef}
+                                                                                {...provided.draggableProps}
+                                                                                {...provided.dragHandleProps}
+                                                                            >
+                                                                                <ItemBoxView className="flex" key={index}>
+                                                                                    <ItemImgBox className="flex_center" onClick={this.handleUploadView.bind(this, index, 'value')}>
+                                                                                        <Image src={i.url} style={{ width: '100%' }} />
+                                                                                    </ItemImgBox>
+                                                                                    <div className="flex_1">
+                                                                                        <div className="flex">
+                                                                                            <Input className="flex_1" disabled value={i.link} />
+                                                                                            <Button mold="primary" onClick={this.handleGoodsView.bind(this, index, 'value')}>跳转地址</Button>
+                                                                                        </div>
+                                                                                        <div className="flex" style={{ marginTop: getUnit(16) }}>
+                                                                                            <Input className="flex_1" value={i.href} placeholder="外部连接(填写后将作为默认跳转)" onChange={this.handleCarouselHref.bind(this, index, 'value', 'href')} />
+                                                                                        </div>
+
                                                                                     </div>
-                                                                                    <div className="flex" style={{ marginTop: getUnit(16) }}>
-                                                                                        <Input className="flex_1" value={i.href} placeholder="外部连接(填写后将作为默认跳转)" onChange={this.handleCarouselHref.bind(this, index, 'value', 'href')} />
-                                                                                    </div>
+                                                                                    <CloseIcon
+                                                                                        icon="md-close-circle"
+                                                                                        color="rgba(0, 0, 0, 0.3)"
+                                                                                        theme={new IconThemeData({ size: 18 })}
+                                                                                        style={{ cursor: 'pointer' }}
+                                                                                        onClick={this.handleDel.bind(this, index, 'value')}
+                                                                                    />
+                                                                                </ItemBoxView>
+                                                                            </div>
+                                                                        )
+                                                                    }}
+                                                                </Draggable>
+                                                            )
 
-                                                                                </div>
-                                                                                <CloseIcon
-                                                                                    icon="md-close-circle"
-                                                                                    color="rgba(0, 0, 0, 0.3)"
-                                                                                    theme={new IconThemeData({ size: 18 })}
-                                                                                    style={{ cursor: 'pointer' }}
-                                                                                    onClick={this.handleDel.bind(this, index, 'value')}
-                                                                                />
-                                                                            </ItemBoxView>
-                                                                        </div>
-                                                                    )
-                                                                }}
-                                                            </Draggable>
-                                                        )
+                                                        })
+                                                    }
+                                                    {provided.placeholder}
+                                                </div>
+                                            )}
+                                        </Droppable>
+                                    </DragDropContext>
 
-                                                    })
-                                                }
-                                                {provided.placeholder}
-                                            </div>
-                                        )}
-                                    </Droppable>
-                                </DragDropContext>
-
-                                <Button
-                                    theme={new ButtonThemeData({ width: '100%' })}
-                                    onClick={this.handleFieldAdd.bind(this, 'value', 'Advertising')}
-                                >
-                                    <div className="flex">
-                                        <Icon icon="ios-add" />
-                                        <div className="flex_center">添加</div>
-                                    </div>
-                                </Button>
-                            </div>
-                        )
+                                    <Button
+                                        theme={new ButtonThemeData({ width: '100%' })}
+                                        onClick={this.handleFieldAdd.bind(this, 'value', 'Advertising')}
+                                    >
+                                        <div className="flex">
+                                            <Icon icon="ios-add" />
+                                            <div className="flex_center">添加</div>
+                                        </div>
+                                    </Button>
+                                </div>
+                            )
+                        }
+                        return <div />
                     }
                 },]
             }
@@ -1605,6 +1623,7 @@ class AppsDesign extends Component<IProps & RouteComponentProps<IParams>, any> {
                     link: null,
                 }]
                 props['lineNum'] = 2
+                props['dataGetType'] = 'server'
             }
         }
         componentData.pageProps.push({

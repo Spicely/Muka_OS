@@ -109,13 +109,14 @@ interface IActiveBarProps {
     tabBarTheme: TabBarThemeData
     type?: IType
     activeNum: number
+    activeLeft: number
     selectIndex?: number
 }
 
 const ActiveBar = styled.div<IActiveBarProps>`
-    ${transition(0.3, ['top', 'left'])};
-    ${({ type, activeNum, selectIndex }) => {
-        if (type === 'horizontal') return css`height: ${getUnit(2)};width: ${getUnit(activeNum)};bottom: 0;left: ${getUnit((selectIndex || 0) * activeNum)};`
+    ${transition(0.3, ['top', 'left', 'width'])};
+    ${({ type, activeNum, selectIndex, activeLeft }) => {
+        if (type === 'horizontal') return css`height: ${getUnit(2)};width: ${getUnit(activeNum)};bottom: 0;left: ${getUnit(activeLeft)};`
         else return css`width: ${getUnit(2)};height: ${getUnit(activeNum)};left: 0;top: ${getUnit((selectIndex || 0) * activeNum)};`
     }}
     background: ${({ tabBarTheme, theme }) => tabBarTheme.activeBarColor || theme.primarySwatch};
@@ -188,6 +189,7 @@ interface ITabBarState {
     menuHeight: string | number
     width: number
     activeNum: number
+    activeLeft: number
 }
 
 export default class TabBar extends Component<ITabBarProps, ITabBarState> {
@@ -214,14 +216,15 @@ export default class TabBar extends Component<ITabBarProps, ITabBarState> {
         width: 0,
         height: 0,
         menuHeight: '100vh',
-        activeNum: 0
+        activeNum: 0,
+        activeLeft: 0
     }
 
     private node: HTMLDivElement | null = null
 
     public render(): JSX.Element {
         const { mode, type, theme, style, children, tabViewClassName, tabViewBarClassName, itemBarClassName, itemClassName } = this.props
-        const { selected, height, width, activeNum, menuHeight } = this.state
+        const { selected, height, width, activeNum, menuHeight, activeLeft } = this.state
         const tabBars: JSX.Element[] = []
         const tabViews: JSX.Element[] = []
         Children.forEach(children, (child: any, index) => {
@@ -263,6 +266,7 @@ export default class TabBar extends Component<ITabBarProps, ITabBarState> {
                                         {tabBars}
                                         <ActiveBar
                                             activeNum={activeNum}
+                                            activeLeft={activeLeft}
                                             selectIndex={selected}
                                             type={type}
                                             tabBarTheme={theme || value.theme.tabBarTheme}
@@ -318,7 +322,8 @@ export default class TabBar extends Component<ITabBarProps, ITabBarState> {
             height: info.height,
             // menuHeight: mode === 'menu' ? browser.GL_SC_HEIGHT : browser.height,
             width: info.width,
-            activeNum: itemInfo
+            activeNum: itemInfo.activeNum,
+            activeLeft: itemInfo.activeLeft,
         })
     }
 
@@ -327,7 +332,8 @@ export default class TabBar extends Component<ITabBarProps, ITabBarState> {
         if (!isNil(nextProps.selected) && nextProps.selected !== selected) {
             const itemInfo = this.getSelectedNodeInfo(nextProps.selected)
             this.setState({
-                activeNum: itemInfo,
+                activeNum: itemInfo.activeNum,
+                activeLeft: itemInfo.activeLeft,
                 selected: nextProps.selected
             })
         }
@@ -336,15 +342,19 @@ export default class TabBar extends Component<ITabBarProps, ITabBarState> {
     public getSelectedNodeInfo = (index?: number) => {
         const { selected } = this.state
         const { type } = this.props
-        let value = 0
+        let activeNum = 0
+        let node: any
         if (this.node && !isNil(selected)) {
-            const node = this.node.querySelectorAll('.tab_ev_item')[isNil(index) ? selected : index]
+            node = this.node.querySelectorAll('.tab_ev_item')[isNil(index) ? selected : index]
             if (node) {
                 const rect = node.getBoundingClientRect()
-                value = type === 'horizontal' ? rect.width : rect.height
+                activeNum = type === 'horizontal' ? rect.width : rect.height
             }
         }
-        return value
+        return {
+            activeNum,
+            activeLeft: node?.offsetLeft || 0,
+        }
     }
 
     private getRootNodeInfo = () => {
@@ -377,7 +387,8 @@ export default class TabBar extends Component<ITabBarProps, ITabBarState> {
                 selected: field,
                 width: info.width,
                 height: info.height,
-                activeNum: itemInfo
+                activeNum: itemInfo.activeNum,
+                activeLeft: itemInfo.activeLeft,
             })
 
         }

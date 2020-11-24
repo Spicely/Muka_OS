@@ -75,13 +75,13 @@ export default class Layout extends Component<ILayoutProps, any> {
                     <div>
                         {logoView}
                     </div>
-                    <Menu
+                    {/* <Menu
                         {...options}
                         className={`flex_1 ${menuOptions.className || ''}`}
                         onChange={menuChange}
                     >
                         {this.getMenuView()}
-                    </Menu>
+                    </Menu> */}
                 </div>
                 <div className="flex_column flex_1">
                     <LayoutNav>

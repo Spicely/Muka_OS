@@ -20,15 +20,15 @@ export interface IConnectProps {
 }
 
 const ListItem = styled.div`
-    width: ${getUnit(100)};
-    height: ${getUnit(100)};
+    width: ${getUnit(200)};
+    height: ${getUnit(200)};
     display: inline-block;
     cursor: pointer;
     margin: ${getUnit(10)} ${getUnit(10)} 0 0;
 `
 
 interface IGoodsModalProps {
-    onSelect?: (type: any, data: MukaOS.IImageParams) => void
+    onSelect?: (type: any, data?: any) => void
 }
 
 interface IProps extends IDialogProps {
@@ -75,8 +75,8 @@ class GoodsModal extends PureComponent<IProps & IGoodsModalProps & DispatchProp,
                         {
                             data[0].map((i: any, index: number) => {
                                 return (
-                                    <ListItem key={index} onClick={this.handleItem.bind(this, 1, i)}>
-                                        <Image src={i.pic} />
+                                    <ListItem key={index} onClick={this.handleItem.bind(this, 0, i)}>
+                                        <Image src={i.pic} style={{ width: getUnit(200), height: getUnit(200) }} />
                                     </ListItem>
                                 )
                             })
@@ -86,8 +86,28 @@ class GoodsModal extends PureComponent<IProps & IGoodsModalProps & DispatchProp,
                     <TabBar.Item title="在线充值">
                     </TabBar.Item>
                     <TabBar.Item title="活动">
+                        {
+                            data[2].map((i: any, index: number) => {
+                                return (
+                                    <ListItem key={index} onClick={this.handleItem.bind(this, 2, i)}>
+                                        <Image src={i.pic} style={{ width: getUnit(200), height: getUnit(200) }} />
+                                    </ListItem>
+                                )
+                            })
+                        }
+                        {data[2].length === 0 ? <Empty /> : null}
                     </TabBar.Item>
                     <TabBar.Item title="商户">
+                        {
+                            data[3].map((i: any, index: number) => {
+                                return (
+                                    <ListItem key={index} onClick={this.handleItem.bind(this, 3, i)}>
+                                        <Image src={i.logo} style={{ width: getUnit(200), height: getUnit(200) }} />
+                                    </ListItem>
+                                )
+                            })
+                        }
+                        {data[3].length === 0 ? <Empty /> : null}
                     </TabBar.Item>
                     <TabBar.Item title="优惠券">
                     </TabBar.Item>
@@ -111,7 +131,10 @@ class GoodsModal extends PureComponent<IProps & IGoodsModalProps & DispatchProp,
             const { activeNum, data } = this.state
             let url = ''
             switch (activeNum) {
-                default: url = '/admin/marketing-integral-goods'
+                case 0: url = '/admin/marketing-integral-goods'; break;
+                case 2: url = '/admin/marketing-promotion-activity'; break;
+                case 3: url = '/admin/merchant-manage'; break;
+                default: return
             }
             const res = await http(`${url}`, {}, {
                 method: 'GET',
@@ -124,13 +147,21 @@ class GoodsModal extends PureComponent<IProps & IGoodsModalProps & DispatchProp,
     }
 
     private handleTabChange = (field: number | string) => {
-        console.log(field)
         const { data } = this.state
-        if (!data[Number(field)].length) {
-            this.handleFirstLoading()
+        const { onSelect, dispatch } = this.props
+        if (Number(field) == 1 || Number(field) == 4 || Number(field) == 5) {
+            if (isFunction(onSelect)) {
+                onSelect(Number(field), undefined)
+            }
+            dispatch({ type: SET_GOODS_MODAL_VISIBLE, data: false })
+            return
         }
         this.setState({
             activeNum: Number(field)
+        }, () => {
+            if (!data[Number(field)]?.length) {
+                this.handleFirstLoading()
+            }
         })
     }
 
