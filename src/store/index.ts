@@ -9,7 +9,7 @@ const sagaMiddleware = createSagaMiddleware()
 const persistConfig = {
     key: 'muka_store',
     storage,
-    blacklist: ['imageModalVisible', 'spinLoading', 'selectModalVisible', 'goodsModalVisible']
+    blacklist: ['imageModalVisible', 'spinLoading', 'selectModalVisible', 'goodsModalVisible', 'goodsList']
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

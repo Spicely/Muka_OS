@@ -218,6 +218,7 @@ class Jurisdiction extends Component<IProps, IState> {
                 const { dispatch } = this.props
                 dispatch({ type: SET_JURISDICTION_DATA, data: data.authority })
                 dispatch({ type: SET_ROUTER_DATA, data: data.routers })
+                message.success(jurisd.id ? '更新成功' : '创建成功')
                 this.setState({
                     visible: false
                 })

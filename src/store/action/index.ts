@@ -58,3 +58,6 @@ export const SET_DIY_COM_DATA = 'SET_DIY_COM_DATA'
 
 // 设置商品组件弹窗
 export const SET_GOODS_MODAL_VISIBLE = 'SET_GOODS_MODAL_VISIBLE'
+
+// 设置商品数据
+export const SET_GOODS_LIST_DATA = 'SET_GOODS_LIST_DATA'

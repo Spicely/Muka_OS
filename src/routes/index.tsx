@@ -14,12 +14,12 @@ function Loading(props: any) {
 
 export interface IRoutes {
     path: string
-    component: Promise<React.ComponentClass<any> | React.StatelessComponent<any> | { default: React.ComponentType<any> }>
+    component: Promise<React.ComponentClass<any> | React.FunctionComponent<any> | { default: React.ComponentType<any> }>
 }
 
 export const routes: IRoutes[] = [{
-    component: import('../pages/ShopList'),
-    path: '/ShopList'
+    component: import('../pages/Shop/list'),
+    path: '/shop/list'
 }, {
     /// 权限设置
     component: import('../pages/Jurisdiction'),
@@ -48,10 +48,10 @@ export const routes: IRoutes[] = [{
 }, {
     component: import('../pages/Region'),
     path: '/platform/region'
-},  {
+}, {
     component: import('../pages/Admin'),
     path: '/user/list'
-},{
+}, {
     component: import('../pages/View'),
     path: '/view/:id'
 }, {

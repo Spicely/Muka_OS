@@ -1,29 +1,25 @@
 import React, { Component } from 'react'
-import { find } from 'lodash'
 import { message, Modal } from 'antd'
 import styled from 'styled-components'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
-import { Button, Dialog, LabelHeader, Form, Table, Label, Icon, Image, Tag, Toast } from 'components'
-import http, { imgUrl, httpUtils } from '../../utils/axios'
+import { Button, Dialog, LabelHeader, Form, Table, Label, Tag } from 'components'
+import http, {  httpUtils } from '../../utils/axios'
 import { connect, DispatchProp } from 'react-redux'
 import { IFormItem, IFormFun } from 'src/components/lib/Form'
 import { ITableColumns } from 'src/components/lib/Table'
 import { GlobalView } from 'src/utils/node'
-import { IInitState } from 'src/store/state'
-import { IJurisd } from 'src/store/reducers/jurisd'
-import { IIcons } from 'src/store/reducers/icons'
+import { IInitState, MukaOS } from 'src/store/state'
 import { NavBarThemeData, Color, getUnit, DialogThemeData } from 'src/components/lib/utils'
-import { SET_ROUTERS_DATA, SET_SPINLOADING_DATA } from 'src/store/action'
+import { SET_GOODS_LIST_DATA, SET_ROUTERS_DATA, SET_SPINLOADING_DATA } from 'src/store/action'
 import { IRouter } from 'src/store/reducers/router'
 
 const { confirm } = Modal
 
 interface IProps extends DispatchProp {
-    routers: IRouter[]
-    lastIds: number[]
-    jurisd: IJurisd[]
-    icons: IIcons[]
+    goodsList: MukaOS.GoodsList
 }
+
+const navBarTheme = new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255) })
 
 interface IState {
     classifyVisible: boolean
@@ -44,7 +40,7 @@ const dialogTheme = new DialogThemeData({
 })
 
 
-class Routers extends Component<IProps, IState> {
+class ShopList extends Component<IProps, IState> {
 
     public state: IState = {
         classifyVisible: false,
@@ -75,26 +71,9 @@ class Routers extends Component<IProps, IState> {
         title: '操作',
         key: 'action',
         render: (val: any, data: IRouter) => {
-            const { jurisd } = this.props
-            const { lastIds } = this.state
-            const ids: number[] = []
-            ids.push(data.id)
-            if (data.children) {
-                data.children.forEach((i) => {
-                    ids.push(i.id)
-                    if (i.children) {
-                        i.children.forEach((z: any) => {
-                            ids.push(z.id)
-                        })
-                    }
-                })
-            }
             return (
                 <div>
-                    {lastIds.includes(val.id) ? null : find(jurisd, { type: 3 }) ? <Label onClick={this.handleAddChildRouter.bind(this, data.id)}>添加子路由</Label> : null}
                     <Label onClick={this.handleEdit.bind(this, data)}>修改</Label>
-                    {data.status && find(jurisd, { type: 6 }) ? <Label onClick={this.handleSetStatus.bind(this, ids, false)} color="red">禁用</Label> : null}
-                    {!data.status && find(jurisd, { type: 6 }) ? <Label onClick={this.handleSetStatus.bind(this, ids, true)} color="green">启用</Label> : null}
                 </div>
             )
         }
@@ -102,16 +81,19 @@ class Routers extends Component<IProps, IState> {
 
     public componentDidMount() {
         this.getData()
-        this.initIds()
     }
 
     private async getData() {
-        const { dispatch } = this.props
+        const { dispatch, goodsList } = this.props
+        if (goodsList.data.length) return
         try {
             dispatch({ type: SET_SPINLOADING_DATA, data: true })
-            const data = await http('/admin/router/get')
+            const data = await http('/admin/goods/find', {
+                page_num: goodsList.page_num,
+                page_size: goodsList.page_num
+            })
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
-            dispatch({ type: SET_ROUTERS_DATA, data: data })
+            dispatch({ type: SET_GOODS_LIST_DATA, data: data })
         } catch (msg) {
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
             message.error(msg)
@@ -119,23 +101,22 @@ class Routers extends Component<IProps, IState> {
     }
 
     public render(): JSX.Element {
-        const { routers } = this.props
+        const { goodsList } = this.props
         const { classifyVisible, dialogName } = this.state
         return (
             <GlobalView>
                 <LayoutNavBar
                     left={null}
-                    theme={new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255) })}
-                    title={<LabelHeader title="路由设置" line="vertical" />}
-                    right={<Button mold="primary" onClick={this.setClassifyVisble}>添加路由</Button>}
+                    theme={navBarTheme}
+                    title={<LabelHeader title="商品列表" line="vertical" />}
+                    right={<Button mold="primary" onClick={this.setClassifyVisble}>添加商品</Button>}
                 />
                 <Table
                     bordered
                     columns={this.columns}
-                    dataSource={routers}
+                    dataSource={goodsList.data}
                     rowKey={(data: any) => data.id}
-                    expandedRowKeys={routers.map(item => item.id)}
-                    pagination={false}
+                    expandedRowKeys={goodsList.data.map(item => item.id)}
                 />
                 <Dialog
                     visible={classifyVisible}
@@ -151,22 +132,8 @@ class Routers extends Component<IProps, IState> {
         )
     }
 
-    private handleAddChildRouter = (parentId: number) => {
-        this.setState({
-            classifyVisible: true,
-            dialogName: '创建子路由'
-        }, () => {
-            setTimeout(() => {
-                this.fn && this.fn.setFieldValue({
-                    'parent': parentId
-                })
-            }, 10)
-        })
-    }
-
     private getItems = (fn: IFormFun) => {
         const { parents } = this.state
-        const { icons } = this.props
         this.fn = fn
         const items: IFormItem[] = [{
             component: 'NULL',
@@ -215,27 +182,6 @@ class Routers extends Component<IProps, IState> {
                 options: parents
             },
             field: 'router_id'
-        }, {
-            component: 'Select',
-            label: <FromLabel>路由图标</FromLabel>,
-            props: {
-                options: icons.map((i) => {
-                    const name: any = i.name
-                    return {
-                        value: i.id,
-                        label: (
-                            <div className="flex">
-                                <div className="flex_center" style={{ marginRight: getUnit(5) }}>
-                                    {i.type === 'icon' ? <Icon icon={name} /> : null}
-                                    {i.type === 'image' ? <Image src={imgUrl + name} /> : null}
-                                </div>
-                                <div className="flex_1">{i.name}</div>
-                            </div>
-                        )
-                    }
-                })
-            },
-            field: 'icon_id'
         }]
         return items
     }
@@ -265,8 +211,6 @@ class Routers extends Component<IProps, IState> {
                 this.fn.cleanFieldValue()
                 this.setState({
                     classifyVisible: false
-                }, () => {
-                    this.initIds()
                 })
             }
 
@@ -291,8 +235,6 @@ class Routers extends Component<IProps, IState> {
                         message.success(data.msg)
                         this.setState({
                             classifyVisible: false
-                        }, () => {
-                            this.initIds()
                         })
                     },
                     onCancel() {
@@ -309,8 +251,6 @@ class Routers extends Component<IProps, IState> {
                 message.success(data.msg)
                 this.setState({
                     classifyVisible: false
-                }, () => {
-                    this.initIds()
                 })
             }
 
@@ -329,16 +269,15 @@ class Routers extends Component<IProps, IState> {
     private setClassifyVisble = () => {
         this.setState({
             classifyVisible: true,
-            dialogName: '创建路由'
+            dialogName: '创建商品'
         })
     }
 
     private handleEdit = (data: IRouter) => {
         this.setState({
             classifyVisible: true,
-            dialogName: '修改路由'
+            dialogName: '修改商品'
         }, () => {
-            this.initIds(data.id)
             setTimeout(() => {
                 this.fn && this.fn.setFieldValue({
                     ...data,
@@ -347,38 +286,10 @@ class Routers extends Component<IProps, IState> {
             }, 10)
         })
     }
-
-    private initIds = (id?: number) => {
-        const { routers } = this.props
-        const lastIds: number[] = []
-        const parents: { label: number, value: any, children?: any[] }[] = []
-        routers.forEach((i: any) => {
-            if (i.id !== id) {
-                parents.push({
-                    label: i.name,
-                    value: i.id,
-                    // children: i.children?.map((z: any) => {
-                    //     if (z.id !== id) {
-                    //         return {
-                    //             label: z.name,
-                    //             value: z.id
-                    //         }
-                    //     }
-                    // })
-                })
-            }
-        })
-        this.setState({
-            lastIds,
-            parents
-        })
-    }
 }
 
 export default connect(
-    ({ routers, jurisd, icons }: IInitState) => ({
-        routers,
-        jurisd,
-        icons
+    ({ goodsList }: IInitState) => ({
+        goodsList
     })
-)(Routers)
+)(ShopList)

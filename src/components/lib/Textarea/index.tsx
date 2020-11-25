@@ -69,7 +69,7 @@ export default class Textarea extends Component<ITextareaProps, IState> {
     }
 
     public render(): JSX.Element {
-        const { className, maxLength, showMaxLength, theme, style } = this.props
+        const { className, maxLength, showMaxLength, theme, style, value } = this.props
         const { val } = this.state
         const props = omit(this.props, ['className', 'onChange', 'showMaxLength', 'theme', 'style'])
         return (
@@ -86,7 +86,7 @@ export default class Textarea extends Component<ITextareaProps, IState> {
                                 onChange={this.handleChange}
                                 textareaTheme={theme || init.theme.textareaTheme}
                             />
-                            {(showMaxLength && maxLength) ? <TextMax className='flex_justify'>{val.length}/{maxLength}</TextMax> : null}
+                            {(showMaxLength && maxLength) ? <TextMax className='flex_justify'>{val.length || (value as any)?.length}/{maxLength}</TextMax> : null}
                         </TextareaBox>
                     )
                 }

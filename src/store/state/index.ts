@@ -99,6 +99,14 @@ export namespace MukaOS {
     export interface DiyCom extends DiyComItem {
         children: DiyComItem[]
     }
+
+    export interface GoodsList {
+        page_num: number
+        page_size: number
+        count: number
+        data: any[]
+    }
+
 }
 
 export interface ITabelRes<T = any> {
@@ -137,4 +145,5 @@ export interface IInitState {
     selectModalVisible: boolean
     diyCom: MukaOS.DiyCom[]
     goodsModalVisible: boolean
+    goodsList: MukaOS.GoodsList
 }

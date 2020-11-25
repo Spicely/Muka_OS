@@ -167,7 +167,7 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
         const { children, navBar, collapsed, title, router, userInfo, solo, spinLoading } = this.props
         const { visible, selected, extendSelected } = this.state
         let items: any[] = []
-        if (userInfo.type == 2 && !userInfo.business) {
+        if (userInfo.type == 2 && (!userInfo.business || userInfo.business.status != 2)) {
             items = router.filter((i) => i.path == '/').map((i) => {
                 return {
                     item: {

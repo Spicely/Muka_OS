@@ -26,6 +26,7 @@ import imageModalVisible from './imageModal/index'
 import selectModalVisible from './selectModal/index'
 import diyCom from './diyCom'
 import goodsModalVisible from './goods_model/index'
+import goodsList from './goodsList/index'
 
 export interface IConfig {
     amapKey: string
@@ -59,4 +60,5 @@ export default combineReducers({
     selectModalVisible,
     diyCom,
     goodsModalVisible,
+    goodsList,
 })
