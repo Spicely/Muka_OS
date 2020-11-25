@@ -3,8 +3,8 @@ import { AnyAction } from 'redux'
 import { MukaOS } from 'src/store/state'
 
 const initData: MukaOS.GoodsList = {
-    page_num: 10,
-    page_size: 1,
+    page_num: 1,
+    page_size: 10,
     data: [],
     count: 0,
 }

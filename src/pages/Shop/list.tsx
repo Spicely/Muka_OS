@@ -3,7 +3,7 @@ import { message, Modal } from 'antd'
 import styled from 'styled-components'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
 import { Button, Dialog, LabelHeader, Form, Table, Label, Tag } from 'components'
-import http, {  httpUtils } from '../../utils/axios'
+import http, { httpUtils, baseUrl } from '../../utils/axios'
 import { connect, DispatchProp } from 'react-redux'
 import { IFormItem, IFormFun } from 'src/components/lib/Form'
 import { ITableColumns } from 'src/components/lib/Table'
@@ -90,7 +90,7 @@ class ShopList extends Component<IProps, IState> {
             dispatch({ type: SET_SPINLOADING_DATA, data: true })
             const data = await http('/admin/goods/find', {
                 page_num: goodsList.page_num,
-                page_size: goodsList.page_num
+                page_size: goodsList.page_size,
             })
             dispatch({ type: SET_SPINLOADING_DATA, data: false })
             dispatch({ type: SET_GOODS_LIST_DATA, data: data })
@@ -139,47 +139,46 @@ class ShopList extends Component<IProps, IState> {
             component: 'NULL',
             field: 'id'
         }, {
+            component: 'Input',
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>商品名称</FromLabel>,
+            field: 'name'
+        }, {
+            component: 'Upload',
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>展示图</FromLabel>,
+            props: {
+                maxLength: 5,
+                crop: true,
+                fileTypes: ['.jpeg', '.jpg', '.png'],
+                cropProps: {
+                    cropSize: {
+                        width: 720,
+                        height: 460,
+                    },
+                },
+            },
+            field: 'logo'
+        }, {
             component: 'Select',
-            label: <FromLabel><span style={{ color: 'red' }}>*</span>路由类型</FromLabel>,
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>商品类型</FromLabel>,
             props: {
                 options: [{
-                    label: '内部地址',
-                    value: 'path'
+                    label: '普通商品',
+                    value: 1,
                 }, {
-                    label: '外部地址',
-                    value: 'url'
+                    label: '手办',
+                    value: 2,
+                }, {
+                    label: '门票',
+                    value: 3,
                 }],
-                value: 'path'
+                value: 1,
             },
             field: 'type'
         }, {
-            component: 'Input',
-            label: <FromLabel><span style={{ color: 'red' }}>*</span>路由名称</FromLabel>,
+            component: 'AsyncSelect',
+            label: <FromLabel>销售地区</FromLabel>,
             props: {
-                placeholder: '请输入路由名称(输入已经存在的路由会导致创建失败)'
-            },
-            field: 'name'
-        }, {
-            component: 'Input',
-            label: <FromLabel><span style={{ color: 'red' }}>*</span>路由地址</FromLabel>,
-            props: {
-                placeholder: '请输入路由地址(以/开头)',
-            },
-            field: 'path'
-        }, {
-            component: 'Input',
-            label: <FromLabel>权重</FromLabel>,
-            props: {
-                placeholder: '数值越高显示越前',
-                value: 1,
-                type: 'number'
-            },
-            field: 'sort'
-        }, {
-            component: 'Select',
-            label: <FromLabel>父级路由</FromLabel>,
-            props: {
-                options: parents
+                url: baseUrl + '/admin/city/options'
             },
             field: 'router_id'
         }]
