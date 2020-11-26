@@ -21,6 +21,8 @@ export interface ISelectProps {
     multiple?: boolean
     disabled?: boolean
     url: string
+    params?: any
+    onBeforeOptions?: (value: any) => ISelectOptionsProps
     noOptionsMessage?: string | JSX.Element
     theme?: SelectThemeData
     withCredentials?: boolean
@@ -76,19 +78,19 @@ export default class AsyncSelect extends Component<ISelectProps, IState> {
     }
 
     private handleFocus = () => {
-        const { url, withCredentials } = this.props
+        const { url, withCredentials, params, onBeforeOptions } = this.props
         const { options } = this.state
         if (url && !options.length) {
             this.setState({
                 loading: true
             })
-            Axios.post(url, {}, {
+            Axios.post(url, params||{}, {
                 timeout: 25000,
                 withCredentials,
             }).then(({ data }) => {
                 this.setState({
                     loading: false,
-                    options: data.data
+                    options: onBeforeOptions?.call(null, data.data) || data.data
                 })
             })
         }

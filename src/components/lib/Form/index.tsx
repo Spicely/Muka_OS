@@ -617,13 +617,16 @@ export default class Form extends Component<IFormProps, IState> {
                 const _porps: any = props
                 return (
                     <FormItem className={`flex_justify ${className || ''}`} key={field}>
-                        {label && <FormItemLabel spacing={labelSpacing} style={{ paddingTop: getUnit(16) }}>{label}</FormItemLabel>}
-                        <div className="flex_1">
-                            <View
-                                onLocationAddr={this.steArrVal.bind(this, field, _porps.onLocationAddr)}
-                                {...vProps}
-                            />
+                        <div className="flex">
+                            {label ? (isFunction(label) ? label(vals) : <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>) : null}
+                            <div className="flex_1">
+                                <View
+                                    onLocationAddr={this.steArrVal.bind(this, field, _porps.onLocationAddr)}
+                                    {...vProps}
+                                />
+                            </div>
                         </div>
+                        {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
                     </FormItem>
                 )
             }

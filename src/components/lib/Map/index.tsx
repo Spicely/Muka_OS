@@ -1,15 +1,31 @@
 import React, { Component } from 'react'
 import load from 'load-script'
 import { isFunction, browser } from 'muka'
-import { getClassName, prefix } from '../utils'
+import { getUnit, prefix } from '../utils'
+import styled from 'styled-components'
 
 declare const qq: any
 declare const AMap: any
+declare const AMapUI: any
 
+const PickerBox = styled.div`
+    position: absolute;
+    z-index: 9999;
+    top:${getUnit(50)};
+    right: ${getUnit(30)};
+`
+
+const PoiInfo = styled.div`
+    background: #fff;
+`
+const MapBox = styled.div`
+    position: relative;
+`
 export interface IMapProps {
     type: 'tMap' | 'bMap' | 'aMap'
     width?: string | number
     height?: string | number
+    version?: string
     apiKey: string
     // 地址参数追加
     urlParams?: string
@@ -22,8 +38,14 @@ export interface IMapProps {
         lat: number
         lng: number
     }
+    // 需要使用的的插件列表，如比例尺'AMap.Scale'等
+    plugins?: string[]
+    // 需要加载的 AMapUI ui插件
+    UIPlugins?: string[]
     extendUrls?: string[]
-    onInit?: (params: any) => void
+    // 显示搜索框
+    poiPicker?: boolean
+    onInit?: (map: any) => void
     onLocationError?: () => void
     onLocationAddr?: (position: any) => void
     onLoadUrlError?: () => void
@@ -58,12 +80,16 @@ export default class Map extends Component<IMapProps, IState> {
         height: 600,
         width: 800,
         apiKey: '',
-        extendUrls: []
+        extendUrls: [],
+        plugins: [],
+        UIPlugins: [],
     }
 
     public state: IState = {}
 
     private node: Element | null = null
+
+    private map: any
 
     private location?: ILocation = undefined
 
@@ -78,7 +104,7 @@ export default class Map extends Component<IMapProps, IState> {
     }
 
     public componentDidMount() {
-        const { type } = this.props
+        const { type, version, apiKey, plugins, initLatLng, onInit, UIPlugins, poiPicker } = this.props
         const win: any = window
         switch (type) {
             case 'tMap': {
@@ -96,41 +122,46 @@ export default class Map extends Component<IMapProps, IState> {
             }; break;
             case 'bMap': ; break;
             default: {
-                if (!isFunction(win.aMapInit)) {
-                    this.initAMap()
-                    this.getScriptFile().catch(() => {
-                        const { onLoadUrlError } = this.props
-                        if (isFunction(onLoadUrlError)) {
-                            onLoadUrlError()
-                        }
+                const AMapLoader = require('@amap/amap-jsapi-loader')
+                AMapLoader.load({
+                    "key": apiKey,
+                    "version": version,
+                    "plugins": plugins,
+                    "AMapUI": {
+                        "version": '1.1',
+                        "plugins": UIPlugins,
+                    },
+                    "Loca": {
+                        "version": '1.3.2'
+                    },
+                }).then((AMap: any) => {
+                    this.map = new AMap.Map(`${prefix}map`, {
+                        center: initLatLng ? [initLatLng.lat, initLatLng.lng] : undefined,
+                        zoom: 12
                     })
-                } else {
-                    win.aMapInit()
-                }
+                    poiPicker && this.poiPicker()
+                    onInit?.call(null, this.map)
+                }).catch((e: any) => {
+                    console.log(e);
+                })
             };
         }
 
     }
 
     public render(): JSX.Element {
-        const { width, height } = this.props
+        const { width, height, poiPicker } = this.props
         return (
-            <div className={`${prefix}map`} id={`${prefix}map`} style={{ height, width }} ref={(e) => this.node = e} />
+            <MapBox>
+                <div className={`${prefix}map`} id={`${prefix}map`} style={{ height, width }} ref={(e) => this.node = e} />
+                {poiPicker && (
+                    <PickerBox>
+                        <input id={`${prefix}picker_input`} placeholder="输入关键字选取地点" />
+                        <PoiInfo id="poiInfo"></PoiInfo>
+                    </PickerBox>
+                )}
+            </MapBox>
         )
-    }
-
-    private initAMap = () => {
-        const { onInit, initLatLng, onLocationAddr } = this.props
-        const win: any = window
-        win.aMapInit = () => {
-            const map = new AMap.Map(`${prefix}map`, {
-                center: initLatLng ? [initLatLng.lat, initLatLng.lng] : undefined,
-                zoom: 12
-            })
-            if (isFunction(onInit)) {
-                onInit(map)
-            }
-        }
     }
 
     private initTMap = () => {
@@ -217,12 +248,44 @@ export default class Map extends Component<IMapProps, IState> {
         return Promise.all(promiseAll)
     }
 
+    private poiPicker() {
+        const poiPicker = new AMapUI.PoiPicker({
+            input: `${prefix}picker_input`
+        });
+        var marker = new AMap.Marker();
+        var infoWindow = new AMap.InfoWindow({
+            offset: new AMap.Pixel(0, -20)
+        });
+        //选取了某个POI
+        poiPicker.on('poiPicked', (poiResult: any) => {
+            var source = poiResult.source,
+                poi = poiResult.item,
+                info = {
+                    source: source,
+                    id: poi.id,
+                    name: poi.name,
+                    location: poi.location.toString(),
+                    address: poi.address
+                };
+
+            marker.setMap(this.map);
+            infoWindow.setMap(this.map);
+            marker.setPosition(poi.location);
+            infoWindow.setPosition(poi.location);
+            infoWindow.setContent('POI信息: <pre>' + JSON.stringify(info, null, 2) + '</pre>');
+            infoWindow.open(this.map, marker.getPosition());
+            this.map.setCenter(marker.getPosition());
+        });
+        poiPicker.onCityReady(function () {
+            poiPicker.suggest('美食');
+        });
+    }
+
     /**
      *
      * 使用地图插件获得精准位置
      *
      */
-
     private getLocation(): Promise<any> {
         return new Promise((resolve, reject) => {
             const { apiKey, type, appName } = this.props

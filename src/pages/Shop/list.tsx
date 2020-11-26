@@ -13,6 +13,8 @@ import { NavBarThemeData, Color, getUnit, DialogThemeData } from 'src/components
 import { SET_GOODS_LIST_DATA, SET_ROUTERS_DATA, SET_SPINLOADING_DATA } from 'src/store/action'
 import { IRouter } from 'src/store/reducers/router'
 
+declare const AMap: any
+
 const { confirm } = Modal
 
 interface IProps extends DispatchProp {
@@ -178,9 +180,36 @@ class ShopList extends Component<IProps, IState> {
             component: 'AsyncSelect',
             label: <FromLabel>销售地区</FromLabel>,
             props: {
-                url: baseUrl + '/admin/city/options'
+                url: baseUrl + '/admin/city/options',
+                onBeforeOptions: (data: any[]) => {
+                    return data.map((i) => {
+                        return {
+                            label: i.name,
+                            value: i.id,
+                            children: i.ascription?.map((v: any) => {
+                                return {
+                                    label: v.name,
+                                    value: v.id,
+                                }
+                            })
+                        }
+                    });
+                }
             },
-            field: 'router_id'
+            field: 'city'
+        }, {
+            component: 'Map',
+            label: <FromLabel>选择地区</FromLabel>,
+            props: {
+                apiKey: '3eed71ca58c5e7517c830080a89589fc',
+                width: 'auto',
+                height: 300,
+                UIPlugins: ['misc/PoiPicker'],
+                poiPicker: true,
+                onInit: (map) => {
+                    
+                }
+            }
         }]
         return items
     }
