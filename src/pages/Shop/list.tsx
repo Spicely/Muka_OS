@@ -200,10 +200,13 @@ class ShopList extends Component<IProps, IState> {
         }, {
             component: 'Map',
             label: <FromLabel>选择地区</FromLabel>,
+            // visible: (value) => !!value.city,
             props: {
                 apiKey: '3eed71ca58c5e7517c830080a89589fc',
                 width: 'auto',
                 height: 300,
+                showMaxBtn: true,
+                isInDialog: true,
                 UIPlugins: ['misc/PoiPicker'],
                 poiPicker: true,
                 onInit: (map) => {

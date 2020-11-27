@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import load from 'load-script'
 import { isFunction, browser } from 'muka'
-import { getUnit, prefix } from '../utils'
+import { getUnit, prefix, transition } from '../utils'
 import styled from 'styled-components'
+import Icon from '../Icon'
+import { theme } from 'src/App'
 
 declare const qq: any
 declare const AMap: any
@@ -10,16 +12,23 @@ declare const AMapUI: any
 
 const PickerBox = styled.div`
     position: absolute;
-    z-index: 9999;
-    top:${getUnit(50)};
+    top:${getUnit(30)};
     right: ${getUnit(30)};
 `
 
 const PoiInfo = styled.div`
     background: #fff;
 `
-const MapBox = styled.div`
-    position: relative;
+
+const PickerMax = styled.div`
+    position: absolute;
+    bottom:${getUnit(10)};
+    right: ${getUnit(10)};
+    cursor: pointer;
+`
+const MapView = styled.div`
+    width: 100%;
+    height: 100%;
 `
 export interface IMapProps {
     type: 'tMap' | 'bMap' | 'aMap'
@@ -45,6 +54,9 @@ export interface IMapProps {
     extendUrls?: string[]
     // 显示搜索框
     poiPicker?: boolean
+    // 最大化按钮
+    showMaxBtn?: boolean
+    isInDialog?: boolean
     onInit?: (map: any) => void
     onLocationError?: () => void
     onLocationAddr?: (position: any) => void
@@ -58,6 +70,7 @@ interface ILocation {
 
 // tslint:disable-next-line: no-empty-interface
 interface IState {
+    maxView: boolean
 }
 
 const mapUrl: any = {
@@ -85,7 +98,9 @@ export default class Map extends Component<IMapProps, IState> {
         UIPlugins: [],
     }
 
-    public state: IState = {}
+    public state: IState = {
+        maxView: false
+    }
 
     private node: Element | null = null
 
@@ -146,22 +161,49 @@ export default class Map extends Component<IMapProps, IState> {
                 })
             };
         }
-
     }
 
     public render(): JSX.Element {
-        const { width, height, poiPicker } = this.props
+        const { width, height, poiPicker, showMaxBtn, isInDialog } = this.props
+        const { maxView } = this.state
         return (
-            <MapBox>
-                <div className={`${prefix}map`} id={`${prefix}map`} style={{ height, width }} ref={(e) => this.node = e} />
-                {poiPicker && (
-                    <PickerBox>
-                        <input id={`${prefix}picker_input`} placeholder="输入关键字选取地点" />
-                        <PoiInfo id="poiInfo"></PoiInfo>
-                    </PickerBox>
-                )}
-            </MapBox>
+            <div style={{ position: 'relative', height, width }}>
+                <div style={maxView ? {
+                    width: '100%',
+                    height: isInDialog ? `calc(100% - ${getUnit(Number(theme.navBarTheme.height) * 2)})` : '100%',
+                    position: 'fixed',
+                    top: isInDialog ? getUnit(theme.navBarTheme.height) : 0,
+                    left: 0
+                } : { height, width }}>
+                    <MapView
+                        className={`${prefix}map`}
+                        id={`${prefix}map`}
+                        ref={(e) => this.node = e}
+                    />
+                    {poiPicker && (
+                        <PickerBox>
+                            <input id={`${prefix}picker_input`} placeholder="输入关键字选取地点" />
+                            <PoiInfo id="poiInfo"></PoiInfo>
+                        </PickerBox>
+                    )}
+                    {showMaxBtn && (
+                        <PickerMax>
+                            <Icon
+                                icon={maxView ? 'ios-contract' : 'ios-expand'}
+                                onClick={this.handleReSize}
+                            />
+                        </PickerMax>
+                    )}
+                </div>
+            </div>
         )
+    }
+
+    private handleReSize = () => {
+        const { maxView } = this.state
+        this.setState({
+            maxView: !maxView,
+        })
     }
 
     private initTMap = () => {
@@ -172,7 +214,8 @@ export default class Map extends Component<IMapProps, IState> {
             const posLatLng = initLatLng ? new qq.maps.LatLng(initLatLng.lat, initLatLng.lng) : undefined
             const map = new qq.maps.Map(this.node, {
                 zoom: 12,
-                center: posLatLng
+                center: posLatLng,
+                resize: true,
             })
             const geocoder = new qq.maps.Geocoder()
             geocoder.setComplete((result: any) => {
@@ -275,9 +318,6 @@ export default class Map extends Component<IMapProps, IState> {
             infoWindow.setContent('POI信息: <pre>' + JSON.stringify(info, null, 2) + '</pre>');
             infoWindow.open(this.map, marker.getPosition());
             this.map.setCenter(marker.getPosition());
-        });
-        poiPicker.onCityReady(function () {
-            poiPicker.suggest('美食');
         });
     }
 
