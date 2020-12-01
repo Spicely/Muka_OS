@@ -36,7 +36,7 @@ export interface IFormItem {
     label?: string | JSX.Element | ((val: any) => JSX.Element)
     additional?: string | JSX.Element | ((val: any) => JSX.Element)
     className?: string
-    render?: (val: any) => JSX.Element
+    render?: (val: any, vals: any) => JSX.Element
     visible?: ((val: any) => boolean) | boolean
     extend?: string | JSX.Element | ((val: any) => JSX.Element)
 }
@@ -72,7 +72,7 @@ interface IFormChild {
     props: IValue | ((val: any) => props)
     additional?: string | JSX.Element | ((val: any) => JSX.Element)
     view: any
-    render?: (val: any) => JSX.Element
+    render?: (val: any, vals: any) => JSX.Element
     visible: ((val: any) => boolean) | boolean
     extend?: string | JSX.Element | ((val: any) => JSX.Element)
 }
@@ -376,7 +376,7 @@ export default class Form extends Component<IFormProps, IState> {
     }
 
     // tslint:disable-next-line: no-shadowed-variable
-    private setTypeCom(component: component, View: any, props: props, field: string | undefined, key: number | string, className?: string, label?: string | JSX.Element | ((val: any) => JSX.Element), additional?: string | JSX.Element | ((val: any) => JSX.Element), render?: (val: any) => JSX.Element, extend?: ((val: any) => JSX.Element) | string | JSX.Element): JSX.Element | null {
+    private setTypeCom(component: component, View: any, props: props, field: string | undefined, key: number | string, className?: string, label?: string | JSX.Element | ((val: any) => JSX.Element), additional?: string | JSX.Element | ((val: any) => JSX.Element), render?: (val: any, vals: any) => JSX.Element, extend?: ((val: any) => JSX.Element) | string | JSX.Element): JSX.Element | null {
         const { vals } = this.state
         const { labelSpacing } = this.props
         /// 得到field
@@ -721,7 +721,7 @@ export default class Form extends Component<IFormProps, IState> {
                         <div className="flex">
                             {label ? (isFunction(label) ? label(vals) : <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>) : null}
                             <div className="flex_1">
-                                {isFunction(render) ? render(vals[field]) : (
+                                {isFunction(render) ? render(vals[field], vals) : (
                                     <View
                                         {...vProps}
                                         fileList={vals[field]}
@@ -825,7 +825,7 @@ export default class Form extends Component<IFormProps, IState> {
                             {label ? (isFunction(label) ? label(vals) : <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>) : null}
                             <div className="flex_1 flex_justify">
                                 {
-                                    isFunction(render) ? render(vals[field]) : (
+                                    isFunction(render) ? render(vals[field], vals) : (
                                         <View
                                             {...vProps}
                                             style={{ paddingTop: '0', paddingBottom: '0' }}

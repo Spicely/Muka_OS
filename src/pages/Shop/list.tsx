@@ -173,9 +173,28 @@ class ShopList extends Component<IProps, IState> {
                     label: '门票',
                     value: 3,
                 }],
-                value: 1,
+                value: 3,
             },
             field: 'type'
+        }, {
+            component: 'Label',
+            label: <FromLabel>商品分类</FromLabel>,
+            props: {
+                value: [],
+            },
+            render: (val, vals) => {
+                return (
+                    <div>
+                        {
+                            val.map((i: any) => {
+                                console.log(i)
+                                return <div/>
+                            })
+                        }
+                    </div>
+                )
+            },
+            field: 'classify'
         }, {
             component: 'AsyncSelect',
             label: <FromLabel>销售地区</FromLabel>,
@@ -210,7 +229,7 @@ class ShopList extends Component<IProps, IState> {
                 UIPlugins: ['misc/PoiPicker'],
                 poiPicker: true,
                 onInit: (map) => {
-                    
+
                 }
             }
         }]
