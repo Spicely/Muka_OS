@@ -44,7 +44,7 @@ class ShopInfo extends Component<IProps, IState> {
                     theme={new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255) })}
                     title={<LabelHeader title="商家信息设置" line="vertical" />}
                     right={
-                        userInfo.business?.status == 3 ? (
+                        userInfo.business?.status === 3 ? (
                             <Button mold="primary" theme={waitBtnTheme}>等待审核</Button>
                         ) : <Button mold="primary" async onClick={this.handleSave}>更新</Button>
                     }
@@ -72,7 +72,7 @@ class ShopInfo extends Component<IProps, IState> {
             label: <FormLabel>商家名称</FormLabel>,
             props: {
                 placeholder: '请输入商家名称',
-                disabled: userInfo.business?.status == 2 ? true : false
+                disabled: userInfo.business?.status === 2 ? true : false
             },
             field: 'name'
         }, {
@@ -87,7 +87,7 @@ class ShopInfo extends Component<IProps, IState> {
                         height: 300,
                     },
                 },
-                disabled: userInfo.business?.status == 2 ? true : false
+                disabled: userInfo.business?.status === 2 ? true : false
             },
             field: 'logo',
         }, {
@@ -107,7 +107,7 @@ class ShopInfo extends Component<IProps, IState> {
                         height: 360,
                     },
                 },
-                disabled: userInfo.business?.status == 2 ? true : false
+                disabled: userInfo.business?.status === 2 ? true : false
             },
             field: 'backdrop',
         }, {
@@ -117,7 +117,7 @@ class ShopInfo extends Component<IProps, IState> {
                 placeholder: '请输入商家介绍',
                 maxLength: 120,
                 showMaxLength: true,
-                disabled: userInfo.business?.status == 2 ? true : false
+                disabled: userInfo.business?.status === 2 ? true : false
             },
             field: 'introduce'
         }]
@@ -131,7 +131,7 @@ class ShopInfo extends Component<IProps, IState> {
                 const value = this.fn.getFieldValue()
                 const formData = new FormData()
                 Object.keys(value).forEach((i) => {
-                    if (i == 'logo' || i == 'backdrop') {
+                    if (i === 'logo' || i === 'backdrop') {
                         value[i][0] && formData.append(i, value[i][0].file)
                     } else {
                         formData.append(i, value[i])

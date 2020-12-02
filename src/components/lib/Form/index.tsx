@@ -835,8 +835,8 @@ export default class Form extends Component<IFormProps, IState> {
                                         </View>
                                     )
                                 }
-                                {extend}
                             </div>
+                            <div className="flex_center">{isFunction(extend) ? extend(vals) : extend}</div>
                         </div>
                         {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
                     </FormItem>

@@ -23,9 +23,16 @@ interface IProps extends DispatchProp {
 
 const navBarTheme = new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255) })
 
+const AddClass = styled.div`
+    cursor: pointer;
+    color:${({ theme }) => theme.primarySwatch};
+`
+
 interface IState {
+    visible: boolean
+    visibleName: string
     classifyVisible: boolean
-    dialogName: string
+    classifyName: string
     lastIds: number[]
     parents: { label: number, value: any }[]
 }
@@ -45,13 +52,17 @@ const dialogTheme = new DialogThemeData({
 class ShopList extends Component<IProps, IState> {
 
     public state: IState = {
+        visible: false,
+        visibleName: '',
         classifyVisible: false,
+        classifyName: '',
         lastIds: [],
-        dialogName: '',
         parents: []
     }
 
     private fn: IFormFun | null = null
+
+    private classifyFn: IFormFun | null = null
 
     private columns: ITableColumns<any>[] = [{
         title: '路由名称',
@@ -104,7 +115,7 @@ class ShopList extends Component<IProps, IState> {
 
     public render(): JSX.Element {
         const { goodsList } = this.props
-        const { classifyVisible, dialogName } = this.state
+        const { visible, visibleName, classifyVisible, classifyName } = this.state
         return (
             <GlobalView>
                 <LayoutNavBar
@@ -121,8 +132,8 @@ class ShopList extends Component<IProps, IState> {
                     expandedRowKeys={goodsList.data.map(item => item.id)}
                 />
                 <Dialog
-                    visible={classifyVisible}
-                    title={dialogName}
+                    visible={visible}
+                    title={visibleName}
                     theme={dialogTheme}
                     onOk={this.handleUpdateOrCreate}
                     async
@@ -130,8 +141,31 @@ class ShopList extends Component<IProps, IState> {
                 >
                     <Form getItems={this.getItems} style={{ padding: getUnit(10) }} />
                 </Dialog>
+                <Dialog
+                    visible={classifyVisible}
+                    title={classifyName}
+                    theme={dialogTheme}
+                    onOk={this.handleUpdateOrCreate}
+                    async
+                    onClose={this.handleAddClassifyClose}
+                >
+                    <Form getItems={this.getClassifyItems} style={{ padding: getUnit(10) }} />
+                </Dialog>
             </GlobalView>
         )
+    }
+
+    private getClassifyItems = (fn: IFormFun) => {
+        this.classifyFn = fn
+        const items: IFormItem[] = [{
+            component: 'NULL',
+            field: 'id'
+        }, {
+            component: 'Input',
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>分类名称</FromLabel>,
+            field: 'name'
+        }]
+        return items
     }
 
     private getItems = (fn: IFormFun) => {
@@ -188,12 +222,13 @@ class ShopList extends Component<IProps, IState> {
                         {
                             val.map((i: any) => {
                                 console.log(i)
-                                return <div/>
+                                return <div />
                             })
                         }
                     </div>
                 )
             },
+            extend: <AddClass onClick={this.addClassify}>+添加</AddClass>,
             field: 'classify'
         }, {
             component: 'AsyncSelect',
@@ -234,6 +269,22 @@ class ShopList extends Component<IProps, IState> {
             }
         }]
         return items
+    }
+
+    private addClassify = () => {
+        this.setState({
+            classifyVisible: true,
+            classifyName: '添加分类'
+        })
+    }
+
+    
+
+    private handleAddClassifyClose = () => {
+        this.setState({
+            classifyVisible: false,
+        })
+        this.fn && this.fn.cleanFieldValue()
     }
 
 
@@ -311,22 +362,22 @@ class ShopList extends Component<IProps, IState> {
 
     private handleClassifyClose = () => {
         this.setState({
-            classifyVisible: false,
+            visible: false,
         })
         this.fn && this.fn.cleanFieldValue()
     }
 
     private setClassifyVisble = () => {
         this.setState({
-            classifyVisible: true,
-            dialogName: '创建商品'
+            visible: true,
+            visibleName: '创建商品'
         })
     }
 
     private handleEdit = (data: IRouter) => {
         this.setState({
-            classifyVisible: true,
-            dialogName: '修改商品'
+            visible: true,
+            visibleName: '修改商品'
         }, () => {
             setTimeout(() => {
                 this.fn && this.fn.setFieldValue({
