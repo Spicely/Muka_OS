@@ -2,9 +2,9 @@ import React, { Component } from 'react'
 import { message } from 'antd'
 import styled from 'styled-components'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
-import { LabelHeader, Button, Form, TabBar } from 'components'
-import http, { getTitle, getJurisd } from 'src/utils/axios'
-import { NavBarThemeData, Color, getUnit, TabBarThemeData, ButtonThemeData } from 'src/components/lib/utils'
+import { LabelHeader, Form } from 'components'
+import http from 'src/utils/axios'
+import { NavBarThemeData, Color, getUnit, TabBarThemeData, } from 'src/components/lib/utils'
 import { GlobalView } from 'src/utils/node'
 import { IFormFun, IFormItem } from 'src/components/lib/Form'
 import { IConfig } from 'src/store/reducers'
@@ -53,15 +53,9 @@ export default class Setting extends Component<IProps, IState> {
                 <LayoutNavBar
                     left={null}
                     theme={new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255) })}
-                    title={<LabelHeader title="系统参数" line="vertical" />}
+                    title={<LabelHeader title="首页设置" line="vertical" />}
                 />
-                <TabBar
-                    theme={tabBarTheme}
-                >
-                    <TabBar.Item title="基础设置">
-                        <Form getItems={this.getItems} style={{ width: getUnit(560) }} />
-                    </TabBar.Item>
-                </TabBar>
+                <Form getItems={this.getItems} style={{ width: getUnit(560) }} />
 
             </GlobalView>
         )
@@ -84,36 +78,28 @@ export default class Setting extends Component<IProps, IState> {
     private getItems = (fn: IFormFun) => {
         this.fn = fn
         const items: IFormItem[] = [{
-            component: 'Input',
-            label: <FormLabel>短信账号</FormLabel>,
+            component: 'Editor',
+            label: <FormLabel>左侧信息</FormLabel>,
             props: {
-                placeholder: '请输入短信账号'
+                placeholder: '请输入左侧信息'
             },
-            field: 'smsAccount'
-        }, {
-            component: 'Input',
-            label: <FormLabel>短信密码</FormLabel>,
-            props: {
-                placeholder: '请输入短信密码'
-            },
-            field: 'smsKey'
-        }, {
-            component: 'Input',
-            label: <FormLabel>企业ID</FormLabel>,
-            props: {
-                placeholder: '请输入企业ID'
-            },
-            field: 'smsId'
+            field: 'ossAccessKeyID'
         }, {
             component: 'Editor',
-            label: <FormLabel>系统公告</FormLabel>,
+            label: <FormLabel>右侧信息</FormLabel>,
             props: {
-                placeholder: '请输入系统公告'
+                placeholder: '请输入右侧信息'
             },
-            field: 'notice'
+            field: 'ossAccessKeySecret'
+        },{
+            component: 'Input',
+            label: <FormLabel>版权信息</FormLabel>,
+            props: {
+                placeholder: '请输入版权信息'
+            },
+            field: 'ossServer'
         }, {
             component: 'Button',
-            visible: getJurisd(9) || false,
             props: {
                 async: true,
                 children: '更新',

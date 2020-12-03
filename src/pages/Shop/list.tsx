@@ -133,7 +133,6 @@ class ShopList extends Component<IProps, IState> {
                         onChange: (page)=> {
                             const { dispatch, goodsList } = this.props
                             goodsList.page_num = page
-                            console.log(page)
                             dispatch({ type: SET_GOODS_LIST_DATA, data: {...goodsList} })
                             this.getData()
                         }

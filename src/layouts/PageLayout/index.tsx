@@ -247,26 +247,26 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                 theme={new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255), height: 50 })}
                 style={{ padding: 0 }}
                 onBack={() => { }}
-                left={
-                    <div className="flex">
-                        <LayoutNavList className="flex_center">
-                            <Icon icon="md-home" theme={new IconThemeData({ color: Color.hex('#696363') })} />
-                        </LayoutNavList>
-                        <LayoutNavList className="flex_1" hasAfter>
-                            <Input
-                                placeholder="请输入关键词进行功能搜索..."
-                                theme={new InputThemeData({ height: 50, width: 280 })}
-                                extend={
-                                    <div style={{ width: '1.5rem' }}
-                                        className="flex_center"
-                                    >
-                                        <Icon icon="md-search" theme={new IconThemeData({ color: Color.hex('#696363') })} />
-                                    </div>
-                                }
-                            />
-                        </LayoutNavList>
-                    </div>
-                }
+                // left={
+                //     <div className="flex">
+                //         <LayoutNavList className="flex_center">
+                //             <Icon icon="md-home" theme={new IconThemeData({ color: Color.hex('#696363') })} />
+                //         </LayoutNavList>
+                //         <LayoutNavList className="flex_1" hasAfter>
+                //             <Input
+                //                 placeholder="请输入关键词进行功能搜索..."
+                //                 theme={new InputThemeData({ height: 50, width: 280 })}
+                //                 extend={
+                //                     <div style={{ width: '1.5rem' }}
+                //                         className="flex_center"
+                //                     >
+                //                         <Icon icon="md-search" theme={new IconThemeData({ color: Color.hex('#696363') })} />
+                //                     </div>
+                //                 }
+                //             />
+                //         </LayoutNavList>
+                //     </div>
+                // }
                 right={
                     <div className="flex">
                         <LayoutNavList className="flex_center" userBox hasAfter hasBefore>
@@ -278,7 +278,7 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                                 <span className="flex_center" style={{ paddingLeft: '0.5rem' }}>{userInfo.userName}</span>
                             </span>
                         </LayoutNavList>
-                        <LayoutNavList className="flex_center" hasAfter userBox onClick={this.handleShowVisible}>
+                        {/* <LayoutNavList className="flex_center" hasAfter userBox onClick={this.handleShowVisible}>
                             <span className="flex">
                                 <Icon icon="ios-lock" />
                                 <span className="flex_center" style={{ paddingLeft: '0.5rem' }}>修改密码</span>
@@ -288,7 +288,7 @@ class PageLayout extends Component<IPageLayout & RouteComponentProps, PageState>
                             <LayoutNavList className="flex_center" onClick={this.handleExit}>
                                 <Icon icon="md-exit" color="#696363" />
                             </LayoutNavList>
-                        </Tooltip>
+                        </Tooltip> */}
                     </div>
                 }
             />

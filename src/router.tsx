@@ -14,6 +14,11 @@ class RouterItem extends Component<IProps, any> {
         return (
             <Switch>
                 <Route path="/" exact component={loadable(import('./pages/Shop/list'))} />
+                {
+                    routes.map((item: IRoutes, index: number) => {
+                        return <Route path={item.path} exact component={loadable(item.component)} key={index} />
+                    })
+                }
             </Switch>
         )
     }

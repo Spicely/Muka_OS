@@ -30,7 +30,7 @@ interface IState {
     data: any[]
 }
 
-class AdminList extends Component<IProps, IState> {
+class Links extends Component<IProps, IState> {
 
     public state: IState = {
         previewVisible: false,
@@ -46,17 +46,13 @@ class AdminList extends Component<IProps, IState> {
     private fn: IFormFun | null = null
 
     private columns: ITableColumns<any>[] = [{
-        title: '图片',
+        title: '链接名称',
+        dataIndex: 'name',
+        key: 'name'
+    }, {
+        title: '链接地址',
         dataIndex: 'url',
-        key: 'url',
-        render: (val) => {
-            return <Image src={baseUrl + val} style={{ height: getUnit(40) }} onClick={() => {
-                this.setState({
-                    previewVisible: true,
-                    previewImage: baseUrl + val
-                })
-            }} />
-        }
+        key: 'url'
     }, {
         title: '状态',
         dataIndex: 'status',
@@ -87,8 +83,8 @@ class AdminList extends Component<IProps, IState> {
                 <LayoutNavBar
                     left={null}
                     theme={new NavBarThemeData({ navBarColor: Color.fromRGB(255, 255, 255) })}
-                    title={<LabelHeader title="轮播列表" line="vertical" />}
-                    right={<Button mold="primary" onClick={this.setClassifyVisble}>新增轮播</Button>}
+                    title={<LabelHeader title="外部链接" line="vertical" />}
+                    right={<Button mold="primary" onClick={this.setClassifyVisble}>新增链接</Button>}
                 />
                 <Table
                     columns={this.columns}
@@ -140,7 +136,7 @@ class AdminList extends Component<IProps, IState> {
         const { page_num, page_size } = this.state
         try {
             dispatch({ type: SET_SPINLOADING_DATA, data: true })
-            const data = await http('/admin/img/get', {
+            const data = await http('/admin/link/get', {
                 page_size: page_size,
                 page_num: page_num,
             })
@@ -155,24 +151,27 @@ class AdminList extends Component<IProps, IState> {
     private getItems = (fn: IFormFun) => {
         this.fn = fn
         const items: IFormItem[] = [{
-            component: 'Upload',
-            label: <FormLable><FormRequire color="red">*</FormRequire>轮播图</FormLable>,
+            component: 'Input',
+            label: <FormLable><FormRequire color="red">*</FormRequire>链接名称</FormLable>,
             props: {
-                maxLength: 1,
-                crop: true,
-                fileTypes: ['.jpeg', '.jpg', '.png'],
-                theme: new UploadThemeData({
-                    itemWidth: 360,
-                    itemHeight: 180,
-                }),
-                cropProps: {
-                    cropSize: {
-                        width: 720,
-                        height: 360,
-                    },
-                },
+                placeholder: "请输入链接名称"
             },
-            field: 'file'
+            field: 'name'
+        }, {
+            component: 'Input',
+            label: <FormLable><FormRequire color="red">*</FormRequire>链接地址</FormLable>,
+            props: {
+                placeholder: "请输入链接地址"
+            },
+            field: 'url'
+        }, {
+            component: 'Input',
+            label: <FormLable><FormRequire color="red">*</FormRequire>排序</FormLable>,
+            props: {
+                type: 'number',
+                placeholder: "请输入排序"
+            },
+            field: 'sort'
         }]
         return items
     }
@@ -182,13 +181,16 @@ class AdminList extends Component<IProps, IState> {
             if (this.fn) {
                 const { data, count } = this.state
                 const value = this.fn.getFieldValue()
-                if (value.file.length === 0) {
-                    message.error('请选择图片')
+                if (!value.name) {
+                    message.error('请输入链接名称')
                     return
                 }
-                const formData = new FormData()
-                formData.append('file', value.file[0].file)
-                const v = await http('/admin/img/create', formData)
+                if (!value.url) {
+                    message.error('请输入链接地址')
+                    return
+                }
+                value.sort = Number(value.sort || 1)
+                const v = await http('/admin/link/create', value)
                 data.unshift(v)
                 this.setState({
                     data: [...data],
@@ -210,8 +212,11 @@ class AdminList extends Component<IProps, IState> {
         const { data } = this.state
         try {
             dispatch({ type: SET_SPINLOADING_DATA, data: true })
-            await http('/admin/img/update', {
+            await http('/admin/link/update', {
                 id: v.id,
+                name: v.name,
+                url: v.url,
+                sort: v.sort,
                 status: !v.status,
             })
             data[index].status = !v.status
@@ -242,4 +247,4 @@ export default connect(
         userList,
         userInfo
     })
-)(AdminList)
+)(Links)

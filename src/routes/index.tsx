@@ -18,45 +18,14 @@ export interface IRoutes {
 }
 
 export const routes: IRoutes[] = [{
-    component: import('../pages/Shop/list'),
-    path: '/shop/list'
-}, {
-    /// 权限设置
-    component: import('../pages/Jurisdiction'),
-    path: '/setting/authority'
-}, {
-    component: import('../pages/Routers'),
-    path: '/setting/router'
-}, {
-    component: import('../pages/Setting'),
-    path: '/setting/config'
-}, {
-    component: import('../pages/Setting'),
-    path: '/system'
-}, {
-    component: import('../pages/Icon'),
-    path: '/setting/icon'
-}, {
-    component: import('../pages/Diy'),
-    path: '/page/diy'
-}, {
-    component: import('../pages/Diy/edit'),
-    path: '/diy/item'
-}, {
-    component: import('../pages/Carousel'),
-    path: '/platform/carousel'
-}, {
-    component: import('../pages/Region'),
-    path: '/platform/region'
-}, {
     component: import('../pages/Admin'),
-    path: '/user/list'
+    path: '/ca/v'
 }, {
-    component: import('../pages/View'),
-    path: '/view/:id'
+    component: import('../pages/Setting'),
+    path: '/ca/b'
 }, {
-    component: import('../pages/Index'),
-    path: '/'
+    component: import('../pages/Links'),
+    path: '/ca/c'
 }]
 
 export const loadable = (component: Promise<React.ComponentClass<any> | React.StatelessComponent<any> | { default: React.ComponentType<any> }>) => {
