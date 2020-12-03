@@ -11,22 +11,9 @@ interface IProps {
 class RouterItem extends Component<IProps, any> {
 
     public render(): JSX.Element {
-        const { userInfo } = this.props
-        console.log(userInfo)
-        if (userInfo.type == 2 && (!userInfo.business || userInfo.business.status != 2)) {
-            return (
-                <Switch>
-                    <Route path="/" exact component={loadable(import('./pages/Shop/info'))} />
-                </Switch>
-            )
-        } 
         return (
             <Switch>
-                {
-                    routes.map((item: IRoutes, index: number) => {
-                        return <Route path={item.path} exact component={loadable(item.component)} key={index} />
-                    })
-                }
+                <Route path="/" exact component={loadable(import('./pages/Shop/list'))} />
             </Switch>
         )
     }

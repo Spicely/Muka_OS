@@ -65,31 +65,30 @@ class ShopList extends Component<IProps, IState> {
     private classifyFn: IFormFun | null = null
 
     private columns: ITableColumns<any>[] = [{
-        title: '路由名称',
+        title: '姓名',
         dataIndex: 'name',
         key: 'name',
 
     }, {
-        title: '路由地址',
-        dataIndex: 'path',
-        key: 'path'
+        title: '年龄',
+        dataIndex: 'age',
+        key: 'age'
     }, {
-        title: '状态',
-        dataIndex: 'status',
-        key: 'staus',
-        render: (status: boolean) => {
-            return <Tag color={status ? '#7edc55' : 'red'}>{status ? '使用中' : '禁用中'}</Tag>
-        }
+        title: '性别',
+        dataIndex: 'sex',
+        key: 'sex'
     }, {
-        title: '操作',
-        key: 'action',
-        render: (val: any, data: IRouter) => {
-            return (
-                <div>
-                    <Label onClick={this.handleEdit.bind(this, data)}>修改</Label>
-                </div>
-            )
-        }
+        title: 'WhatsApp',
+        dataIndex: 'whatsApp',
+        key: 'whatsApp'
+    }, {
+        title: '手机号',
+        dataIndex: 'mobile',
+        key: 'mobile'
+    }, {
+        title: '自我介绍',
+        dataIndex: 'introduce',
+        key: 'introduce'
     }]
 
     public componentDidMount() {
@@ -98,7 +97,7 @@ class ShopList extends Component<IProps, IState> {
 
     private async getData() {
         const { dispatch, goodsList } = this.props
-        if (goodsList.data.length) return
+        // if (goodsList.data.length) return
         try {
             dispatch({ type: SET_SPINLOADING_DATA, data: true })
             const data = await http('/admin/goods/find', {
@@ -121,14 +120,24 @@ class ShopList extends Component<IProps, IState> {
                 <LayoutNavBar
                     left={null}
                     theme={navBarTheme}
-                    title={<LabelHeader title="商品列表" line="vertical" />}
-                    right={<Button mold="primary" onClick={this.setClassifyVisble}>添加商品</Button>}
+                    title={<LabelHeader title="申请列表" line="vertical" />}
                 />
                 <Table
                     bordered
                     columns={this.columns}
                     dataSource={goodsList.data}
                     rowKey={(data: any) => data.id}
+                    pagination={{
+                        current: goodsList.page_num,
+                        total: goodsList.count,
+                        onChange: (page)=> {
+                            const { dispatch, goodsList } = this.props
+                            goodsList.page_num = page
+                            console.log(page)
+                            dispatch({ type: SET_GOODS_LIST_DATA, data: {...goodsList} })
+                            this.getData()
+                        }
+                    }}
                     expandedRowKeys={goodsList.data.map(item => item.id)}
                 />
                 <Dialog
@@ -278,7 +287,7 @@ class ShopList extends Component<IProps, IState> {
         })
     }
 
-    
+
 
     private handleAddClassifyClose = () => {
         this.setState({
