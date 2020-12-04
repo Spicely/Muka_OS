@@ -12,7 +12,7 @@ import { message } from 'antd'
 const LoginView = styled.div`
     width: 100vw;
     height: 100vh;
-    background-image: url('https://i.muka.site/pixiv/pixiv_2019_06_07/75063657_p0.png');
+    background-image: url('https://img.muka.site/images/logo_bg.jpg');
     background-size: cover;
     position: relative;
 `
