@@ -12,6 +12,7 @@ import { IInitState, MukaOS } from 'src/store/state'
 import { NavBarThemeData, Color, getUnit, DialogThemeData } from 'src/components/lib/utils'
 import { SET_GOODS_LIST_DATA, SET_ROUTERS_DATA, SET_SPINLOADING_DATA } from 'src/store/action'
 import { IRouter } from 'src/store/reducers/router'
+import moment from 'moment'
 
 declare const AMap: any
 
@@ -89,6 +90,13 @@ class ShopList extends Component<IProps, IState> {
         title: '自我介绍',
         dataIndex: 'introduce',
         key: 'introduce'
+    }, {
+        title: '创建时间',
+        dataIndex: 'created_at',
+        key: 'created_at',
+        render: (val) => {
+            return moment(val).format('YYYY-MM-DD HH:mm:ss')
+        }
     }]
 
     public componentDidMount() {
