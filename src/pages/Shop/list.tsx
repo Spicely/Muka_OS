@@ -63,7 +63,7 @@ class ShopList extends Component<IProps, IState> {
 
     private fn: IFormFun | null = null
 
-    private classifyFn: IFormFun | null = null
+    private index: number = 0
 
     private columns: ITableColumns<any>[] = [{
         title: '姓名',
@@ -97,6 +97,18 @@ class ShopList extends Component<IProps, IState> {
         render: (val) => {
             return moment(val).format('YYYY-MM-DD HH:mm:ss')
         }
+    }, {
+        title: '操作',
+        dataIndex: 'actions',
+        key: 'actions',
+        render: (val: any, data: any, index: number) => {
+            return (
+                <div>
+                    <Label onClick={this.handleDelete.bind(this, data.id)} color="red">删除</Label>
+                    <Label onClick={this.handleEdit.bind(this, data, index)} color="green">修改</Label>
+                </div>
+            )
+        }
     }]
 
     public componentDidMount() {
@@ -122,7 +134,7 @@ class ShopList extends Component<IProps, IState> {
 
     public render(): JSX.Element {
         const { goodsList } = this.props
-        const { visible, visibleName, classifyVisible, classifyName } = this.state
+        const { visible, visibleName } = this.state
         return (
             <GlobalView>
                 <LayoutNavBar
@@ -138,10 +150,10 @@ class ShopList extends Component<IProps, IState> {
                     pagination={{
                         current: goodsList.page_num,
                         total: goodsList.count,
-                        onChange: (page)=> {
+                        onChange: (page) => {
                             const { dispatch, goodsList } = this.props
                             goodsList.page_num = page
-                            dispatch({ type: SET_GOODS_LIST_DATA, data: {...goodsList} })
+                            dispatch({ type: SET_GOODS_LIST_DATA, data: { ...goodsList } })
                             this.getData()
                         }
                     }}
@@ -157,174 +169,99 @@ class ShopList extends Component<IProps, IState> {
                 >
                     <Form getItems={this.getItems} style={{ padding: getUnit(10) }} />
                 </Dialog>
-                <Dialog
-                    visible={classifyVisible}
-                    title={classifyName}
-                    theme={dialogTheme}
-                    onOk={this.handleUpdateOrCreate}
-                    async
-                    onClose={this.handleAddClassifyClose}
-                >
-                    <Form getItems={this.getClassifyItems} style={{ padding: getUnit(10) }} />
-                </Dialog>
             </GlobalView>
         )
     }
 
-    private getClassifyItems = (fn: IFormFun) => {
-        this.classifyFn = fn
-        const items: IFormItem[] = [{
-            component: 'NULL',
-            field: 'id'
-        }, {
-            component: 'Input',
-            label: <FromLabel><span style={{ color: 'red' }}>*</span>分类名称</FromLabel>,
-            field: 'name'
-        }]
-        return items
+    private handleDelete = async (id: any) => {
+        const { dispatch, goodsList } = this.props
+        try {
+            dispatch({ type: SET_SPINLOADING_DATA, data: true })
+            const data = await http('/admin/goods/delete', {
+                page_num: goodsList.page_num,
+                page_size: goodsList.page_size,
+                id: id,
+            })
+            dispatch({ type: SET_GOODS_LIST_DATA, data: data })
+            dispatch({ type: SET_SPINLOADING_DATA, data: false })
+        } catch (msg) {
+            dispatch({ type: SET_SPINLOADING_DATA, data: false })
+            message.error(msg)
+        }
     }
 
     private getItems = (fn: IFormFun) => {
-        const { parents } = this.state
         this.fn = fn
         const items: IFormItem[] = [{
             component: 'NULL',
             field: 'id'
         }, {
             component: 'Input',
-            label: <FromLabel><span style={{ color: 'red' }}>*</span>商品名称</FromLabel>,
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>姓名</FromLabel>,
             field: 'name'
         }, {
-            component: 'Upload',
-            label: <FromLabel><span style={{ color: 'red' }}>*</span>展示图</FromLabel>,
-            props: {
-                maxLength: 5,
-                crop: true,
-                fileTypes: ['.jpeg', '.jpg', '.png'],
-                cropProps: {
-                    cropSize: {
-                        width: 720,
-                        height: 460,
-                    },
-                },
-            },
-            field: 'logo'
+            component: 'Input',
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>年龄</FromLabel>,
+            field: 'age',
+            props: { type: 'number' }
         }, {
-            component: 'Select',
-            label: <FromLabel><span style={{ color: 'red' }}>*</span>商品类型</FromLabel>,
-            props: {
-                options: [{
-                    label: '普通商品',
-                    value: 1,
-                }, {
-                    label: '手办',
-                    value: 2,
-                }, {
-                    label: '门票',
-                    value: 3,
-                }],
-                value: 3,
-            },
-            field: 'type'
+            component: 'Input',
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>性别</FromLabel>,
+            field: 'sex'
         }, {
-            component: 'Label',
-            label: <FromLabel>商品分类</FromLabel>,
-            props: {
-                value: [],
-            },
-            render: (val, vals) => {
-                return (
-                    <div>
-                        {
-                            val.map((i: any) => {
-                                console.log(i)
-                                return <div />
-                            })
-                        }
-                    </div>
-                )
-            },
-            extend: <AddClass onClick={this.addClassify}>+添加</AddClass>,
-            field: 'classify'
+            component: 'Input',
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>WhatsApp</FromLabel>,
+            field: 'whatsApp'
         }, {
-            component: 'AsyncSelect',
-            label: <FromLabel>销售地区</FromLabel>,
-            props: {
-                url: baseUrl + '/admin/city/options',
-                onBeforeOptions: (data: any[]) => {
-                    return data.map((i) => {
-                        return {
-                            label: i.name,
-                            value: i.id,
-                            children: i.ascription?.map((v: any) => {
-                                return {
-                                    label: v.name,
-                                    value: v.id,
-                                }
-                            })
-                        }
-                    });
-                }
-            },
-            field: 'city'
+            component: 'Input',
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>手机号</FromLabel>,
+            field: 'mobile'
         }, {
-            component: 'Map',
-            label: <FromLabel>选择地区</FromLabel>,
-            // visible: (value) => !!value.city,
-            props: {
-                apiKey: '3eed71ca58c5e7517c830080a89589fc',
-                width: 'auto',
-                height: 300,
-                showMaxBtn: true,
-                isInDialog: true,
-                UIPlugins: ['misc/PoiPicker'],
-                poiPicker: true,
-                onInit: (map) => {
-
-                }
-            }
+            component: 'Input',
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>自我介绍</FromLabel>,
+            field: 'introduce'
         }]
         return items
-    }
-
-    private addClassify = () => {
-        this.setState({
-            classifyVisible: true,
-            classifyName: '添加分类'
-        })
-    }
-
-
-
-    private handleAddClassifyClose = () => {
-        this.setState({
-            classifyVisible: false,
-        })
-        this.fn && this.fn.cleanFieldValue()
     }
 
 
     private handleUpdateOrCreate = async () => {
         try {
             if (this.fn) {
-                const router = this.fn.getFieldValue()
-                if (!router.name) {
-                    message.error('请输入路由名称')
+                const data = this.fn.getFieldValue()
+                if (!data.name) {
+                    message.error('Please enter name')
                     return
                 }
-                if (!router.path) {
-                    message.error('请输入路由地址')
+                if (!Number(data.age)) {
+                    message.error('Please enter age')
                     return
                 }
-                if (!router.id) delete router.id
-                if (!router.router_id) delete router.router_id
-                const data = await http(router.id ? '/admin/router/update' : '/admin/router/create', {
-                    ...router,
-                    'icon_id': router.icon_id ? Number(router.icon_id) : null
+                if (!data.sex) {
+                    message.error('Please enter sex')
+                    return
+                }
+                if (!data.whatsApp) {
+                    message.error('Please enter whatsApp')
+                    return
+                }
+                if (!data.mobile) {
+                    message.error('Please enter Mobile Phone')
+                    return
+                }
+                if (!data.introduce) {
+                    message.error('Please enter self-introduction')
+                    return
+                }
+                await http('/admin/goods/update', data)
+                const { dispatch, goodsList } = this.props
+                goodsList.data[this.index] = data
+                goodsList.data = [...goodsList.data]
+                this.setState({
+                    visible: false
                 })
-                const { dispatch } = this.props
-                dispatch({ type: SET_ROUTERS_DATA, data: data })
-                message.success(router.id ? '更新成功' : '创建成功')
+                dispatch({ type: SET_ROUTERS_DATA, data: { ...goodsList } })
+                message.success('更新成功')
                 this.fn.cleanFieldValue()
                 this.setState({
                     classifyVisible: false
@@ -337,45 +274,6 @@ class ShopList extends Component<IProps, IState> {
         }
     }
 
-    private handleSetStatus = async (ids: number[], status: boolean) => {
-        try {
-            if (ids.length > 1) {
-                confirm({
-                    title: '该路由包含子路由，确认会全部更改',
-                    onOk: async () => {
-                        const data = await http('routers/update', {
-                            id: ids,
-                            status
-                        })
-                        const { dispatch } = this.props
-                        dispatch({ type: SET_ROUTERS_DATA, data: data.data })
-                        message.success(data.msg)
-                        this.setState({
-                            classifyVisible: false
-                        })
-                    },
-                    onCancel() {
-                        console.log('Cancel');
-                    },
-                });
-            } else {
-                const data = await http('routers/update', {
-                    id: ids,
-                    status
-                })
-                const { dispatch } = this.props
-                dispatch({ type: SET_ROUTERS_DATA, data: data.data })
-                message.success(data.msg)
-                this.setState({
-                    classifyVisible: false
-                })
-            }
-
-        } catch (data) {
-            httpUtils.verify(data)
-        }
-    }
-
     private handleClassifyClose = () => {
         this.setState({
             visible: false,
@@ -383,22 +281,15 @@ class ShopList extends Component<IProps, IState> {
         this.fn && this.fn.cleanFieldValue()
     }
 
-    private setClassifyVisble = () => {
+    private handleEdit = (data: any, index: number) => {
+        this.index = index
         this.setState({
             visible: true,
-            visibleName: '创建商品'
-        })
-    }
-
-    private handleEdit = (data: IRouter) => {
-        this.setState({
-            visible: true,
-            visibleName: '修改商品'
+            visibleName: '修改'
         }, () => {
             setTimeout(() => {
                 this.fn && this.fn.setFieldValue({
-                    ...data,
-                    icon: data.icon ? data.icon.id : null,
+                    ...data
                 })
             }, 10)
         })

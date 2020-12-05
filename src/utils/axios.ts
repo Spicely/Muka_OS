@@ -7,7 +7,7 @@ interface IValue {
     [name: string]: any
 }
 // export const baseUrl = 'https://192.168.1.5:8'
-export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://192.168.0.104:8081' : 'http://147.139.42.231:8081'
+export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://192.168.0.104:8081' : 'https://api.88bigwin.com/'
 export const imgUrl = 'https://img.muka.site'
 
 export interface IRresItem<T = any> {

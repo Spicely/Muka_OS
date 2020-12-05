@@ -81,7 +81,7 @@ export default class Editor extends Component<IEditorProps, any> {
                                 container,
                                 handlers: {
                                     ...handlers,
-                                    image: this.handleImgUpload
+                                    // image: this.handleImgUpload
                                 },
                             }
                         }}
@@ -101,7 +101,7 @@ export default class Editor extends Component<IEditorProps, any> {
         const quill = this.quillRef.getEditor()
         const range = quill.getSelection()
         const index = range ? range.index : 0
-        quill.insertEmbed(index, 'image', url, this.quill.Quill.sources.USER)
+        // quill.insertEmbed(index, 'image', url, this.quill.Quill.sources.USER)
         quill.setSelection(index + 1)
     }
 

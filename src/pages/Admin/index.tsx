@@ -167,8 +167,8 @@ class AdminList extends Component<IProps, IState> {
                 }),
                 cropProps: {
                     cropSize: {
-                        width: 720,
-                        height: 360,
+                        width: 1920,
+                        height: 629,
                     },
                 },
             },
