@@ -99,6 +99,13 @@ export default class Setting extends Component<IProps, IState> {
             },
             field: 'ossServer'
         }, {
+            component: 'Input',
+            label: <FormLabel>提交跳转</FormLabel>,
+            props: {
+                placeholder: '请输入提交跳转地址'
+            },
+            field: 'ossBucket'
+        }, {
             component: 'Button',
             props: {
                 async: true,
