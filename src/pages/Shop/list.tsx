@@ -192,7 +192,7 @@ class ShopList extends Component<IProps, IState> {
                     },
                 },
             },
-            field: 'logo'
+            field: 'assets'
         }, {
             component: 'Select',
             label: <FromLabel><span style={{ color: 'red' }}>*</span>商品类型</FromLabel>,
@@ -210,6 +210,11 @@ class ShopList extends Component<IProps, IState> {
                 value: 3,
             },
             field: 'type'
+        }, {
+            component: 'Input',
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>定金</FromLabel>,
+            visible: (val) => val.type === 2,
+            field: 'deposit',
         }, {
             component: 'Label',
             label: <FromLabel>商品分类</FromLabel>,
@@ -278,7 +283,7 @@ class ShopList extends Component<IProps, IState> {
         })
     }
 
-    
+
 
     private handleAddClassifyClose = () => {
         this.setState({
@@ -291,28 +296,46 @@ class ShopList extends Component<IProps, IState> {
     private handleUpdateOrCreate = async () => {
         try {
             if (this.fn) {
-                const router = this.fn.getFieldValue()
-                if (!router.name) {
-                    message.error('请输入路由名称')
+                const params = this.fn.getFieldValue()
+                if (!params.name) {
+                    message.error('请输入商品名称')
                     return
                 }
-                if (!router.path) {
-                    message.error('请输入路由地址')
+                if (!params.assets.length) {
+                    message.error('请上传展示图')
                     return
                 }
-                if (!router.id) delete router.id
-                if (!router.router_id) delete router.router_id
-                const data = await http(router.id ? '/admin/router/update' : '/admin/router/create', {
-                    ...router,
-                    'icon_id': router.icon_id ? Number(router.icon_id) : null
+                if (!params.type) {
+                    message.error('请选择商品类型')
+                    return
+                }
+                const formData = new FormData()
+                Object.keys(params).forEach((i) => {
+                    if (i === 'assets') {
+                        const assets: any[] = []
+                        params[i].forEach((v: any, index: number) => {
+                            if (v.file) {
+                                formData.append(`file${index}`, v.file);
+                            } else {
+                                assets.push(v.id)
+                            }
+                        })
+                    } else {
+                        formData.append(i, params[i])
+                    }
                 })
-                const { dispatch } = this.props
-                dispatch({ type: SET_ROUTERS_DATA, data: data })
-                message.success(router.id ? '更新成功' : '创建成功')
-                this.fn.cleanFieldValue()
-                this.setState({
-                    classifyVisible: false
-                })
+                if (!params.id) delete params.id
+                if (!params.router_id) delete params.router_id
+                // const data = await http(params.id ? '/admin/router/update' : '/admin/goods/create', {
+                //     ...params,
+                // })
+                // const { dispatch } = this.props
+                // dispatch({ type: SET_ROUTERS_DATA, data: data })
+                // message.success(params.id ? '更新成功' : '创建成功')
+                // this.fn.cleanFieldValue()
+                // this.setState({
+                //     classifyVisible: false
+                // })
             }
 
         } catch (msg) {
