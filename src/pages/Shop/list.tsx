@@ -65,14 +65,21 @@ class ShopList extends Component<IProps, IState> {
     private classifyFn: IFormFun | null = null
 
     private columns: ITableColumns<any>[] = [{
-        title: '路由名称',
+        title: '商品名称',
         dataIndex: 'name',
         key: 'name',
 
     }, {
-        title: '路由地址',
-        dataIndex: 'path',
-        key: 'path'
+        title: '商品类型',
+        dataIndex: 'type',
+        key: 'type',
+        render: (val: any) => {
+            switch (val) {
+                case 2: return  <Tag>手办</Tag>
+                case 3: return <Tag>门票</Tag>
+                default: return <Tag>普通商品</Tag>
+            }
+        }
     }, {
         title: '状态',
         dataIndex: 'status',
@@ -309,26 +316,32 @@ class ShopList extends Component<IProps, IState> {
                     message.error('请选择商品类型')
                     return
                 }
+                const ids: any = []
                 const formData = new FormData()
+                let status = false
                 Object.keys(params).forEach((i) => {
                     if (i === 'assets') {
-                        const assets: any[] = []
-                        params[i].forEach((v: any, index: number) => {
+                        params[i].forEach((v: any) => {
                             if (v.file) {
-                                formData.append(`file${index}`, v.file);
+                                status = true
+                                formData.append(`file[]`, v.file);
                             } else {
-                                assets.push(v.id)
+                                ids.push(v.id)
                             }
                         })
-                    } else {
-                        formData.append(i, params[i])
                     }
                 })
+                formData.append('fileName', 'goods')
+                if (status) {
+                    const data = await http('/upload/files', formData)
+                    params.assets = data
+                }
                 if (!params.id) delete params.id
-                if (!params.router_id) delete params.router_id
-                // const data = await http(params.id ? '/admin/router/update' : '/admin/goods/create', {
-                //     ...params,
-                // })
+                const data = await http(params.id ? '/admin/router/update' : '/admin/goods/create', {
+                    pageNum: 1,
+                    pageSize: 10,
+                    data: { ...params },
+                })
                 // const { dispatch } = this.props
                 // dispatch({ type: SET_ROUTERS_DATA, data: data })
                 // message.success(params.id ? '更新成功' : '创建成功')
