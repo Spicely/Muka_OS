@@ -65,10 +65,10 @@ export namespace MukaOS {
         userName?: string
         business?: {
             name: string
-            logo: MukaOS.Image
+            logo: MukaOS.Assets
             status: number
             introduce: string
-            backdrop: MukaOS.Image
+            backdrop: MukaOS.Assets
         }
     }
     export interface Region {
@@ -77,13 +77,28 @@ export namespace MukaOS {
         status: boolean
         children?: MukaOS.Region[]
     }
-    export interface Image {
-        url: string
-        size: number
-        mimeType: string
+    export interface Goods {
+        address: any
+        assets: MukaOS.Assets[]
+        created_at: string
+        deposit: number
+        id: number
+        name: string
+        status: number
+        subtitle: string
+        type: number
+        updated_at: string
+    }
+    export interface Assets {
+        created_at: string
         height: number
+        id: number
+        mimeType: string
+        size: number
+        type: number
+        updated_at: string
+        url: string
         width: number
-        type: string
     }
     export interface Carousel {
         page: number

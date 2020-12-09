@@ -1076,12 +1076,13 @@ export default class Form extends Component<IFormProps, IState> {
                             }]
                         } else {
                             // tslint:disable-next-line: no-shadowed-variable
-                            vals[field] = (params[field] || get(params, field)).map((i: string, index: number) => {
+                            vals[field] = (params[field] || get(params, field)).map((i: any, index: number) => {
                                 return {
                                     uid: `${index}`,
                                     name: `reload_${index}.png`,
                                     status: 'done',
-                                    url: baseUrl + i,
+                                    url: baseUrl + i.url,
+                                    data: i.data
                                 }
                             })
                         }

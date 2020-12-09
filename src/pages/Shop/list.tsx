@@ -2,8 +2,8 @@ import React, { Component } from 'react'
 import { message, Modal } from 'antd'
 import styled from 'styled-components'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
-import { Button, Dialog, LabelHeader, Form, Table, Label, Tag } from 'components'
-import http, { httpUtils, baseUrl } from '../../utils/axios'
+import { Button, Dialog, LabelHeader, Form, Table, Label, Tag, Image, Carousel } from 'components'
+import http, { httpUtils, baseUrl, imgUrl } from '../../utils/axios'
 import { connect, DispatchProp } from 'react-redux'
 import { IFormItem, IFormFun } from 'src/components/lib/Form'
 import { ITableColumns } from 'src/components/lib/Table'
@@ -35,6 +35,8 @@ interface IState {
     classifyName: string
     lastIds: number[]
     parents: { label: number, value: any }[]
+    assets: MukaOS.Assets[]
+    assetsVisible: boolean
 }
 
 const FromLabel = styled.div`
@@ -57,7 +59,9 @@ class ShopList extends Component<IProps, IState> {
         classifyVisible: false,
         classifyName: '',
         lastIds: [],
-        parents: []
+        parents: [],
+        assets: [],
+        assetsVisible: false,
     }
 
     private fn: IFormFun | null = null
@@ -70,12 +74,19 @@ class ShopList extends Component<IProps, IState> {
         key: 'name',
 
     }, {
+        title: '商品图片',
+        dataIndex: 'assets',
+        key: 'assets',
+        render: (val: MukaOS.Assets[]) => {
+            return <Image src={imgUrl + val[0].url} style={{ height: getUnit(30) }} onClick={this.handleAssets.bind(this, val)} />
+        }
+    }, {
         title: '商品类型',
         dataIndex: 'type',
         key: 'type',
         render: (val: any) => {
             switch (val) {
-                case 2: return  <Tag>手办</Tag>
+                case 2: return <Tag>手办</Tag>
                 case 3: return <Tag>门票</Tag>
                 default: return <Tag>普通商品</Tag>
             }
@@ -84,13 +95,16 @@ class ShopList extends Component<IProps, IState> {
         title: '状态',
         dataIndex: 'status',
         key: 'staus',
-        render: (status: boolean) => {
-            return <Tag color={status ? '#7edc55' : 'red'}>{status ? '使用中' : '禁用中'}</Tag>
+        render: (status: number) => {
+            switch (status) {
+                case 1: return <Tag color="#7edc55">已上架</Tag>
+                default: return <Tag color="red">待提交</Tag>
+            }
         }
     }, {
         title: '操作',
         key: 'action',
-        render: (val: any, data: IRouter) => {
+        render: (val: any, data: MukaOS.Goods) => {
             return (
                 <div>
                     <Label onClick={this.handleEdit.bind(this, data)}>修改</Label>
@@ -122,7 +136,7 @@ class ShopList extends Component<IProps, IState> {
 
     public render(): JSX.Element {
         const { goodsList } = this.props
-        const { visible, visibleName, classifyVisible, classifyName } = this.state
+        const { visible, visibleName, classifyVisible, classifyName, assetsVisible, assets } = this.state
         return (
             <GlobalView>
                 <LayoutNavBar
@@ -158,6 +172,15 @@ class ShopList extends Component<IProps, IState> {
                 >
                     <Form getItems={this.getClassifyItems} style={{ padding: getUnit(10) }} />
                 </Dialog>
+                <Modal
+                    visible={assetsVisible}
+                    footer={null}
+                    onCancel={() => {
+                        this.setState({ assetsVisible: false })
+                    }}
+                >
+                    <Carousel value={assets} baseUrl={imgUrl} style={{height: 'auto'}} />
+                </Modal>
             </GlobalView>
         )
     }
@@ -192,6 +215,7 @@ class ShopList extends Component<IProps, IState> {
                 maxLength: 5,
                 crop: true,
                 fileTypes: ['.jpeg', '.jpg', '.png'],
+                baseUrl: imgUrl,
                 cropProps: {
                     cropSize: {
                         width: 720,
@@ -283,6 +307,13 @@ class ShopList extends Component<IProps, IState> {
         return items
     }
 
+    private handleAssets = (val: MukaOS.Assets[]) => {
+        this.setState({
+            assets: val,
+            assetsVisible: true,
+        })
+    }
+
     private addClassify = () => {
         this.setState({
             classifyVisible: true,
@@ -326,15 +357,16 @@ class ShopList extends Component<IProps, IState> {
                                 status = true
                                 formData.append(`file[]`, v.file);
                             } else {
-                                ids.push(v.id)
+                                ids.push({id: v.data.id})
                             }
                         })
                     }
                 })
+                params.assets = ids
                 formData.append('fileName', 'goods')
                 if (status) {
                     const data = await http('/upload/files', formData)
-                    params.assets = data
+                    params.assets = params.assets.concat(data)
                 }
                 if (!params.id) delete params.id
                 const data = await http(params.id ? '/admin/router/update' : '/admin/goods/create', {
@@ -410,7 +442,8 @@ class ShopList extends Component<IProps, IState> {
         })
     }
 
-    private handleEdit = (data: IRouter) => {
+    private handleEdit = (data: MukaOS.Goods) => {
+        console.log(data)
         this.setState({
             visible: true,
             visibleName: '修改商品'
@@ -418,7 +451,12 @@ class ShopList extends Component<IProps, IState> {
             setTimeout(() => {
                 this.fn && this.fn.setFieldValue({
                     ...data,
-                    icon: data.icon ? data.icon.id : null,
+                     assets: data.assets.map((i) => {
+                         return {
+                             url: i.url, 
+                             data: i,
+                         }
+                     })
                 })
             }, 10)
         })
