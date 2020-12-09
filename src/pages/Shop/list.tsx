@@ -321,7 +321,7 @@ class ShopList extends Component<IProps, IState> {
                 end: endTime,
             })
             // 自定义下载的header，注意是数组中的数组哦
-            const Header = [['id', '姓名', '年龄', '性别', 'WhatsApp', '手机号', '自我介绍', '创建时间', 'IP']];
+            const Header = [['id', '姓名', '年龄', '性别', 'WhatsApp', '手机号', '自我介绍', '创建时间', 'IP', '来源']];
 
             // 官方文档中的描述：converts an array of arrays of JS data to a worksheet.
             const headerWs = XLSX.utils.aoa_to_sheet(Header);
@@ -336,7 +336,7 @@ class ShopList extends Component<IProps, IState> {
                     "introduce": i.introduce,
                     "created_at": i.created_at,
                     "ip": i.ip,
-
+                    "origin": i.origin,
                 }
             }), { skipHeader: true, origin: "A2" });
 
