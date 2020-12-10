@@ -102,6 +102,10 @@ class ShopList extends Component<IProps, IState> {
         render: (val) => {
             return moment(val).format('YYYY-MM-DD HH:mm:ss')
         }
+    },{
+        title: '数据来源',
+        dataIndex: 'origin',
+        key: 'origin',
     }, {
         title: '操作',
         dataIndex: 'actions',
