@@ -1,34 +1,42 @@
 import * as React from 'react'
-import { isBool, isFunction } from 'muka'
-import { getClassName } from '../utils'
-
-export interface ISwitchProps {
-    className?: string
-    checked?: boolean
-    onChange?: (status?: boolean) => void
+import { Switch as ASwicth } from 'antd'
+import { SwitchProps } from 'antd/lib/switch'
+import styled from 'styled-components'
+import SwitchThemeData from '../utils/SwitchThemeData'
+import { Consumer } from '../ThemeProvider'
+import { Color } from '../utils'
+import { omit } from 'lodash'
+export interface ISwitchProps extends SwitchProps {
+    theme?: SwitchThemeData
 }
 
-export default class Switch extends React.Component<ISwitchProps, any> {
-    public state = {
-        active: false
-    }
+interface IStyleProps {
+    switchTheme: SwitchThemeData
+}
 
-    public render(): JSX.Element {
-        const { className, checked } = this.props
-        const { active } = this.state
-        return (
-            <div className={getClassName(`switch${(isBool(checked) ? checked : active) ? ' active' : ''}`, className)} onClick={this.handleActive} />
-        )
-    }
-
-    private handleActive = () => {
-        const { checked, onChange } = this.props
-        const { active } = this.state
-        this.setState({
-            active: isBool(checked) ? !checked : !active
-        })
-        if (isFunction(onChange)) {
-            onChange(isBool(checked) ? !checked : !active)
+const LSwitch = styled(ASwicth) <IStyleProps>`
+    &.ant-switch-checked {
+        background-color: ${({ switchTheme, theme }: any) => (switchTheme.color || theme.primarySwatch).toString()};
+        &:focus {
+            box-shadow: 0 0 0 2px ${({ switchTheme, theme }: any) => Color.setOpacity(switchTheme.color || theme.primarySwatch, 0.2).toString()};
         }
+    }
+`
+export default class Switch extends React.Component<ISwitchProps, any> {
+    public render(): JSX.Element {
+        const { theme } = this.props
+        const props = omit(this.props, ['theme'])
+        return (
+            <Consumer>
+                {
+                    (init) => (
+                        <LSwitch
+                            {...props}
+                            switchTheme={theme || init.theme.switchTheme}
+                        />
+                    )
+                }
+            </Consumer>
+        )
     }
 }

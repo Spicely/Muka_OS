@@ -118,7 +118,7 @@ const IntView = styled.div<IIntViewProps>`
     }}
 
     &:hover {
-        border-color: ${({ theme, inputTheme }) => inputTheme.disabledBorderColor || theme.disabledBorderColor};
+        border-color: ${({ theme, inputTheme }) => inputTheme.hoverColor || theme.primarySwatch};
     }
 `
 

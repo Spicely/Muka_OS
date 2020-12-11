@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { message, Modal } from 'antd'
+import { message, Modal, Tag as ATag } from 'antd'
 import styled from 'styled-components'
 import { LayoutNavBar } from 'src/layouts/PageLayout'
 import { Button, Dialog, LabelHeader, Form, Table, Label, Tag, Image, Carousel } from 'components'
@@ -11,7 +11,6 @@ import { GlobalView } from 'src/utils/node'
 import { IInitState, MukaOS } from 'src/store/state'
 import { NavBarThemeData, Color, getUnit, DialogThemeData } from 'src/components/lib/utils'
 import { SET_GOODS_LIST_DATA, SET_ROUTERS_DATA, SET_SPINLOADING_DATA } from 'src/store/action'
-import { IRouter } from 'src/store/reducers/router'
 
 declare const AMap: any
 
@@ -37,6 +36,8 @@ interface IState {
     parents: { label: number, value: any }[]
     assets: MukaOS.Assets[]
     assetsVisible: boolean
+    specsVisible: boolean
+    priceName: string
 }
 
 const FromLabel = styled.div`
@@ -58,15 +59,19 @@ class ShopList extends Component<IProps, IState> {
         visibleName: '',
         classifyVisible: false,
         classifyName: '',
+        priceName: '',
         lastIds: [],
         parents: [],
         assets: [],
         assetsVisible: false,
+        specsVisible: false,
     }
 
     private fn: IFormFun | null = null
 
     private classifyFn: IFormFun | null = null
+
+    private specsFn: IFormFun | null = null
 
     private columns: ITableColumns<any>[] = [{
         title: '商品名称',
@@ -136,7 +141,7 @@ class ShopList extends Component<IProps, IState> {
 
     public render(): JSX.Element {
         const { goodsList } = this.props
-        const { visible, visibleName, classifyVisible, classifyName, assetsVisible, assets } = this.state
+        const { visible, visibleName, classifyVisible, classifyName, assetsVisible, assets, specsVisible, priceName } = this.state
         return (
             <GlobalView>
                 <LayoutNavBar
@@ -144,6 +149,7 @@ class ShopList extends Component<IProps, IState> {
                     theme={navBarTheme}
                     title={<LabelHeader title="商品列表" line="vertical" />}
                     right={<Button mold="primary" onClick={this.setClassifyVisble}>添加商品</Button>}
+                // right={<Switch />}
                 />
                 <Table
                     bordered
@@ -168,9 +174,23 @@ class ShopList extends Component<IProps, IState> {
                     theme={dialogTheme}
                     onOk={this.handleUpdateOrCreate}
                     async
-                    onClose={this.handleAddClassifyClose}
+                    onClose={() => {
+                        this.setState({ classifyVisible: false })
+                    }}
                 >
                     <Form getItems={this.getClassifyItems} style={{ padding: getUnit(10) }} />
+                </Dialog>
+                <Dialog
+                    visible={specsVisible}
+                    title={priceName}
+                    theme={dialogTheme}
+                    onOk={this.handleAddSpace}
+                    async
+                    onClose={() => {
+                        this.setState({ specsVisible: false })
+                    }}
+                >
+                    <Form getItems={this.getPriceItems} style={{ padding: getUnit(10) }} />
                 </Dialog>
                 <Modal
                     visible={assetsVisible}
@@ -179,10 +199,63 @@ class ShopList extends Component<IProps, IState> {
                         this.setState({ assetsVisible: false })
                     }}
                 >
-                    <Carousel value={assets} baseUrl={imgUrl} style={{height: 'auto'}} />
+                    <Carousel value={assets} baseUrl={imgUrl} style={{ height: 'auto' }} />
                 </Modal>
             </GlobalView>
         )
+    }
+
+    private getPriceItems = (fn: IFormFun) => {
+        this.specsFn = fn
+        const items: IFormItem[] = [{
+            component: 'NULL',
+            field: 'id'
+        }, {
+            component: 'Input',
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>规格名称</FromLabel>,
+            props: {
+                placeholder: '请输入规格名称',
+            },
+            field: 'name',
+        }, {
+            component: 'Input',
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>规格价格</FromLabel>,
+            props: {
+                placeholder: '请输入规格价格',
+                type: 'number',
+            },
+            field: 'price',
+        }, {
+            component: 'Input',
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>规格数量</FromLabel>,
+            props: {
+                placeholder: '请输入规格数量',
+                type: 'number',
+            },
+            field: 'number',
+        }, {
+            component: 'Switch',
+            label: <FromLabel>状态</FromLabel>,
+            props: {
+                value: true
+            },
+            field: 'status',
+        }, {
+            component: 'DatePicker',
+            label: <FromLabel>开始时间</FromLabel>,
+            props: {
+                placeholder: '指定的时间之后才可购买(不填则不限制)'
+            },
+            field: 'startTime',
+        }, {
+            component: 'DatePicker',
+            label: <FromLabel>结束时间</FromLabel>,
+            props: {
+                placeholder: '指定的时间之前才可购买(不填则不限制)'
+            },
+            field: 'endTime',
+        }]
+        return items
     }
 
     private getClassifyItems = (fn: IFormFun) => {
@@ -194,12 +267,33 @@ class ShopList extends Component<IProps, IState> {
             component: 'Input',
             label: <FromLabel><span style={{ color: 'red' }}>*</span>分类名称</FromLabel>,
             field: 'name'
-        }]
+        }, {
+            component: 'Label',
+            label: <FromLabel><span style={{ color: 'red' }}>*</span>分类规格</FromLabel>,
+            props: {
+                value: [],
+            },
+            render: (val, vals) => {
+                return (
+                    <div>
+                        {
+                            val.map((i: MukaOS.GoodsClassifySpecs, index: number) => {
+                                return <ATag key={index} closable onClose={(e) =>{
+                                    e.preventDefault()
+                                    this.handleClean(index)
+                                }}>{i.name}</ATag>
+                            })
+                        }
+                    </div>
+                )
+            },
+            extend: <AddClass onClick={this.addPrice}>+添加</AddClass>,
+            field: 'specs'
+        },]
         return items
     }
 
     private getItems = (fn: IFormFun) => {
-        const { parents } = this.state
         this.fn = fn
         const items: IFormItem[] = [{
             component: 'NULL',
@@ -307,6 +401,21 @@ class ShopList extends Component<IProps, IState> {
         return items
     }
 
+    private addPrice = () => {
+        this.setState({
+            specsVisible: true,
+            priceName: '添加规格'
+        })
+    }
+
+    private handleClean = (index: number) => {
+        if (this.classifyFn) {
+            const classif = this.classifyFn.getFieldValue()
+            classif.specs.splice(index, 1)
+            this.classifyFn.setFieldValue(classif)
+        }
+    }
+
     private handleAssets = (val: MukaOS.Assets[]) => {
         this.setState({
             assets: val,
@@ -323,11 +432,31 @@ class ShopList extends Component<IProps, IState> {
 
 
 
-    private handleAddClassifyClose = () => {
-        this.setState({
-            classifyVisible: false,
-        })
-        this.fn && this.fn.cleanFieldValue()
+    private handleAddSpace = () => {
+        if (this.specsFn) {
+            const data = this.specsFn.getFieldValue()
+            if (!data.name) {
+                message.error('请输入规格名称')
+                return
+            }
+            if (!data.price) {
+                message.error('请输入规格价格')
+                return
+            }
+            if (!data.number) {
+                message.error('请输入规格数量')
+                return
+            }
+            if (this.classifyFn) {
+                const classif = this.classifyFn.getFieldValue()
+                classif.specs.push(data)
+                this.classifyFn.setFieldValue(classif)
+                this.specsFn.cleanFieldValue()
+                this.setState({
+                    specsVisible: false,
+                })
+            }
+        }
     }
 
 
@@ -357,7 +486,7 @@ class ShopList extends Component<IProps, IState> {
                                 status = true
                                 formData.append(`file[]`, v.file);
                             } else {
-                                ids.push({id: v.data.id})
+                                ids.push({ id: v.data.id })
                             }
                         })
                     }
@@ -443,7 +572,6 @@ class ShopList extends Component<IProps, IState> {
     }
 
     private handleEdit = (data: MukaOS.Goods) => {
-        console.log(data)
         this.setState({
             visible: true,
             visibleName: '修改商品'
@@ -451,12 +579,12 @@ class ShopList extends Component<IProps, IState> {
             setTimeout(() => {
                 this.fn && this.fn.setFieldValue({
                     ...data,
-                     assets: data.assets.map((i) => {
-                         return {
-                             url: i.url, 
-                             data: i,
-                         }
-                     })
+                    assets: data.assets.map((i) => {
+                        return {
+                            url: i.url,
+                            data: i,
+                        }
+                    })
                 })
             }, 10)
         })

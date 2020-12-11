@@ -25,7 +25,9 @@ import NoticeThemeData from './NoticeThemeData'
 import GridThemeData from './GridThemeData'
 import GirdThemeData from './GirdThemeData'
 import RangePickerThemeData from './RangePickerThemeData'
-import { TableThemeData } from '.'
+import DatePickerThemeData from './DateThemeData'
+import TableThemeData from './TableThemeData'
+import SwitchThemeData from './SwitchThemeData'
 
 export type IUnit = 'px' | 'rem'
 
@@ -39,6 +41,7 @@ interface IThemeDataProps {
     buttonTheme?: ButtonThemeData
     iconTheme?: IconThemeData
     borderRadius?: BorderRadius
+    datePickerTheme?: DatePickerThemeData
     dialogColor?: number
     fontSize?: number
     inputTheme?: InputThemeData
@@ -64,6 +67,7 @@ interface IThemeDataProps {
     rangePickerTheme?: RangePickerThemeData
     tableTheme?: TableThemeData
     girdTheme?: GirdThemeData
+    switchTheme?: SwitchThemeData
 }
 
 export default class ThemeData {
@@ -100,8 +104,10 @@ export default class ThemeData {
             if (data.noticeTheme) this.noticeTheme = data.noticeTheme
             if (data.gridTheme) this.gridTheme = data.gridTheme
             if (data.rangePickerTheme) this.rangePickerTheme = data.rangePickerTheme
+            if (data.datePickerTheme) this.datePickerTheme = data.datePickerTheme
             if (data.tableTheme) this.tableTheme = data.tableTheme
             if (data.disabledColor) this.disabledColor = data.disabledColor
+            if (data.switchTheme) this.switchTheme = data.switchTheme
         }
     }
 
@@ -128,6 +134,8 @@ export default class ThemeData {
     public fontSize: number = 12
 
     public dialogTheme: DialogThemeData = new DialogThemeData()
+
+    public datePickerTheme: DatePickerThemeData = new DatePickerThemeData()
 
     public buttonTheme: ButtonThemeData = new ButtonThemeData()
 
@@ -176,6 +184,8 @@ export default class ThemeData {
     public tableTheme: TableThemeData = new TableThemeData()
 
     public girdTheme: GirdThemeData = new GirdThemeData()
+
+    public switchTheme: SwitchThemeData = new SwitchThemeData()
 
     public unit: IUnit = 'rem'
 

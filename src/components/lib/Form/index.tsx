@@ -18,6 +18,7 @@ import { ISelectProps } from '../Select'
 import { ICheckBoxProps } from '../CheckBox'
 import { IEditorProps } from '../Editor'
 import { IItemProps } from '../Item'
+import { ISwitchProps } from '../Switch'
 import { ColorResult } from 'react-color'
 import styled from 'styled-components'
 
@@ -25,8 +26,8 @@ interface IFormUpload extends IUploadProps {
     label?: string | JSX.Element
 }
 
-type component = 'Colors' | 'Input' | 'Button' | 'Radio' | 'DatePicker' | 'Upload' | 'RangePicker' | 'NULL' | 'Label' | 'RadioGroup' | 'Select' | 'AsyncSelect' | 'Map' | 'Textarea' | 'Carousel' | 'Slider' | 'CheckBox' | 'Editor' | 'TimePicker' | 'Upload' | 'Item' | 'ItemInput' | 'Dragger'
-type props = RadioGroupProps | IInputProps | IButtonProps | ILDatePicker | IFormUpload | IMapProps | ICarouselProps | ITextareaProps | IColorsProps | ISelectProps | ICheckBoxProps | IEditorProps | TimePickerProps | IItemProps | undefined
+type component = 'Colors' | 'Input' | 'Button' | 'Radio' | 'DatePicker' | 'Upload' | 'RangePicker' | 'NULL' | 'Label' | 'RadioGroup' | 'Select' | 'AsyncSelect' | 'Map' | 'Textarea' | 'Carousel' | 'Slider' | 'CheckBox' | 'Editor' | 'TimePicker' | 'Upload' | 'Item' | 'ItemInput' | 'Dragger' | 'Switch'
+type props = RadioGroupProps | IInputProps | IButtonProps | ILDatePicker | IFormUpload | IMapProps | ICarouselProps | ITextareaProps | IColorsProps | ISelectProps | ICheckBoxProps | IEditorProps | TimePickerProps | IItemProps | ISwitchProps | undefined
 
 export interface IFormItem {
     component: component
@@ -371,6 +372,7 @@ export default class Form extends Component<IFormProps, IState> {
             case 'TimePicker': return loadableComponent(import('antd/lib/time-picker'))
             case 'Item': return loadableComponent(import('../Item'))
             case 'ItemInput': return loadableComponent(import('../Item'))
+            case 'Switch': return loadableComponent(import('../Switch'))
             default: return null
         }
     }
@@ -638,17 +640,44 @@ export default class Form extends Component<IFormProps, IState> {
                     <FormItem className={`flex_justify ${className || ''}`} key={field}>
                         <div className="flex">
                             {label ? (isFunction(label) ? label(vals) : <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>) : null}
-                            <div className="flex_1 flex">
+                            <div className="flex_1 flex_justify">
                                 <View
                                     {...vProps}
                                     key={field}
-                                    className={`flex_1 ${_porps.className || ''}`}
+                                    className={`${_porps.className || ''}`}
                                     value={vals[field] ? moment(vals[field]) : null}
                                     onChange={this.setDatePickerVal.bind(this, field, onChange)}
                                 />
                             </div>
+                            <div className="flex_center">{isFunction(extend) ? extend(vals) : extend}</div>
                         </div>
                         {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
+
+                    </FormItem>
+                )
+            }
+            case 'Switch': {
+                const vProps = omit(props, ['onChange', 'className'])
+                const _porps: any = props
+                const onChange: any = _porps.onChange
+                return (
+                    <FormItem className={`flex_justify ${className || ''}`} key={field}>
+                        <div className="flex">
+                            {label ? (isFunction(label) ? label(vals) : <FormItemLabel spacing={labelSpacing} className="flex_justify">{label}</FormItemLabel>) : null}
+                            <div className="flex_1 flex_justify">
+                                <div>
+                                    <View
+                                        {...vProps}
+                                        key={field}
+                                        checked={vals[field]}
+                                        onChange={this.setRVal.bind(this, field, onChange)}
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex_center">{isFunction(extend) ? extend(vals) : extend}</div>
+                        </div>
+                        {additional ? isFunction(additional) ? additional(vals) : <div className={getClassName(`${prefixClass}__additional flex_justify`)}>{additional}</div> : null}
+
                     </FormItem>
                 )
             }

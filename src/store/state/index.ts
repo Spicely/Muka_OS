@@ -77,11 +77,29 @@ export namespace MukaOS {
         status: boolean
         children?: MukaOS.Region[]
     }
+    
+    export interface GoodsClassify {
+        name: string
+        specs: MukaOS.GoodsClassifySpecs[]
+        status: boolean
+        createdAt: string
+        updatedAat: string
+    }
+    export interface GoodsClassifySpecs {
+        name: string
+        price: number
+        createdAt: string
+        number: number
+        id: number
+        status: boolean
+        updatedAat: string
+    }
     export interface Goods {
         address: any
         assets: MukaOS.Assets[]
         created_at: string
         deposit: number
+        classify: MukaOS.GoodsClassify[]
         id: number
         name: string
         status: number
